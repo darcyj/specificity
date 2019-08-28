@@ -1,0 +1,19 @@
+Package: specificity
+Title: Calculate Environmental or Host Phylogenetic Specificity
+Version: 0.0.0.9000
+Authors@R: person(given=c("John", "L"), family="Darcy", email = "darcyj@colorado.edu", role = c("aut", "cre"))
+Description: The purpose of this package is to calculate phylogenetic and environmental specificity of species. I wrote this software to analyze specificity of microbes to hosts or to environment, but there is no reason that this software wouldn't work with macroorganisms as well. The mathematics for the standardized effect size of phylogenetic specificity were adapted from Poulin et al. (2011). See: Poulin R, Krasnov BR, Mouillot D (2011) Host specificity in phylogenetic and geographic space. Trends in Parasitology 27(8): 355-361.
+License: GPL
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1
+Depends: 
+    ape,
+    geiger,
+    parallel
+Imports: 
+    Rcpp,
+    fields,
+    testthat
+LinkingTo: 
+    Rcpp

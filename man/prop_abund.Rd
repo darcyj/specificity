@@ -5,7 +5,7 @@
 \title{prop_abund}
 \usage{
 prop_abund(m, to_int = FALSE,
-  max_int = floor(sqrt(.Machine$integer.max)))
+  max_int = floor(sqrt(.Machine$integer.max)), speciesRows = FALSE)
 }
 \arguments{
 \item{m}{matrix or data frame of numeric values. Columns represent 
@@ -19,6 +19,9 @@ precision (DEFAULT: FALSE).}
 \item{max_int}{integer. Maximum integer value used for to_int. If pairwise
 geometric means will be calculated with these data, it is nice to keep this
 value as the square root of the maximum integer size, which is the default.}
+
+\item{speciesRows}{logical. Do rows represent species (instead of samples)? 
+(DEFAULT:FALSE)}
 }
 \value{
 matrix of proportional abundances.

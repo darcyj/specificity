@@ -32,6 +32,7 @@ setwd(packwd)
 # run test code
 library(testthat)
 setwd("tests/")
+### doing tests can take a minute! ###
 capture.output(test_check("specificity"), file="../test_results.txt", split=TRUE)
 setwd(packwd)
 

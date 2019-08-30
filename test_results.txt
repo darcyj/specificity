@@ -1,1 +1,2 @@
-══ testthat results  ═══════════════════════════════════════════════════════════[ OK: 31 | SKIPPED: 0 | WARNINGS: 0 | FAILED: 0 ]
+══ testthat results  ═══════════════════════════════════════════════════════════
+[ OK: 31 | SKIPPED: 0 | WARNINGS: 0 | FAILED: 0 ]

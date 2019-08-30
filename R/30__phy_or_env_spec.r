@@ -331,7 +331,7 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 				FUN=spec_fun, extras=extra_inputs))
 			if(verbose){setTxtProgressBar(pb, b)}
 		}
-		close(pb) # to kill of progress bar
+		if(verbose){close(pb)} # to kill of progress bar
 		#specs_sim <- unlist(lapply_fun(X=perm_cols, FUN=spec_fun, extras=extra_inputs))
 		# turn it into a matrix, where each row is a simulation, and each column is a species.
 		specs_sim_mat <- matrix(specs_sim, ncol=ncol(abunds_mat), byrow = TRUE )
@@ -347,7 +347,7 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 			specs_sim_mat[i,] <- unlist(lapply_fun(X=perm_cols, FUN=spec_fun, extras=extra_inputs))
 			if(verbose){setTxtProgressBar(pb, i)}
 		}
-		close(pb)# to kill of progress bar
+		if(verbose){close(pb)}# to kill of progress bar
 	}
 
 	# use spec_fun on empirical data

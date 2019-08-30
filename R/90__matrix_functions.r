@@ -14,7 +14,8 @@
 #' @param max_int integer. Maximum integer value used for to_int. If pairwise
 #'   geometric means will be calculated with these data, it is nice to keep this
 #'   value as the square root of the maximum integer size, which is the default.
-#'
+#' @param speciesRows logical. Do rows represent species (instead of samples)? 
+#'   (DEFAULT:FALSE)
 #' @return matrix of proportional abundances.
 #'
 #' @examples
@@ -30,13 +31,15 @@
 #' plot(m_int[random_positions] ~ m_dbl[random_positions])
 #' 
 #' @export
-prop_abund <- function(m, to_int=FALSE, max_int=floor(sqrt(.Machine$integer.max))){
+prop_abund <- function(m, to_int=FALSE, max_int=floor(sqrt(.Machine$integer.max)), speciesRows=FALSE){
+	if(speciesRows){m <- t(m)}
 	totals <- matrix(rep(rowSums(m), ncol(m)), nrow=nrow(m))
 	m_out <- m / totals
 	if(to_int){
 		m_out <- matrix(as.integer(m_out * max_int), nrow=nrow(m_out))
 		dimnames(m_out) <- dimnames(m)
 	}
+	if(speciesRows){m_out <- t(m_out)}
 	return(m_out)
 }
 

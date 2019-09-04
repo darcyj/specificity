@@ -38,7 +38,46 @@ As you can see, there are 3 objects inside 'endophyte'.
 * supertree: a phylogenetic tree of host plants.
 
 ## Pre-processing of 'endophyte' data
-Like most statistics, specificity is useless with a low sample size. In the case of specificity, this 'sample size' is the occupancy of a species, or how many samples that species was observed in. Here, we will create a new table containing only species that observed in at least 10 samples. Before we do this, we must also transform the data to proportional abundances, so that each species' observation data are a proportion of the total data, instead of a proportion of the data with rare species excluded. 
+Like most statistics, specificity is useless with a low sample size. In the case of specificity, this 'sample size' is the occupancy of a species, or how many samples that species was observed in. Here, we will create a new table containing only species that observed in at least 10 samples. Before we do this, we must also transform the data to proportional abundances, so that each species' observation data are a proportion of the total sample depth, instead of a proportion of the data with rare species excluded. Note that a CLR transformation could be used in place of this proportional transformation, or an ALR transformation could be used in the case where a known invariant species was added experimentally. 
 ```{r echo = T}
-zotutable_less <- occ_threshold
+# transform to proportional abundance
+zt_p <- prop_abund(zotutable, speciesRows=FALSE)
+# apply occupancy threshold to remove low-occupancy species
+zt_p_ovr10 <- occ_threshold(zt_p, threshold=10)
+# how many species are we left with?
+ncol(zt_p_ovr10)
+```
+
+## Specificity analysis
+Calculating specificity for various data types is fairly easy with this package. In this example, we will analyze specificity to elevation, rainfall, host plant phylogeny, and geographic distance. In the function `phy_or_env_spec()`, the `n_sim` argument determines the number of simulations (i.e. permutations) to do. The default value is 1000, but so that this vignette runs more quickly we will use 300 instead. Each analysis below should take 1 or 2 minutes to complete. When you run them, you will see status updates that are ommitted in this vignette for the sake of brevity.
+```{r echo = T, results = 'hide'}
+# specificity for elevation:
+elev_spec <- phy_or_env_spec(zt_p_ovr10, env=metadata$Elevation, n_sim=300, n_cores=3)
+# specificity for rainfall
+rain_spec <- phy_or_env_spec(zt_p_ovr10, env=metadata$Rainfall, n_sim=300, n_cores=3)
+# specificity for evapotranspiration
+evap_spec <- phy_or_env_spec(zt_p_ovr10, env=metadata$Evapotranspiration, n_sim=300,
+	n_cores=3)
+# specificity for host phylogeny
+host_spec <- phy_or_env_spec(zt_p_ovr10, hosts=metadata$PlantGenus, 
+	hosts_phylo=supertree, n_sim=300, n_cores=3)
+# specificity for geographic distance
+geo_distmat <- distcalc(lat=metadata$Lat, lng=metadata$Lon, sampIDs=metadata$SampleID)
+geo_spec <- phy_or_env_spec(zt_p_ovr10, env=geo_distmat, n_sim=300, n_cores=3)
+
+```
+
+## Visualization
+Our built-in visualization function takes a list of results from `phy_or_env_spec()` as input, and produces a violin plot composed of bars colored by statistical significance. The names of items within `specs_list` will be the labels used in the plot.
+```{r}
+plot_specificities(specs_list=list(
+	"Elevation"=elev_spec,
+	"Rainfall"=rain_spec,
+	"Evapotranspiration"=evap_spec,
+	"Host Plant"=host_spec,
+	"Geographic Distance"=geo_spec
+), n_bins=60)
+
+
+
 ```

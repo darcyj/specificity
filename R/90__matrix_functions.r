@@ -124,12 +124,11 @@ random_rep_positions <- function(x, nbins=50){
 #' 
 #' @export
 distcalc <- function(lat, lng, sampIDs=NULL){
-	require(fields)
 	longlats <- data.frame(lng, lat)
 	if(!is.null(sampIDs)){
 		rownames(longlats) <- sampIDs
 	}
-	distmat=rdist.earth(as.matrix(longlats), miles=F, R=NULL) 
+	distmat=fields::rdist.earth(as.matrix(longlats), miles=F, R=NULL) 
 	return((distmat))
 }
 

@@ -35,33 +35,34 @@ spec_results <- phy_or_env_spec(
 	abunds_mat = data.frame(z_flat, z_elev_lo, z_elev_med, z_elev_hi,
 		z_elev_lo_all, z_elev_med_all, z_elev_hi_all),
 	env = metadata$Elevation,
-	n_sim = 1000,
+	n_sim = 100,
 	n_cores = 10,
-	verbose=FALSE
+	verbose=FALSE,
+	p_method="raw"
 )
 
-test_that("flat otu SES is zero", {
-	expect_identical(0, round(spec_results$SES[1], 4))
+test_that("flat otu Specificity is zero", {
+	expect_identical(0, round(spec_results$Spec[1], 4))
 })
 
 test_that("flat otu pval is 1", {
 	expect_identical(1, spec_results$Pval[1])
 })
 
-test_that("SES follows lo < med < hi sims", { expect_true(all(c(
-	spec_results$SES[2] < spec_results$SES[3],
-	spec_results$SES[3] < spec_results$SES[4]
+test_that("Spec follows lo < med < hi sims", { expect_true(all(c(
+	spec_results$Spec[2] < spec_results$Spec[3],
+	spec_results$Spec[3] < spec_results$Spec[4]
 )))})
 
-test_that("SES follows lo < med < hi sims with 1 added", {expect_true(all(c(
-	spec_results$SES[5] < spec_results$SES[6],
-	spec_results$SES[6] < spec_results$SES[7]
+test_that("Spec follows lo < med < hi sims with 1 added", {expect_true(all(c(
+	spec_results$Spec[5] < spec_results$Spec[6],
+	spec_results$Spec[6] < spec_results$Spec[7]
 )))})
 
-test_that("SES sensitive to occupancy as expected",{expect_true(all(c(
-	spec_results$SES[2] < spec_results$SES[5],
-	spec_results$SES[3] < spec_results$SES[6],
-	spec_results$SES[4] < spec_results$SES[7]
+test_that("Spec sensitive to occupancy as expected",{expect_true(all(c(
+	spec_results$Spec[2] < spec_results$Spec[5],
+	spec_results$Spec[3] < spec_results$Spec[6],
+	spec_results$Spec[4] < spec_results$Spec[7]
 )))})
 
 test_that("non-square env matrix gives error", {expect_error(

@@ -4,7 +4,7 @@
 \alias{pval_from_perms}
 \title{pval_from_perms}
 \usage{
-pval_from_perms(emp, perm, tails, threshold = 100)
+pval_from_perms(emp, perm, tails, method = "MASS_fit", threshold = 30)
 }
 \arguments{
 \item{emp}{Numeric scalar. An empirical test statistic value.}
@@ -20,8 +20,24 @@ from permuted data.}
   \item{0:}{No test, P=1.}
 }}
 
+\item{method}{string. Method by which P should be calculated from perms:
+\item{raw:}{
+  P is calculated as the sum of sim values more extreme than the empirical
+  value plus one, divided by the number of sim values. 
+}
+\item{MASS_fit:}{
+  P is calculated by fitting a normal distribution to sim values, using the
+  MASS package, and calculating area under the curve from (-inf,emp] or 
+  [emp,inf) depending on tailedness.
+}
+\item{dumb_fit:}{
+  Same as MASS_fit, except a quick-and-dirty fit is used, which is just using
+  mean and sd of sim values. Actually slower than MASS_fit somehow. Only to
+  be used if MASS_fit isn't working or if you can't install MASS.
+}}
+
 \item{threshold}{integer. Minimum number n of non-NA values in perm that are
-acceptable. If n < threshold, P=NA (DEFAULT: 100).}
+acceptable. If n < threshold, P=NA (DEFAULT: 50).}
 }
 \value{
 a P-value.

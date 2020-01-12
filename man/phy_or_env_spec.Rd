@@ -7,8 +7,8 @@
 phy_or_env_spec(abunds_mat, env = NULL, hosts = NULL,
   hosts_phylo = NULL, n_sim = 1000, sim_fun = function(m) {    
   m[sample(1:nrow(m)), ] }, p_adj = "fdr", seed = 1234567, tails = 1,
-  n_cores = 2, verbose = TRUE, lowmem = FALSE, vec_wvar = FALSE,
-  phy_ent = FALSE, denom_type = "global_unif")
+  n_cores = 2, verbose = TRUE, lowmem = FALSE, p_method = "raw",
+  denom_type = "flat", diagnostic = F)
 }
 \arguments{
 \item{abunds_mat}{matrix or data frame of numeric values. Columns represent 
@@ -53,71 +53,67 @@ set to 1, lapply will be used instead of mclapply (DEFAULT: 2).}
 
 \item{verbose}{logical. Should status messages be displayed? (DEFAULT: TRUE).}
 
-\item{lowmem}{logical. Should this function be run in a way that saves memory?
-If TRUE, will run FAR slower but use almost no ram. If FALSE, lots of ram is
-used but it will run quickly. For example, on an 800x1600 matrix, with nperm=
-1000, n_cores=12 and lowmem=F, will use roughly 90 GB ram but finish in one
-minute. With the same settings but lowmem=T, will use less than 1 GB ram but 
-take over an hour. A progress bar is shown if TRUE (DEFAULT: FALSE).}
+\item{p_method}{string. method argument to pval_from_perms (DEFAULT: "raw").}
 
-\item{vec_wvar}{logical. For vector input, should old weighted-variance approach
-be used instead of transforming the vector into a euclidean distance matrix?
-(DEFAULT: FALSE).}
-
-\item{phy_ent}{logical. For phylogenetic input, should SES of phylogenetic
-entropy be used instead of trandforming the phylogeny into patristic distances
-using tree2mat? (DEFAULT: FALSE).}
-
-\item{denom_type}{string. Type of denominator (d) to use for SES. SES is the 
-difference between empirical and mean simulated specificity, divided by d
-(DEFAULT: global_unif).
+\item{denom_type}{string. Type of denominator (d) to use (DEFAULT: "flat"). Note
+that denominator type does NOT affect P-values.
 \describe{
   \item{species_sim:}{
     d for species s is calculated as the standard deviation of specificities
-    calculated from permuted abundances of s. This makes SES of specificity
+    calculated from permuted abundances of s. This makes the output specificity
+    a standardized effect size (SES). Unfortunately, this makes SES of specificity
     counterintuitively sensitive to occupancy, where species with high occupancy
     have more extreme SES of specificity than rare species, due to their more 
     deterministic sim specificities. Not suggested.
   }
-  \item{global_sim:}{
-    d is same for all species. Calculated as standard deviation of all
-    specificities calculated from permuted species. SES is much less sensitive
-    to occupancy, and intuitively, species with greater occupancy have less
-    extreme SES of specificity than rare species. However, using this d makes
-    results from different abundance matrices NOT comparable, because d is a
-    function of the distribution of species distributions unique to abunds_mat.
-    Results for different variables and the same abundance matrix are still 
-    comparable, though (obviously using same denom_type and other parameters).
-  }
   \item{global_unif:}{
-    d is same for all species. Calculated as variability in specificity under
-    random uniform distribution (beta 1,1) of species abunds. This d is 
-    comparable between different abundance matrices and between different
-    variables. SES results using this denom_type are NOT comparable with results
-    from any other. Due to its stability, this is the default option.
+    d is same for all species. Calculated as variability in RQE* under random
+    uniform distribution (beta 1,1) of species abunds. This d is comparable between
+    different abundance matrices and between different variables. Specificity is an
+    SES using this denom_type, but is NOT comparable with results from any other.
+    Fairly sensitive to sample size (number of data points per species), so this is
+    a better option than species_sim if you really want units of SDs, but is still
+    not suggested.
   }
   \item{raw:}{
-    d is 1 for all species, so SES is not actually standardized (although the
-    column label in output data will still be "SES"). This option only exists
-    for diagnostic purposes, since units of this metric are incomprehensible.
+    d is 1 for all species, so output specificity has units of distance, i.e. the
+    raw difference between empirical and simulated RQE*. This means that results
+    from different variables are not comparable, since it is not scale-invariant to
+    env or hosts_phylo. It IS still scale-invariant to the species weights in 
+    aunds_mat. Not sensitive to number of samples. Not suggested because units are
+    strange, and isn't comparable between variables.
+  }
+  \item{flat:}{
+    d is RQE* calculated for a flat abundance distribution, i.e. all abundances = 1.
+    Since RQE* is a weighted mean, this simplifies d to the mean of unique pairwise
+    distances in env or in the matrix decomposition of hosts_phylo. While that
+    species distribution may seem (and is) arbitrary, this d has useful properties:
+    scale invariance to abunds_mat, scale invariance to env/hosts_phylo,
+    insensitivity to number of samples, insensitivity to occupancy, and strong
+    sensitivity to specificity. Interpretation of results is similar to common SES
+    approaches in that specificity is negative, null is 0, and positive results
+    indicate overdispersion. Default. 
   }
 }}
+
+\item{diagnostic}{logical. If true, changes output to include different parts of SES. This
+   includes Pval, SES, raw, denom, emp, and all sim values with column labels as
+simN where N is the number of sims (DEFAULT: FALSE)}
 }
 \value{
 data.frame where each row is an input species. First column is P-value
-  ($Pval), second column is SES ($SES).
+  ($Pval), second column is specificity ($Spec).
 }
 \description{
-Calculates standardized effect size (SES) of species' specificity to either
-a 1-dimensional variable (vector), 2-dimensional variable (matrix), or to
-a phylogeny. Default operation is to transform all variable input types into a 
-matrix M, and calculate specificity as SES of the empirical sum of M
-weighted by weights matrix W. W is a matrix of pair-wise products of species
-species abundances (Rao's quadratic entropy). Optionally, host phylogenetic
-specificity can be calculated per Poulin et al. (2011) using weighted 
-phylogenetic entropy, and specificity to 1-dimensional data can be calculated
-using a weighted variance approach. These approaches are included mainly for
-comparative methodological purposes.
+Calculates species' specificities to either a 1-dimensional variable (vector), 
+2-dimensional variable (matrix), or to a phylogeny. Transforms all variable
+input types into a matrix D, and calculates specificity by comparing empirical
+RQE* (weighted mean of D's lower triangle and unique pairwise products of 
+species abundances) to simulated RQE* (same but with permuted abundances). This
+"raw" specificity is then divided by some denominator d in order to standardize
+it such that specificities can be compared between different species and
+different variables. Values closer to 0 indicate random assortment (null
+hypothesis), and more negative values indicate stronger specificity.
 }
 \examples{
 # phylogenetic specificity using endophyte data set
@@ -143,10 +139,10 @@ ses_host_vaz <- phy_or_env_spec(
 )
 
 # compare naive permutation vs. vazquez:
-plot(ses_host$SES, ses_host_vaz$SES, ylab="bipartite::vaznull", xlab="naive")
+plot(ses_host$Spec, ses_host_vaz$Spec, ylab="bipartite::vaznull", xlab="naive")
 abline(h=0);abline(v=0)
-hist(ses_host_vaz$SES)
-hist(ses_host$SES)
+hist(ses_host_vaz$Spec)
+hist(ses_host$Spec)
 
 # environmental specificity using elevation from endophyte data set:
 ses_elev <- phy_or_env_spec(

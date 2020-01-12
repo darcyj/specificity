@@ -1,15 +1,14 @@
 #' phy_or_env_spec
 #'
-#' Calculates standardized effect size (SES) of species' specificity to either
-#' a 1-dimensional variable (vector), 2-dimensional variable (matrix), or to
-#' a phylogeny. Default operation is to transform all variable input types into a 
-#' matrix M, and calculate specificity as SES of the empirical sum of M
-#' weighted by weights matrix W. W is a matrix of pair-wise products of species
-#' species abundances (Rao's quadratic entropy). Optionally, host phylogenetic
-#' specificity can be calculated per Poulin et al. (2011) using weighted 
-#' phylogenetic entropy, and specificity to 1-dimensional data can be calculated
-#' using a weighted variance approach. These approaches are included mainly for
-#' comparative methodological purposes. 
+#' Calculates species' specificities to either a 1-dimensional variable (vector), 
+#' 2-dimensional variable (matrix), or to a phylogeny. Transforms all variable
+#' input types into a matrix D, and calculates specificity by comparing empirical
+#' RQE* (weighted mean of D's lower triangle and unique pairwise products of 
+#' species abundances) to simulated RQE* (same but with permuted abundances). This
+#' "raw" specificity is then divided by some denominator d in order to standardize
+#' it such that specificities can be compared between different species and
+#' different variables. Values closer to 0 indicate random assortment (null
+#' hypothesis), and more negative values indicate stronger specificity.
 #'
 #' @author John L. Darcy
 #' @references 
@@ -47,56 +46,54 @@
 #' @param n_cores integer. Number of CPU cores to use for parallel operations. If
 #'   set to 1, lapply will be used instead of mclapply (DEFAULT: 2).
 #' @param verbose logical. Should status messages be displayed? (DEFAULT: TRUE).
-#' @param lowmem logical. Should this function be run in a way that saves memory?
-#'   If TRUE, will run FAR slower but use almost no ram. If FALSE, lots of ram is
-#'   used but it will run quickly. For example, on an 800x1600 matrix, with nperm=
-#'   1000, n_cores=12 and lowmem=F, will use roughly 90 GB ram but finish in one
-#'   minute. With the same settings but lowmem=T, will use less than 1 GB ram but 
-#'   take over an hour. A progress bar is shown if TRUE (DEFAULT: FALSE).
-#' @param vec_wvar logical. For vector input, should old weighted-variance approach
-#'   be used instead of transforming the vector into a euclidean distance matrix?
-#'   (DEFAULT: FALSE).
-#' @param phy_ent logical. For phylogenetic input, should SES of phylogenetic
-#'   entropy be used instead of trandforming the phylogeny into patristic distances
-#'   using tree2mat? (DEFAULT: FALSE).
-#' @param denom_type string. Type of denominator (d) to use for SES. SES is the 
-#'   difference between empirical and mean simulated specificity, divided by d
-#'   (DEFAULT: global_unif).
+#' @param p_method string. method argument to pval_from_perms (DEFAULT: "raw").
+#' @param denom_type string. Type of denominator (d) to use (DEFAULT: "flat"). Note
+#'   that denominator type does NOT affect P-values.
 #'   \describe{
 #'     \item{species_sim:}{
 #'       d for species s is calculated as the standard deviation of specificities
-#'       calculated from permuted abundances of s. This makes SES of specificity
+#'       calculated from permuted abundances of s. This makes the output specificity
+#'       a standardized effect size (SES). Unfortunately, this makes SES of specificity
 #'       counterintuitively sensitive to occupancy, where species with high occupancy
 #'       have more extreme SES of specificity than rare species, due to their more 
 #'       deterministic sim specificities. Not suggested.
 #'     }
-#'     \item{global_sim:}{
-#'       d is same for all species. Calculated as standard deviation of all
-#'       specificities calculated from permuted species. SES is much less sensitive
-#'       to occupancy, and intuitively, species with greater occupancy have less
-#'       extreme SES of specificity than rare species. However, using this d makes
-#'       results from different abundance matrices NOT comparable, because d is a
-#'       function of the distribution of species distributions unique to abunds_mat.
-#'       Results for different variables and the same abundance matrix are still 
-#'       comparable, though (obviously using same denom_type and other parameters).
-#'     }
 #'     \item{global_unif:}{
-#'       d is same for all species. Calculated as variability in specificity under
-#'       random uniform distribution (beta 1,1) of species abunds. This d is 
-#'       comparable between different abundance matrices and between different
-#'       variables. SES results using this denom_type are NOT comparable with results
-#'       from any other. Due to its stability, this is the default option.
+#'       d is same for all species. Calculated as variability in RQE* under random
+#'       uniform distribution (beta 1,1) of species abunds. This d is comparable between
+#'       different abundance matrices and between different variables. Specificity is an
+#'       SES using this denom_type, but is NOT comparable with results from any other.
+#'       Fairly sensitive to sample size (number of data points per species), so this is
+#'       a better option than species_sim if you really want units of SDs, but is still
+#'       not suggested.
 #'     }
 #'     \item{raw:}{
-#'       d is 1 for all species, so SES is not actually standardized (although the
-#'       column label in output data will still be "SES"). This option only exists
-#'       for diagnostic purposes, since units of this metric are incomprehensible.
+#'       d is 1 for all species, so output specificity has units of distance, i.e. the
+#'       raw difference between empirical and simulated RQE*. This means that results
+#'       from different variables are not comparable, since it is not scale-invariant to
+#'       env or hosts_phylo. It IS still scale-invariant to the species weights in 
+#'       aunds_mat. Not sensitive to number of samples. Not suggested because units are
+#'       strange, and isn't comparable between variables.
+#'     }
+#'     \item{flat:}{
+#'       d is RQE* calculated for a flat abundance distribution, i.e. all abundances = 1.
+#'       Since RQE* is a weighted mean, this simplifies d to the mean of unique pairwise
+#'       distances in env or in the matrix decomposition of hosts_phylo. While that
+#'       species distribution may seem (and is) arbitrary, this d has useful properties:
+#'       scale invariance to abunds_mat, scale invariance to env/hosts_phylo,
+#'       insensitivity to number of samples, insensitivity to occupancy, and strong
+#'       sensitivity to specificity. Interpretation of results is similar to common SES
+#'       approaches in that specificity is negative, null is 0, and positive results
+#'       indicate overdispersion. Default. 
 #'     }
 #'   }
+#' @param diagnostic logical. If true, changes output to include different parts of SES. This
+#' 	 includes Pval, SES, raw, denom, emp, and all sim values with column labels as
+#'   simN where N is the number of sims (DEFAULT: FALSE)
 #'
 #'
 #' @return data.frame where each row is an input species. First column is P-value
-#'   ($Pval), second column is SES ($SES).
+#'   ($Pval), second column is specificity ($Spec).
 #'
 #' @examples
 #' # phylogenetic specificity using endophyte data set
@@ -122,10 +119,10 @@
 #' )
 #'
 #' # compare naive permutation vs. vazquez:
-#' plot(ses_host$SES, ses_host_vaz$SES, ylab="bipartite::vaznull", xlab="naive")
+#' plot(ses_host$Spec, ses_host_vaz$Spec, ylab="bipartite::vaznull", xlab="naive")
 #' abline(h=0);abline(v=0)
-#' hist(ses_host_vaz$SES)
-#' hist(ses_host$SES)
+#' hist(ses_host_vaz$Spec)
+#' hist(ses_host$Spec)
 #'
 #' # environmental specificity using elevation from endophyte data set:
 #' ses_elev <- phy_or_env_spec(
@@ -145,19 +142,19 @@
 phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL, 
 	hosts_phylo=NULL, n_sim=1000,  sim_fun=function(m){ m[sample(1:nrow(m)), ] }, 
 	p_adj="fdr", seed=1234567, tails=1, n_cores=2, verbose=TRUE, lowmem=FALSE, 
-	vec_wvar=FALSE, phy_ent=FALSE, denom_type="global_unif"){
+	p_method="raw", denom_type="flat", diagnostic=F){
 
 	# testing crap:
 	# abunds_mat = data.frame(z_flat, z_elev_lo, z_elev_med, 
 	#   z_elev_hi, z_elev_lo_all, z_elev_med_all, z_elev_hi_all)
 	# env = metadata$Elevation
-	# n_sim=1000
+	# n_sim=100
 	# n_cores=10
 	# hosts=NULL
 	# hosts_phylo=NULL; n_sim=1000
 	# sim_fun=function(m){ m[sample(1:nrow(m)), ] }
 	# p_adj="fdr"; seed=1234567; tails=1; verbose=TRUE; lowmem=FALSE
-	# vec_wvar=FALSE; phy_ent=FALSE; denom_type="global_unif"
+	# vec_wvar=FALSE; phy_ent=FALSE; denom_type="flat"
 	#   
 
 	require(ape)
@@ -171,128 +168,24 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 	if(! p_adj %in% p.adjust.methods){
 		stop("p_adj not in p.adjust.methods.")
 	}
-	# decide inputs type
-	env_prsnt <- !is.null(env)
-	hos_prsnt <- !is.null(hosts)
-	phy_prsnt <- !is.null(hosts_phylo)
-	if(env_prsnt && (hos_prsnt || phy_prsnt)){
-		stop("Too many inputs. Pick either env only, or hosts+hosts_phylo.")
-	}else if(env_prsnt && (is.matrix(env) || is.data.frame(env) || class(env) == "dist")){
-		# env present and it's 2-dimensional
-		# make sure env is numeric
-		if(!is.numeric(env)){
-			stop("env not numeric.")
-		}
-		# if it's a data.frame or matrix, make sure it's square
-		# and turn it into a dist
-		if(is.matrix(env) || is.data.frame(env)){
-			if(nrow(env) != ncol(env)){
-				stop("env is 2-dimensional, but not square.")
-			}else{
-				env <- as.dist(env)
-			}
-		}
-		data_type <- "dist"
-	}else if(env_prsnt && is.vector(env)){
-		# env present and it's a vector
-		# make sure env is numeric
-		if(!is.numeric(env)){
-			stop("env not numeric.")
-		}
-		data_type <- "vec"
-	}else if(hos_prsnt || phy_prsnt){
-		if(sum(hos_prsnt, phy_prsnt) < 2){
-			stop("both hosts AND hosts_phylo must be input for phylogenetic specificity.")
-		}
-		data_type <- "phy"
-	}else{
-		message(paste("Is env a vector?", is.vector(env)))
-		message(paste("Is env a matrix?", is.matrix(env)))
-		message(paste("Is env a data.frame?", is.data.frame(env)))
-		message(paste("Is env a dist?", (class(env) == "dist")))
-		message(paste("is hosts a vector?", is.vector(hosts)))
-		message(paste("is hosts a factor?", is.factor(hosts)))
-		message(paste("is hosts_phylo a tree?", is.phylo(hosts_phylo)))
-		stop("Type error with env, hosts, or hosts_phylo. See diagnostics above.")
-	}
+	data_type <- check_pes_inputs(abunds_mat, env, hosts, hosts_phylo, verbose)
+	if(data_type == "error"){stop()}
 
-	# check to make sure inputs are compatible
-	predict_distlength <- function(x){((x^2)-x) /2}
+
+	# turn it all into a dist, no matter what.
 	if(data_type == "phy"){
-		if(! all(hosts_phylo$tip.label %in% hosts)){
-			stop("Some hosts are missing from hosts_phylo.")
-		}else if(length(hosts) != nrow(abunds_mat)){
-			stop("hosts and abunds_mat have incompatible dimensions.")
-		}else if(any(grepl(";", x=hosts_phylo$tip.label))){
-			stop("hosts cannot contain semicolons.")
-		}
-	}else if (data_type == "vec"){
-		if(! is.numeric(env)){
-			stop("env is not numeric.")
-		}else if(length(env) != nrow(abunds_mat)){
-			stop("env and abunds_mat have incompatible dimensions.")
-		}
-	}else if(data_type == "dist"){
-		if(! is.numeric(env)){
-			stop("env is not numeric.")
-		}else if(length(env) != predict_distlength(nrow(abunds_mat))){
-			stop("env and abunds_mat have incompatible dimensions.")
-		}
-	}
-
-	# turn vector or phy input into dist and set data_type to dist unless 
-	# requested otherwise
-	if(data_type == "phy" && phy_ent == FALSE){
 		msg("Converting tree to dist.")
 		env <- tree2mat(tree=hosts_phylo, x=hosts, n_cores=n_cores, delim=";")
-		data_type <- "dist"
-	}else if(data_type == "vec" && vec_wvar == FALSE){
+	}else if(data_type == "vec"){
 		msg("Converting env vector to dist.")
 		env <- dist(env)
-		data_type <- "dist"
+	}else if(data_type == "mat"){
+		env <- as.dist(env)
 	}
 
-
-	# define specificity function
-	ns <- NULL # nested set for phy stuff
-	if(data_type == "phy"){
-		# if it's still phy, we're doing phylogenetic entropy. 
-		# go ahead and prune tree and make nsested set, too.
-		hosts_phylo <- keep.tip(hosts_phylo, hosts)
-		ns <- make_nested_set(hosts_phylo, n_cores)
-		# objects that spec_fun needs (other than abundance vector ab) 
-		# are put into a list called extra_inputs
-		extra_inputs <- list(hosts=hosts, hosts_phylo=hosts_phylo, ns=ns)
-		spec_fun <- function(ab, extras){
-			return(wpd(s=extras$hosts, s_phylo=extras$hosts_phylo, w=ab, nested_set=extras$ns, metric="Hp"))
-		}
-	}else if(data_type == "vec"){
-		# if data_type is still "vec", we're doing weighted variance approach. 
-		# need to define weighted variance function:
-		w_var <- function(x, w){
-			if(sum(w > 0) < 2){
-				return(NA)
-			}else{
-				return(sum(w * (x - weighted.mean(x,w))^2) / (sum(w) - (sum(w^2 / sum(w)))) )
-			}
-		}
-		# objects that spec_fun needs (other than abundance vector ab) 
-		# are put into a list called extra_inputs
-		extra_inputs <- list(env=env)
-		spec_fun <- function(ab, extras){
-			return(w_var(x=extras$env, w=ab))
-		}
-	}else if(data_type == "dist"){
-		# data_type is "dist", the default. 
-		# objects that spec_fun needs (other than abundance vector ab) 
-		# are put into a list called extra_inputs
-		# note that "env" on next line may be a phylo distmat or a euclidean dismat from a vector!!
-		extra_inputs <- list(env=env)
-		spec_fun <- function(ab, extras){
-			return(rao_quad_ent(d=extras$env, w=ab, raw=FALSE))
-		}
-	}else{
-		stop("mystery error - data type undefined.")
+	# define specificity function, necessary because rao_quad_ent has args in wrong order.
+	spec_fun <- function(ab, e){
+		return(rao_quad_ent(d=e, w=ab, raw=FALSE))
 	}
 
 	# make wrapper for lapply/mclapply so with cores=1 it just uses lapply
@@ -304,7 +197,6 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 	}
 
 	# generate n_sim daughter seeds for generation of each permuted matrix
-	msg("Generating daughter seeds.")
 	seeds <- daughter_seeds(n=n_sim, s=seed)
 
 	# function to generate matrix given seed:
@@ -312,48 +204,32 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 		set.seed(s)
 		return((sim_fun(abunds_mat)))
 	}
-	if(lowmem == FALSE){
-		# create n_sim permuted matrices, but convert them into a list of column vectors.
-		msg(paste("Creating", n_sim, "permuted matrices."))
-		perm_cols <- do.call("cbind", lapply_fun(X=seeds, FUN=perm_mat))
-		# turn list of matrices into a list of column vectors
-		perm_cols <- lapply(seq_len(ncol(perm_cols)), function(i){perm_cols[,i]})
+	# create n_sim permuted matrices, but convert them into a list of column vectors.
+	msg(paste("Creating", n_sim, "permuted matrices."))
+	perm_cols <- do.call("cbind", lapply_fun(X=seeds, FUN=perm_mat))
+	# turn list of matrices into a list of column vectors
+	perm_cols <- lapply(seq_len(ncol(perm_cols)), function(i){perm_cols[,i]})
 
-		# apply spec_fun to each column vector in perm_cols
-		msg("Calculating specificities for permuted matrices.")
-		# bs = batch size = number of seqs to process at a time
-		bs <- n_cores * 8
-		batches <- rep(1:bs, each=ceiling(length(perm_cols) / bs))[1:length(perm_cols)]
-		specs_sim <- rep(0, length(perm_cols))
-		if(verbose){pb <- txtProgressBar(min=0, max=bs, style=3)}
-		for(b in 1:bs){
-			specs_sim[batches==b] <- unlist(lapply_fun(X=perm_cols[batches==b], 
-				FUN=spec_fun, extras=extra_inputs))
-			if(verbose){setTxtProgressBar(pb, b)}
-		}
-		if(verbose){close(pb)} # to kill of progress bar
-		#specs_sim <- unlist(lapply_fun(X=perm_cols, FUN=spec_fun, extras=extra_inputs))
-		# turn it into a matrix, where each row is a simulation, and each column is a species.
-		specs_sim_mat <- matrix(specs_sim, ncol=ncol(abunds_mat), byrow = TRUE )
-	}else{
-		msg("Calculating specificities for permuted matrices (lomem).")
-		specs_sim_mat <- matrix(0, nrow=n_sim, ncol=ncol(abunds_mat))
-		if(verbose){pb <- txtProgressBar(min=0, max=n_sim, style=3)}
-		nc <- ncol(abunds_mat)
-		for(i in 1:n_sim){
-			# permute, adjust abunds_mat, and split it into list of columns.
-			pm <- perm_mat(seeds[i])
-			perm_cols <- lapply(seq_len(nc), function(i){pm[,i]})
-			specs_sim_mat[i,] <- unlist(lapply_fun(X=perm_cols, FUN=spec_fun, extras=extra_inputs))
-			if(verbose){setTxtProgressBar(pb, i)}
-		}
-		if(verbose){close(pb)}# to kill of progress bar
+	# apply spec_fun to each column vector in perm_cols
+	msg("Calculating specificities for permuted matrices.")
+	# bs = batch size = number of seqs to process at a time
+	bs <- n_cores * 8
+	batches <- rep(1:bs, each=ceiling(length(perm_cols) / bs))[1:length(perm_cols)]
+	specs_sim <- rep(0, length(perm_cols))
+	if(verbose){pb <- txtProgressBar(min=0, max=bs, style=3)}
+	for(b in 1:bs){
+		specs_sim[batches==b] <- unlist(lapply_fun(X=perm_cols[batches==b], 
+			FUN=spec_fun, e=env))
+		if(verbose){setTxtProgressBar(pb, b)}
 	}
+	if(verbose){close(pb)} # to kill of progress bar
+	# turn it into a matrix, where each row is a simulation, and each column is a species.
+	specs_sim_mat <- matrix(specs_sim, ncol=ncol(abunds_mat), byrow = TRUE )
 
 	# use spec_fun on empirical data
-	msg("Calculating empirical specificities.")
+	msg("Calculating empirical RQE*.")
 	emp_cols <- lapply(seq_len(ncol(abunds_mat)), function(i){abunds_mat[,i]})
-	specs_emp <- unlist(lapply_fun(X=emp_cols, FUN=spec_fun, extras=extra_inputs))
+	specs_emp <- unlist(lapply_fun(X=emp_cols, FUN=spec_fun, e=env))
 	# round specs_emp to 4 decimal places to match precision of cpp functions
 	specs_emp <- round(specs_emp, 4)
 
@@ -369,47 +245,61 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 	msg("Calculating P-values.")
 	Pval <- rep(-1, length(specs_emp))
 	for(i in 1:length(Pval)){
-		Pval[i] <- pval_from_perms(emp=specs_emp[i], perm=specs_sim_mat[,i], tails=tails)
+		Pval[i] <- pval_from_perms(emp=specs_emp[i], perm=specs_sim_mat[,i], 
+			tails=tails, method=p_method)
 	}
 	# adjust p-values
 	Pval <- p.adjust(Pval, method=p_adj)
 
 	# calculate SES
-	msg("Calculating SES.")
+	msg("Calculating specificities.")
 
 	# get denominator
-	if(denom_type == "global_sim"){
-		d <- sd(as.vector(specs_sim_mat))
-		denom <- rep(d, ncol(specs_sim_mat))
-	}else if(denom_type == "species_sim"){
+	if(denom_type == "species_sim"){
 		denom <- apply(X=specs_sim_mat, MAR=2, FUN=sd)
 	}else if(denom_type == "raw"){
 		denom <- rep(1, ncol(specs_sim_mat))
 	}else if(denom_type == "global_unif"){
-		# make option?
+		# todo: make option?
 		n_null <- 2000
 		dseeds <- daughter_seeds(n=n_null, s=seed)
 		make_null_col <- function(s, n_samp=nrow(abunds_mat)){
 			set.seed(s)
 			a <- runif(n_samp, min=0, max=1)
-			return(a/sum(a))
+			return(a)
 		}
 		null_cols <- lapply_fun(X=dseeds, FUN=make_null_col)
-		null_specs <- unlist(lapply_fun(X=null_cols, FUN=spec_fun, extras=extra_inputs))
+		null_specs <- unlist(lapply_fun(X=null_cols, FUN=spec_fun, e=env))
 		denom <- rep(sd(null_specs), ncol(specs_sim_mat))
+	}else if(denom_type == "flat"){
+		d <- spec_fun(rep(1, nrow(abunds_mat)), e=env)
+		denom <- rep(d, ncol(specs_sim_mat))
 	}else{
 		stop("Invalid denom_type.")
 	}
 
 	spec_sim_means <- apply(X=specs_sim_mat, MAR=2, FUN=mean)
-	SES <- (specs_emp - spec_sim_means)/denom
+	out_specs <- (specs_emp - spec_sim_means)/denom
 	
-
 	# format output object
-	output <- data.frame(Pval, SES)
+	output <- data.frame(Pval, Spec=out_specs)
 	# if col names were input, use them for output too.
 	if( !is.null(colnames(abunds_mat))){
 		rownames(output) <- colnames(abunds_mat)
+	}
+
+	# if diagnostic output is desired, add columns to output
+	if(diagnostic){
+		specs_sim_mat_named <- t(specs_sim_mat)
+		colnames(specs_sim_mat_named) <- paste0("sim", 1:ncol(specs_sim_mat_named))
+
+		output <- data.frame(output, 
+			raw=specs_emp - spec_sim_means,
+			emp=specs_emp,
+			sim_mean=spec_sim_means,
+			denom=denom,
+			specs_sim_mat_named
+		)
 	}
 
 	msg("Done.")
@@ -433,36 +323,61 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 #'     \item{3:}{Right tail only.}
 #'     \item{0:}{No test, P=1.}
 #'   }
+#' @param method string. Method by which P should be calculated from perms:
+#'     \item{raw:}{
+#'       P is calculated as the sum of sim values more extreme than the empirical
+#'       value plus one, divided by the number of sim values. 
+#'     }
+#'     \item{MASS_fit:}{
+#'       P is calculated by fitting a normal distribution to sim values, using the
+#'       MASS package, and calculating area under the curve from (-inf,emp] or 
+#'       [emp,inf) depending on tailedness.
+#'     }
+#'     \item{dumb_fit:}{
+#'       Same as MASS_fit, except a quick-and-dirty fit is used, which is just using
+#'       mean and sd of sim values. Actually slower than MASS_fit somehow. Only to
+#'       be used if MASS_fit isn't working or if you can't install MASS.
+#'     }
 #' @param threshold integer. Minimum number n of non-NA values in perm that are
-#'   acceptable. If n < threshold, P=NA (DEFAULT: 100).
+#'   acceptable. If n < threshold, P=NA (DEFAULT: 50).
 #'
 #' @return a P-value.
 #' 
 #' @export
-pval_from_perms <- function(emp, perm, tails, threshold = 100){
+pval_from_perms <- function(emp, perm, tails, method="MASS_fit", threshold=30){
+	require("MASS")
+	# check if number of perms is below threshold
 	n <- sum(!is.na(perm))
-	if(is.na(emp) || n <= threshold){
-		return(NA)
+	if(n < threshold){
+		LTP <- NA
+		RTP <- NA
+	}else if(method == "MASS_fit"){
+		# remove NAs
+		perm <- perm[!is.na(perm)]
+		# get fit for mean and sd
+		fit <- MASS::fitdistr(perm, densfun="normal")
+		est_mean <- fit$estimate[names(fit$estimate)=="mean"]
+		est_sd <- fit$estimate[names(fit$estimate)=="sd"]
+		# calculate P for right and left tails
+		LTP <- dnorm(x=emp, mean=est_mean, sd=est_sd)
+		RTP <- 1 - LTP
+	}else if(method == "raw"){
+		# remove NAs
+		perm <- perm[!is.na(perm)]
+		# calculate P for right and left tails
+		LTP <- (sum(perm < emp) + 1)/n
+		RTP <- (sum(perm > emp) + 1)/n
 	}else{
-		n_perm_blw <- sum(perm < emp)
-		n_perm_abv <- sum(perm > emp)
-		# if 0s, bump up to 1 because we don't actually know P=0
-		if(n_perm_blw < 1){n_perm_blw <- 1}
-		if(n_perm_abv < 1){n_perm_abv <- 1}
-		# P-value for each tails case
-		if(tails == 1){
-			# left tail only
-			return(n_perm_blw / n)
-		}else if(tails == 3){
-			# right tail only
-			return(n_perm_abv / n)
-		}else if(tails == 2){
-			# 2-tailed
-			return(min(c( n_perm_blw / n, n_perm_abv / n )))
-		}else{
-			# no test
-			return(1)
-		}
+		stop("Invalid method argument.")
+	}
+	if(tails == 1){
+		return(LTP)
+	}else if(tails == 3){
+		return(RTP)
+	}else if(tails == 2){
+		return(min(c(LTP, RTP)))
+	}else{
+		stop("Invalid tails argument.")
 	}
 }
 
@@ -484,3 +399,116 @@ daughter_seeds <- function(n,s=12345){
 	set.seed(s)
 	return(replicate(n, as.integer(paste(sample(0:9, nchar(s), replace=TRUE), collapse=""))))
 }
+
+
+#' check_pes_inputs
+#' 
+#' Function used by phy_or_env_spec. 
+#' checks abunds_mat, env, hosts, and hosts_phylo inputs to phy_or_env_spec to
+#' make sure there are no problems. This could include missing species in trees,
+#' incompatible dimensions, non-numeric inputs, etc. Returns an input type, which
+#' is just a string that can be "mat", "dist", "vec", "phy", or "error".
+#' 
+#' @param abunds_mat (required, see phy_or_env_spec)
+#' @param env (required, can be NULL, see phy_or_env_spec)
+#' @param hosts (required, can be NULL, see phy_or_env_spec)
+#' @param hosts_phylo (required, can be NULL, see phy_or_env_spec)
+#' @param verbose logical. Should status messages be displayed? (DEFAULT: TRUE).
+#' 
+#' @return string. either "mat", "dist", "vec", "phy", or "error".
+#' 
+#' @export
+check_pes_inputs <- function(abunds_mat, env, hosts, hosts_phylo, verbose=TRUE){
+	msg <- function(x){if(verbose){message(x)}}
+	# decide inputs type
+	env_prsnt <- !is.null(env)
+	hos_prsnt <- !is.null(hosts)
+	phy_prsnt <- !is.null(hosts_phylo)
+	if(env_prsnt && (hos_prsnt || phy_prsnt)){
+		# both env AND some phylogenetic stuff present, error!
+		data_type <- "error"
+		msg("Error: Too many inputs. Pick either env only, or hosts+hosts_phylo.")
+	}else if(env_prsnt && (is.matrix(env) || is.data.frame(env))){
+		# env present and it's 2-dimensional
+		data_type <- "mat"
+	}else if(env_prsnt && class(env) == "dist"){
+		# env present and it's a dist (LT from 2-dimensional)
+		data_type <- "dist"
+	}else if(env_prsnt && is.vector(env)){
+		# env present and it's a vector
+		data_type <- "vec"
+	}else if(env_prsnt && is.factor(env)){
+		data_type <- "error"
+		msg("Error: env is a factor.")
+	}else if(hos_prsnt && phy_prsnt){
+		# hosts and hosts_phylo present, it's phy
+		data_type <- "phy"
+	}else if(xor(hos_prsnt, phy_prsnt)){
+		# only one of hosts or hosts_phylo are present, but no env. error!
+		data_type <- "error"
+		msg("Error: Both hosts and hosts_phylo required for phylogenetic analysis.")
+	}else if(! env_prsnt || hos_prsnt){
+		# none of them are present!
+		data_type <- "error"
+		msg("Error: Either env or hosts is required.")
+	}else{
+		# mystery error!
+		data_type <- "error"
+		msg("Error: Mystery error.")
+	}
+
+	# check for errors specific to 2D data:
+	if(data_type %in% c("mat", "dist")){
+		# if it's a dist, just convert to mat. all same checks apply.
+		if(data_type == "dist"){
+			env <- as.matrix(env)
+		}
+		# is env numeric?
+		if(!is.numeric(env)){
+			data_type <- "error"
+			msg("Error: env not numeric.")
+		# is env square?
+		}else if(nrow(env) != ncol(env)){
+			data_type <- "error"
+			msg("Error: env is 2-dimensional, but not square.")
+		# is env same dim as abunds_mat?
+		}else if(nrow(env) != nrow(abunds_mat)){
+			data_type <- "error"
+			msg("Error: env and abunds_mat have incompatible dimensions.")
+		}
+	}
+
+	# check for errors specific to 1D env data:
+	if(data_type == "vec"){
+		# is env numeric?
+		if(!is.numeric(env)){
+			data_type <- "error"
+			msg("Error: env not numeric.")
+		# is env same dim as abunds_mat?
+		}else if(length(env) != nrow(abunds_mat)){
+			data_type <- "error"
+			msg("Error: env and abunds_mat have incompatible dimensions.")
+		}
+	}
+
+	# check for errors specific to phylogenetic data:
+	if(data_type == "phy"){
+		# are all the right tips in hosts_phylo?
+		if(! all(hosts %in% hosts_phylo$tip.label)){
+			data_type <- "error"
+			msg("Some hosts are missing from hosts_phylo.")
+		# is hosts the right length?
+		}else if(length(hosts) != nrow(abunds_mat)){
+			data_type <- "error"
+			msg("hosts and abunds_mat have incompatible dimensions.")
+		# do any hosts contain semicolons?
+		}else if(any(grepl(";", x=hosts_phylo$tip.label))){
+			data_type <- "error"
+			msg("hosts cannot contain semicolons.")
+		}
+	}
+
+	return(data_type)
+}
+
+

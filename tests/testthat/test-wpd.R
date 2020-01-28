@@ -9,7 +9,7 @@ test_that("wpd's pd metric matches simple branch sum", {
 	s <- sample(a$tip.label, 20)
 	wpd_result <- wpd(s,a, metric="PD")
 	mat_result <- sum(ape::keep.tip(a,s)$edge.length)
-	expect_true(wpd_result == mat_result)
+	expect_true(round(wpd_result, 3) == round(mat_result, 3))
 })
 
 test_that("wpd Hp matches manual calculation",{

@@ -8,7 +8,7 @@ phy_or_env_spec(abunds_mat, env = NULL, hosts = NULL,
   hosts_phylo = NULL, n_sim = 1000, sim_fun = function(m) {    
   m[sample(1:nrow(m)), ] }, p_adj = "fdr", seed = 1234567, tails = 1,
   n_cores = 2, verbose = TRUE, lowmem = FALSE, p_method = "raw",
-  denom_type = "flat", diagnostic = F)
+  denom_type = "index", matrix_tmax = 1, diagnostic = F)
 }
 \arguments{
 \item{abunds_mat}{matrix or data frame of numeric values. Columns represent 
@@ -55,49 +55,13 @@ set to 1, lapply will be used instead of mclapply (DEFAULT: 2).}
 
 \item{p_method}{string. method argument to pval_from_perms (DEFAULT: "raw").}
 
-\item{denom_type}{string. Type of denominator (d) to use (DEFAULT: "flat"). Note
-that denominator type does NOT affect P-values.
-\describe{
-  \item{species_sim:}{
-    d for species s is calculated as the standard deviation of specificities
-    calculated from permuted abundances of s. This makes the output specificity
-    a standardized effect size (SES). Unfortunately, this makes SES of specificity
-    counterintuitively sensitive to occupancy, where species with high occupancy
-    have more extreme SES of specificity than rare species, due to their more 
-    deterministic sim specificities. Not suggested.
-  }
-  \item{global_unif:}{
-    d is same for all species. Calculated as variability in RQE* under random
-    uniform distribution (beta 1,1) of species abunds. This d is comparable between
-    different abundance matrices and between different variables. Specificity is an
-    SES using this denom_type, but is NOT comparable with results from any other.
-    Fairly sensitive to sample size (number of data points per species), so this is
-    a better option than species_sim if you really want units of SDs, but is still
-    not suggested.
-  }
-  \item{raw:}{
-    d is 1 for all species, so output specificity has units of distance, i.e. the
-    raw difference between empirical and simulated RQE*. This means that results
-    from different variables are not comparable, since it is not scale-invariant to
-    env or hosts_phylo. It IS still scale-invariant to the species weights in 
-    aunds_mat. Not sensitive to number of samples. Not suggested because units are
-    strange, and isn't comparable between variables.
-  }
-  \item{flat:}{
-    d is RQE* calculated for a flat abundance distribution, i.e. all abundances = 1.
-    Since RQE* is a weighted mean, this simplifies d to the mean of unique pairwise
-    distances in env or in the matrix decomposition of hosts_phylo. While that
-    species distribution may seem (and is) arbitrary, this d has useful properties:
-    scale invariance to abunds_mat, scale invariance to env/hosts_phylo,
-    insensitivity to number of samples, insensitivity to occupancy, and strong
-    sensitivity to specificity. Interpretation of results is similar to common SES
-    approaches in that specificity is negative, null is 0, and positive results
-    indicate overdispersion. Default. 
-  }
-}}
+\item{matrix_tmax}{float. Theoretical maximum value of distances when a matrix or dist
+is supplied as env. Only used with denom_type = "index" (the default); if so an error
+will be thrown if there is a value inside a supplied matrix greater than matrix_tmax
+(DEFAULT: 1).}
 
-\item{diagnostic}{logical. If true, changes output to include different parts of SES. This
-   includes Pval, SES, raw, denom, emp, and all sim values with column labels as
+\item{diagnostic}{logical. If true, changes output to include different parts of SES. 
+This includes Pval, SES, raw, denom, emp, and all sim values with column labels as
 simN where N is the number of sims (DEFAULT: FALSE)}
 }
 \value{

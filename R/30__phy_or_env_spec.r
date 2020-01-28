@@ -47,48 +47,55 @@
 #'   set to 1, lapply will be used instead of mclapply (DEFAULT: 2).
 #' @param verbose logical. Should status messages be displayed? (DEFAULT: TRUE).
 #' @param p_method string. method argument to pval_from_perms (DEFAULT: "raw").
-#' @param denom_type string. Type of denominator (d) to use (DEFAULT: "flat"). Note
+#' @param denom_type string. Type of denominator (d) to use (DEFAULT: "index"). Note
 #'   that denominator type does NOT affect P-values.
 #'   \describe{
-#'     \item{species_sim:}{
-#'       d for species s is calculated as the standard deviation of specificities
-#'       calculated from permuted abundances of s. This makes the output specificity
-#'       a standardized effect size (SES). Unfortunately, this makes SES of specificity
+#'     \item{"ses":}{
+#'       d for species s is calculated as the standard deviation of RQE* values
+#'       calculated from permuted species weights. This makes the output specificity
+#'       a standardized effect size (SES). Unfortunately, this makes SES 
 #'       counterintuitively sensitive to occupancy, where species with high occupancy
-#'       have more extreme SES of specificity than rare species, due to their more 
-#'       deterministic sim specificities. Not suggested.
+#'       have more extreme SES than rare species, due to their more deterministic sim
+#'       specificities. Included for comparative purposes, not suggested.
 #'     }
-#'     \item{global_unif:}{
+#'     \item{"global_unif":}{
 #'       d is same for all species. Calculated as variability in RQE* under random
 #'       uniform distribution (beta 1,1) of species abunds. This d is comparable between
 #'       different abundance matrices and between different variables. Specificity is an
-#'       SES using this denom_type, but is NOT comparable with results from any other.
+#'       SES using this denom_type, and insn't sensitive to occupancy like ses is. 
 #'       Fairly sensitive to sample size (number of data points per species), so this is
-#'       a better option than species_sim if you really want units of SDs, but is still
-#'       not suggested.
+#'       a better option than ses if you really want units of SDs, but is still not 
+#'       suggested.
 #'     }
-#'     \item{raw:}{
+#'     \item{"raw":}{
 #'       d is 1 for all species, so output specificity has units of distance, i.e. the
 #'       raw difference between empirical and simulated RQE*. This means that results
 #'       from different variables are not comparable, since it is not scale-invariant to
 #'       env or hosts_phylo. It IS still scale-invariant to the species weights in 
 #'       aunds_mat. Not sensitive to number of samples. Not suggested because units are
-#'       strange, and isn't comparable between variables.
+#'       strange, and isn't comparable between variables. 
 #'     }
-#'     \item{flat:}{
-#'       d is RQE* calculated for a flat abundance distribution, i.e. all abundances = 1.
-#'       Since RQE* is a weighted mean, this simplifies d to the mean of unique pairwise
-#'       distances in env or in the matrix decomposition of hosts_phylo. While that
-#'       species distribution may seem (and is) arbitrary, this d has useful properties:
-#'       scale invariance to abunds_mat, scale invariance to env/hosts_phylo,
-#'       insensitivity to number of samples, insensitivity to occupancy, and strong
-#'       sensitivity to specificity. Interpretation of results is similar to common SES
-#'       approaches in that specificity is negative, null is 0, and positive results
-#'       indicate overdispersion. Default. 
-#'     }
+#'     \item{"index":}{
+#'       d is the mean of simulated (permuted) RQE* values for species that have stronger
+#'       specificity than expected by chance, resulting in specificity values with range
+#'       [-1, 0), with 0 as the null hypothesis. In this case, -1 indicates perfect
+#'       specificity, where a species is associated with zero environmental variability.
+#'       In the euclidean sense, this could be a species that is always found at the
+#'       exact same elevation or the exact same pH. For species that have weaker specificity
+#'       than expected by chance, d is x - the mean of simulated RQE* values, where x is
+#'       the maximum possible dissimilarity. For vector inputs, this is the vector's range.
+#'       For phylogenetic inputs, it's the greatest observed patristic distance. For matrix
+#'       inputs, it's assumed to be 1, which can be overridden using matrix_tmax. In this
+#'       way, overdispersed values have range (0, 1]. This d has other useful properties:
+#'       scale invariance to env/hosts_phylo, insensitivity to the number of samples, 
+#'       insensitivity to occupancy, and strong sensitivity to specificity (DEFAULT).
 #'   }
-#' @param diagnostic logical. If true, changes output to include different parts of SES. This
-#' 	 includes Pval, SES, raw, denom, emp, and all sim values with column labels as
+#' @param matrix_tmax float. Theoretical maximum value of distances when a matrix or dist
+#'   is supplied as env. Only used with denom_type = "index" (the default); if so an error
+#'   will be thrown if there is a value inside a supplied matrix greater than matrix_tmax
+#'   (DEFAULT: 1). 
+#' @param diagnostic logical. If true, changes output to include different parts of SES. 
+#'   This includes Pval, SES, raw, denom, emp, and all sim values with column labels as
 #'   simN where N is the number of sims (DEFAULT: FALSE)
 #'
 #'
@@ -142,7 +149,7 @@
 phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL, 
 	hosts_phylo=NULL, n_sim=1000,  sim_fun=function(m){ m[sample(1:nrow(m)), ] }, 
 	p_adj="fdr", seed=1234567, tails=1, n_cores=2, verbose=TRUE, lowmem=FALSE, 
-	p_method="raw", denom_type="flat", diagnostic=F){
+	p_method="raw", denom_type="index", matrix_tmax=1, diagnostic=F){
 
 	# testing crap:
 	# abunds_mat = data.frame(z_flat, z_elev_lo, z_elev_med, 
@@ -168,19 +175,31 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 	if(! p_adj %in% p.adjust.methods){
 		stop("p_adj not in p.adjust.methods.")
 	}
+	# possible input types are: error, mat, dist, vec, phy
 	data_type <- check_pes_inputs(abunds_mat, env, hosts, hosts_phylo, verbose)
 	if(data_type == "error"){stop()}
 
+	# check matrix_tmax is ok
+	if(data_type %in% c("mat", "dist") && denom_type == "index"){
+		if(max(env) > matrix_tmax){
+			stop("Values greater than matrix_tmax are present in env.")
+		}
+	}
 
 	# turn it all into a dist, no matter what.
 	if(data_type == "phy"){
 		msg("Converting tree to dist.")
 		env <- tree2mat(tree=hosts_phylo, x=hosts, n_cores=n_cores, delim=";")
+		tmax <- max(env) # only used for "index"
 	}else if(data_type == "vec"){
 		msg("Converting env vector to dist.")
+		tmax <- max(env) - min(env) # only used for "index"
 		env <- dist(env)
 	}else if(data_type == "mat"){
 		env <- as.dist(env)
+		tmax <- matrix_tmax # only used for "index"
+	}else if(data_type == "dist"){
+		tmax <- matrix_tmax # only used for "index"
 	}
 
 	# define specificity function, necessary because rao_quad_ent has args in wrong order.
@@ -246,16 +265,17 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 	Pval <- rep(-1, length(specs_emp))
 	for(i in 1:length(Pval)){
 		Pval[i] <- pval_from_perms(emp=specs_emp[i], perm=specs_sim_mat[,i], 
-			tails=tails, method=p_method)
+			tails=tails, method=p_method, rounding=4)
 	}
 	# adjust p-values
 	Pval <- p.adjust(Pval, method=p_adj)
 
 	# calculate SES
 	msg("Calculating specificities.")
+	spec_sim_means <- apply(X=specs_sim_mat, MAR=2, FUN=mean)
 
 	# get denominator
-	if(denom_type == "species_sim"){
+	if(denom_type == "ses"){
 		denom <- apply(X=specs_sim_mat, MAR=2, FUN=sd)
 	}else if(denom_type == "raw"){
 		denom <- rep(1, ncol(specs_sim_mat))
@@ -271,15 +291,18 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 		null_cols <- lapply_fun(X=dseeds, FUN=make_null_col)
 		null_specs <- unlist(lapply_fun(X=null_cols, FUN=spec_fun, e=env))
 		denom <- rep(sd(null_specs), ncol(specs_sim_mat))
-	}else if(denom_type == "flat"){
-		d <- spec_fun(rep(1, nrow(abunds_mat)), e=env)
-		denom <- rep(d, ncol(specs_sim_mat))
+	#}else if(denom_type == "flat"){
+	#	d <- spec_fun(rep(1, nrow(abunds_mat)), e=env)
+	#	denom <- rep(d, ncol(specs_sim_mat))
+	}else if(denom_type == "index"){
+		denom <- rep(0, length(spec_sim_means))
+		denom[specs_emp <= spec_sim_means] <- spec_sim_means
+		denom[specs_emp >  spec_sim_means] <- tmax
 	}else{
 		stop("Invalid denom_type.")
 	}
 
-	spec_sim_means <- apply(X=specs_sim_mat, MAR=2, FUN=mean)
-	out_specs <- (specs_emp - spec_sim_means)/denom
+	out_specs <- round(specs_emp - spec_sim_means, 4)/ round(denom, 4)
 	
 	# format output object
 	output <- data.frame(Pval, Spec=out_specs)
@@ -333,19 +356,23 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 #'       MASS package, and calculating area under the curve from (-inf,emp] or 
 #'       [emp,inf) depending on tailedness.
 #'     }
-#'     \item{dumb_fit:}{
-#'       Same as MASS_fit, except a quick-and-dirty fit is used, which is just using
-#'       mean and sd of sim values. Actually slower than MASS_fit somehow. Only to
-#'       be used if MASS_fit isn't working or if you can't install MASS.
-#'     }
 #' @param threshold integer. Minimum number n of non-NA values in perm that are
 #'   acceptable. If n < threshold, P=NA (DEFAULT: 50).
+#' @param rounding integer. Number of decimal places to round emp and perm This is only
+#'   useful when emp and perm are expected to contain the exact same value, but the number
+#'   of decimal places in that value is different between emp and perm Use a number less
+#'   then zero to disable rounding (DEFAULT: -1).
 #'
 #' @return a P-value.
 #' 
 #' @export
-pval_from_perms <- function(emp, perm, tails, method="MASS_fit", threshold=30){
+pval_from_perms <- function(emp, perm, tails, method="MASS_fit", threshold=30, rounding=-1){
 	require("MASS")
+	# do rounding...?
+	if(rounding >= 0){
+		emp <- round(emp, rounding)
+		perm <- round(perm, rounding)
+	}
 	# check if number of perms is below threshold
 	n <- sum(!is.na(perm))
 	if(n < threshold){
@@ -365,11 +392,15 @@ pval_from_perms <- function(emp, perm, tails, method="MASS_fit", threshold=30){
 		# remove NAs
 		perm <- perm[!is.na(perm)]
 		# calculate P for right and left tails
-		LTP <- (sum(perm < emp) + 1)/n
-		RTP <- (sum(perm > emp) + 1)/n
+		LTP <- (sum(perm <= emp) + 1)/n
+		RTP <- (sum(perm >= emp) + 1)/n
 	}else{
 		stop("Invalid method argument.")
 	}
+	# fix P > 1 in cases where all values of perm == emp
+	if(LTP > 1){LTP <- 1}
+	if(RTP > 1){RTP <- 1}
+	# calculate P for tailed situations
 	if(tails == 1){
 		return(LTP)
 	}else if(tails == 3){

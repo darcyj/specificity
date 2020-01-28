@@ -4,7 +4,8 @@
 \alias{pval_from_perms}
 \title{pval_from_perms}
 \usage{
-pval_from_perms(emp, perm, tails, method = "MASS_fit", threshold = 30)
+pval_from_perms(emp, perm, tails, method = "MASS_fit", threshold = 30,
+  rounding = -1)
 }
 \arguments{
 \item{emp}{Numeric scalar. An empirical test statistic value.}
@@ -29,15 +30,15 @@ from permuted data.}
   P is calculated by fitting a normal distribution to sim values, using the
   MASS package, and calculating area under the curve from (-inf,emp] or 
   [emp,inf) depending on tailedness.
-}
-\item{dumb_fit:}{
-  Same as MASS_fit, except a quick-and-dirty fit is used, which is just using
-  mean and sd of sim values. Actually slower than MASS_fit somehow. Only to
-  be used if MASS_fit isn't working or if you can't install MASS.
 }}
 
 \item{threshold}{integer. Minimum number n of non-NA values in perm that are
 acceptable. If n < threshold, P=NA (DEFAULT: 50).}
+
+\item{rounding}{integer. Number of decimal places to round emp and perm This is only
+useful when emp and perm are expected to contain the exact same value, but the number
+of decimal places in that value is different between emp and perm Use a number less
+then zero to disable rounding (DEFAULT: -1).}
 }
 \value{
 a P-value.

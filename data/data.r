@@ -4,13 +4,13 @@
 #' metadata, and host plant phylogeny.
 #'
 #' @format A list containing 3 objects:
-#' \item{zotutable}{
+#' \item{otutable}{
 #'   data.frame object where each row is a sample and each column is a
-#'   fungal zOTU. Rownames are sample IDs.
+#'   fungal OTU (actually ASV from DADA2). Rownames are sample IDs.
 #' }
 #' \item{metadata}{
 #'   data.frame object containing environmental metadata for samples in
-#'   zotutable. SampleID column of metadata matches rownames of zotutable.
+#'   otutable. SampleID column of metadata matches rownames of otutable.
 #' }
 #' \item{supertree}{
 #'   Phylogenetic tree containing all host plant genera in PlantGenus

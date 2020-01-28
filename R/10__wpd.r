@@ -284,20 +284,6 @@ wpd_table <- function(m, s_phylo, nested_set, metric="Hp", ncores=4){
 #'   as.matrix(d). Thus, w must have length l such that (l^2-l)/2 = length(d).
 #' @param raw logical. If true, FDq will be returned. If false, FDq* will be returned
 #'   (DEFAULT: FALSE).
-#' @param special string. Used for calculating special cases of the statistic:
-#'   \describe{
-#'     \item{regular:}{
-#'       Regular, not special (DEFAULT).
-#'     }
-#'     \item{max:}{
-#'       Maximum possible value, done by sorting d and dist(w) to match.
-#'     }
-#'     \item{min:}{
-#'       Minimum possible value, done by sorting d and dist(w) to oppose.
-#'     }
-#'   }
-#'
-
 #' 
 #' 
 #' @return A single value.
@@ -306,20 +292,10 @@ wpd_table <- function(m, s_phylo, nested_set, metric="Hp", ncores=4){
 #'   none yet written
 #' 
 #' @export
-rao_quad_ent <- function(d, w, raw=FALSE, special="regular"){
+rao_quad_ent <- function(d, w, raw=FALSE){
+
 	w_dist <- pairwise_product(w)
 
-	if(special == "max"){
-		d <- d[order(d, decreasing = TRUE)]
-		w_dist <- w_dist[order(w_dist, decreasing = TRUE)]
-	}else if(special == "min"){
-		d <- d[order(d, decreasing = TRUE)]
-		w_dist <- w_dist[order(w_dist, decreasing = FALSE)]
-	}else if(special == "regular"){
-		# do nothing
-	}else{
-		stop(paste0("\"", special, "\" not a valid argument for special."))
-	}
 
 	if(raw){
 		return(sum(as.vector(d) * w_dist))

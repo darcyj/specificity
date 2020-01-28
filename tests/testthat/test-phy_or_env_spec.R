@@ -4,9 +4,9 @@ library(testthat)
 data(endophyte)
 attach(endophyte)
 
-# make some zOTUs to test.
+# make some OTUs to test.
 # flat = no pattern
-z_flat <- rep(1, nrow(zotutable))
+z_flat <- rep(1, length(metadata$Elevation))
 # lo = VERY specific
 z_elev_lo <- rep(0, length(metadata$Elevation))
 z_elev_lo[metadata$Elevation > 1000 & metadata$Elevation < 1200] <- 200
@@ -38,7 +38,7 @@ spec_results <- phy_or_env_spec(
 	n_sim = 100,
 	n_cores = 10,
 	verbose=FALSE,
-	p_method="raw"
+	p_method="raw" , diagnostic = T
 )
 
 test_that("flat otu Specificity is zero", {
@@ -48,6 +48,9 @@ test_that("flat otu Specificity is zero", {
 test_that("flat otu pval is 1", {
 	expect_identical(1, spec_results$Pval[1])
 })
+	# sim <- spec_results[1, 7:ncol(spec_results)] 
+	# emp <- spec_results[1,4]
+
 
 test_that("Spec follows lo < med < hi sims", { expect_true(all(c(
 	spec_results$Spec[2] < spec_results$Spec[3],

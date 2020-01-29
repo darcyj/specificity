@@ -5,7 +5,7 @@
 #' @author John L. Darcy
 #'
 #' @param specs_list list of data.frames. Each data.frame must be an output from
-#'   phy_or_env_spec; must have columns "SES" and "Pval".
+#'   phy_or_env_spec; must have columns "Spec" and "Pval".
 #' @param n_bins integer. Number of bins for stacked violins (DEFAULT: 20).
 #' @param col_sig string. Color name or hex code for species where Pval <= alpha
 #'   (DEFAULT = "black").
@@ -25,8 +25,8 @@ plot_specificities <- function(specs_list, n_bins=20, col_sig="black", col_nsig=
 	col_bord=NA, alpha=0.05, label_cex=0.60){
 
 	# find min and max specificities
-	min_spec <- min( sapply(X=specs_list, FUN=function(x){min(x$SES)}) )
-	max_spec <- max( sapply(X=specs_list, FUN=function(x){max(x$SES)}) )
+	min_spec <- min( sapply(X=specs_list, FUN=function(x){min(x$Spec)}) )
+	max_spec <- max( sapply(X=specs_list, FUN=function(x){max(x$Spec)}) )
 
 	# make binning table
 	bin_table <- data.frame(
@@ -40,8 +40,8 @@ plot_specificities <- function(specs_list, n_bins=20, col_sig="black", col_nsig=
 	# function to do binning
 	bin_spec_data <- function(spec, bin_table){
 
-		spec_sig <- spec$SES[spec$Pval <= alpha]
-		spec_nsig<- spec$SES[spec$Pval > alpha]
+		spec_sig <- spec$Spec[spec$Pval <= alpha]
+		spec_nsig<- spec$Spec[spec$Pval > alpha]
 		# count how many are in each bin
 		count_sig <- count_nsig <- rep(0, n_bins)
 		for(i in 1:n_bins){
@@ -73,7 +73,7 @@ plot_specificities <- function(specs_list, n_bins=20, col_sig="black", col_nsig=
 
 	# make plot area
 	n_vars <- length(specs_list)
-	plot(0, type="n", xlab="", ylab="SES", xaxt='n', ylim=c(min_spec, max_spec), xlim=c(0.5, n_vars+0.5))
+	plot(0, type="n", xlab="", ylab="Spec", xaxt='n', ylim=c(min_spec, max_spec), xlim=c(0.5, n_vars+0.5))
 
 	# function to plot boxes in a row
 	# x is a row from plotdf, m is the middle of the stack (x-axis)

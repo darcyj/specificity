@@ -9,7 +9,7 @@ plot_specificities(specs_list, n_bins = 20, col_sig = "black",
 }
 \arguments{
 \item{specs_list}{list of data.frames. Each data.frame must be an output from
-phy_or_env_spec; must have columns "SES" and "Pval".}
+phy_or_env_spec; must have columns "Spec" and "Pval".}
 
 \item{n_bins}{integer. Number of bins for stacked violins (DEFAULT: 20).}
 

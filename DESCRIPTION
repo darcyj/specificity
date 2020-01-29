@@ -11,7 +11,7 @@ Depends:
     ape,
     geiger,
     parallel,
-    MASS
+    fitdistrplus
 Imports: 
     Rcpp,
     fields,

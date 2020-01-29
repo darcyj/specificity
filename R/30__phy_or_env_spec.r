@@ -151,18 +151,19 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 	p_adj="fdr", seed=1234567, tails=1, n_cores=2, verbose=TRUE, lowmem=FALSE, 
 	p_method="raw", denom_type="index", matrix_tmax=1, diagnostic=F){
 
-	# testing crap:
+	# testing stuff:
 	# abunds_mat = data.frame(z_flat, z_elev_lo, z_elev_med, 
 	#   z_elev_hi, z_elev_lo_all, z_elev_med_all, z_elev_hi_all)
 	# env = metadata$Elevation
 	# n_sim=100
 	# n_cores=10
 	# hosts=NULL
-	# hosts_phylo=NULL; n_sim=1000
+	# hosts_phylo=NULL
 	# sim_fun=function(m){ m[sample(1:nrow(m)), ] }
 	# p_adj="fdr"; seed=1234567; tails=1; verbose=TRUE; lowmem=FALSE
-	# vec_wvar=FALSE; phy_ent=FALSE; denom_type="flat"
-	#   
+	# denom_type="index"
+	# p_method <- "raw"
+
 
 	require(ape)
 	require(geiger)
@@ -270,7 +271,7 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 	# adjust p-values
 	Pval <- p.adjust(Pval, method=p_adj)
 
-	# calculate SES
+	# calculate output specificity
 	msg("Calculating specificities.")
 	spec_sim_means <- apply(X=specs_sim_mat, MAR=2, FUN=mean)
 
@@ -295,8 +296,7 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 	#	d <- spec_fun(rep(1, nrow(abunds_mat)), e=env)
 	#	denom <- rep(d, ncol(specs_sim_mat))
 	}else if(denom_type == "index"){
-		denom <- rep(0, length(spec_sim_means))
-		denom[specs_emp <= spec_sim_means] <- spec_sim_means
+		denom <- spec_sim_means
 		denom[specs_emp >  spec_sim_means] <- tmax
 	}else{
 		stop("Invalid denom_type.")
@@ -347,15 +347,17 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 #'     \item{0:}{No test, P=1.}
 #'   }
 #' @param method string. Method by which P should be calculated from perms:
-#'     \item{raw:}{
+#'     \item{"raw":}{
 #'       P is calculated as the sum of sim values more extreme than the empirical
 #'       value plus one, divided by the number of sim values. 
 #'     }
-#'     \item{MASS_fit:}{
-#'       P is calculated by fitting a normal distribution to sim values, using the
-#'       MASS package, and calculating area under the curve from (-inf,emp] or 
-#'       [emp,inf) depending on tailedness.
+#'     \item{"dens_fit":}{
+#'       P is calculated via kernel density estimation. No better than "raw".
 #'     }
+#'     \item{"gamma_fit":}{
+#'       P is calculated by fitting a gamma distribution to sim values and calculating 
+#'       area under the curve from (-inf,emp] or [emp,inf) depending on tailedness.
+#'     }    
 #' @param threshold integer. Minimum number n of non-NA values in perm that are
 #'   acceptable. If n < threshold, P=NA (DEFAULT: 50).
 #' @param rounding integer. Number of decimal places to round emp and perm This is only
@@ -366,8 +368,8 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 #' @return a P-value.
 #' 
 #' @export
-pval_from_perms <- function(emp, perm, tails, method="MASS_fit", threshold=30, rounding=-1){
-	require("MASS")
+pval_from_perms <- function(emp, perm, tails, method="raw", threshold=30, rounding=-1){
+	require("fitdistrplus")
 	# do rounding...?
 	if(rounding >= 0){
 		emp <- round(emp, rounding)
@@ -378,22 +380,29 @@ pval_from_perms <- function(emp, perm, tails, method="MASS_fit", threshold=30, r
 	if(n < threshold){
 		LTP <- NA
 		RTP <- NA
-	}else if(method == "MASS_fit"){
+	}else if(method == "dens_fit"){
 		# remove NAs
 		perm <- perm[!is.na(perm)]
-		# get fit for mean and sd
-		fit <- MASS::fitdistr(perm, densfun="normal")
-		est_mean <- fit$estimate[names(fit$estimate)=="mean"]
-		est_sd <- fit$estimate[names(fit$estimate)=="sd"]
-		# calculate P for right and left tails
-		LTP <- dnorm(x=emp, mean=est_mean, sd=est_sd)
-		RTP <- 1 - LTP
+		frm <- min(c(mean(perm) - (mean(perm) - min(perm)) * 4, emp))
+		too <- max(c(mean(perm) + (max(perm) - mean(perm)) * 4, emp))
+		dns <- density(perm, from=frm, to=too, bw="sj")
+		# Riemann sum
+		dx <- dns$x[2] - dns$x[1]
+		tot <- sum(dns$y * dx)
+		LTP <- sum(dns$y[dns$x < emp] * dx) / tot
+		RTP <- 1-LTP
 	}else if(method == "raw"){
 		# remove NAs
 		perm <- perm[!is.na(perm)]
 		# calculate P for right and left tails
 		LTP <- (sum(perm <= emp) + 1)/n
 		RTP <- (sum(perm >= emp) + 1)/n
+	}else if(method == "gamma_fit"){
+		gfit <- fitdistrplus::fitdist(data=perm, distr="gamma", lower=c(0,0))
+		shp <- gfit$estimate[names(gfit$estimate) == "shape"]
+		rte <- gfit$estimate[names(gfit$estimate) == "rate"]
+		LTP <- pgamma(q=emp, shape=shp, rate=rte)
+		RTP <- 1 - LTP
 	}else{
 		stop("Invalid method argument.")
 	}

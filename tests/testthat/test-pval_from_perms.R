@@ -1,5 +1,6 @@
 library(specificity)
 library(testthat)
+library(parallel)
 
 set.seed(12345)
 perm <- rnorm(1000, mean=50, sd=20)
@@ -21,14 +22,17 @@ test_that("pval matches calculated value (2 tail, raw)", { expect_identical(p_ca
 
 
 
-# testing "MASS_fit" method
+# testing "gamma_fit" method
 
 set.seed(12345)
-perms <- replicate(1000, rnorm(500, mean=0, sd=1))
-emp <- -2.2
-parametric_P <- dnorm(x=emp, mean=0, sd=1)
-calculated_Ps <- apply(X=perms, MAR=2, FUN=function(x){pval_from_perms(emp, x, 1, method="MASS_fit")})
+perms <- replicate(1000, rgamma(500, shape=10, rate=0.005), simplify=FALSE)
+emp <- 1600
+parametric_P <- pgamma(q=emp, shape=10, rate=0.005)
+calculated_Ps <- simplify2array(mclapply(X=perms,
+	FUN=function(x){pval_from_perms(emp, x, 1, method="gamma_fit")},
+	mc.cores=10
+))
 p_fun <- round(mean(calculated_Ps),2)
 p_calc <- round(parametric_P, 2)
-test_that("pval matches calculated value (1 tail, MASS_fit)", { expect_identical(p_calc, p_fun) })
+test_that("pval matches calculated value (1 tail, gamma_fit)", { expect_identical(p_calc, p_fun) })
 

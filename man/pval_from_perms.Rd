@@ -4,7 +4,7 @@
 \alias{pval_from_perms}
 \title{pval_from_perms}
 \usage{
-pval_from_perms(emp, perm, tails, method = "MASS_fit", threshold = 30,
+pval_from_perms(emp, perm, tails, method = "raw", threshold = 30,
   rounding = -1)
 }
 \arguments{
@@ -22,14 +22,16 @@ from permuted data.}
 }}
 
 \item{method}{string. Method by which P should be calculated from perms:
-\item{raw:}{
+\item{"raw":}{
   P is calculated as the sum of sim values more extreme than the empirical
   value plus one, divided by the number of sim values. 
 }
-\item{MASS_fit:}{
-  P is calculated by fitting a normal distribution to sim values, using the
-  MASS package, and calculating area under the curve from (-inf,emp] or 
-  [emp,inf) depending on tailedness.
+\item{"dens_fit":}{
+  P is calculated via kernel density estimation. No better than "raw".
+}
+\item{"gamma_fit":}{
+  P is calculated by fitting a gamma distribution to sim values and calculating 
+  area under the curve from (-inf,emp] or [emp,inf) depending on tailedness.
 }}
 
 \item{threshold}{integer. Minimum number n of non-NA values in perm that are

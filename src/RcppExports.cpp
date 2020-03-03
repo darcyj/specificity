@@ -5,17 +5,6 @@
 
 using namespace Rcpp;
 
-// pairwise_geo_mean
-NumericVector pairwise_geo_mean(const NumericVector x);
-RcppExport SEXP _specificity_pairwise_geo_mean(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const NumericVector >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(pairwise_geo_mean(x));
-    return rcpp_result_gen;
-END_RCPP
-}
 // pairwise_product
 NumericVector pairwise_product(const NumericVector x);
 RcppExport SEXP _specificity_pairwise_product(SEXP xSEXP) {
@@ -27,10 +16,53 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// spec_core
+NumericVector spec_core(const NumericMatrix w, const NumericVector D);
+RcppExport SEXP _specificity_spec_core(SEXP wSEXP, SEXP DSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericMatrix >::type w(wSEXP);
+    Rcpp::traits::input_parameter< const NumericVector >::type D(DSEXP);
+    rcpp_result_gen = Rcpp::wrap(spec_core(w, D));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rao_sort_max
+double rao_sort_max(const NumericVector w, const NumericVector D);
+RcppExport SEXP _specificity_rao_sort_max(SEXP wSEXP, SEXP DSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector >::type w(wSEXP);
+    Rcpp::traits::input_parameter< const NumericVector >::type D(DSEXP);
+    rcpp_result_gen = Rcpp::wrap(rao_sort_max(w, D));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rao_genetic_max
+List rao_genetic_max(const NumericVector w, const NumericVector D, const int term_cycles, const int maxiters, const int popsize, const int keep, const double prc);
+RcppExport SEXP _specificity_rao_genetic_max(SEXP wSEXP, SEXP DSEXP, SEXP term_cyclesSEXP, SEXP maxitersSEXP, SEXP popsizeSEXP, SEXP keepSEXP, SEXP prcSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector >::type w(wSEXP);
+    Rcpp::traits::input_parameter< const NumericVector >::type D(DSEXP);
+    Rcpp::traits::input_parameter< const int >::type term_cycles(term_cyclesSEXP);
+    Rcpp::traits::input_parameter< const int >::type maxiters(maxitersSEXP);
+    Rcpp::traits::input_parameter< const int >::type popsize(popsizeSEXP);
+    Rcpp::traits::input_parameter< const int >::type keep(keepSEXP);
+    Rcpp::traits::input_parameter< const double >::type prc(prcSEXP);
+    rcpp_result_gen = Rcpp::wrap(rao_genetic_max(w, D, term_cycles, maxiters, popsize, keep, prc));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_specificity_pairwise_geo_mean", (DL_FUNC) &_specificity_pairwise_geo_mean, 1},
     {"_specificity_pairwise_product", (DL_FUNC) &_specificity_pairwise_product, 1},
+    {"_specificity_spec_core", (DL_FUNC) &_specificity_spec_core, 2},
+    {"_specificity_rao_sort_max", (DL_FUNC) &_specificity_rao_sort_max, 2},
+    {"_specificity_rao_genetic_max", (DL_FUNC) &_specificity_rao_genetic_max, 7},
     {NULL, NULL, 0}
 };
 

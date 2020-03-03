@@ -5,6 +5,7 @@ packwd <- getwd()
 library(devtools)
 library(roxygen2)
 library(Rcpp)
+library(testthat)
 
 usethis::use_package("ape")
 usethis::use_package("geiger")
@@ -27,11 +28,7 @@ write("importFrom(Rcpp, evalCpp)", file="NAMESPACE", append=TRUE)
 
 setwd("../")
 install("specificity")
-setwd(packwd)
-
-# run test code
-library(testthat)
-setwd("tests/")
+setwd("specificity/tests/")
 ### doing tests can take a minute! ###
 capture.output(test_check("specificity"), file="../test_results.txt", split=TRUE)
 

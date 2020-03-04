@@ -55,6 +55,40 @@ set to 1, lapply will be used instead of mclapply (DEFAULT: 2).}
 
 \item{p_method}{string. method argument to pval_from_perms (DEFAULT: "raw").}
 
+\item{denom_type}{string. Type of denominator (d) to use (DEFAULT: "index"). Note
+that denominator type does NOT affect P-values.
+\describe{
+  \item{"ses":}{
+    d for species s is calculated as the standard deviation of RQE values
+    calculated from permuted species weights. This makes the output specificity
+    a standardized effect size (SES). Unfortunately, this makes SES 
+    counterintuitively sensitive to occupancy, where species with high occupancy
+    have more extreme SES than rare species, due to their more deterministic sim
+    specificities. Included for comparative purposes, not suggested.
+  }
+  \item{"raw":}{
+    d is 1 for all species, so output specificity has units of distance, i.e. the
+    raw difference between empirical and simulated RQE. This means that results
+    from different variables are not comparable, since it is not scale-invariant to
+    env or hosts_phylo. It not scale-invariant to the species weights in aunds_mat,
+    either. Not sensitive to number of samples. Not suggested because units are
+    strange, and isn't comparable between variables. 
+  }
+  \item{"index":}{
+    d is the mean of simulated (permuted) RQE values for species that have stronger
+    specificity than expected by chance, resulting in specificity values with range
+    [-1, 0), with 0 as the null hypothesis. In this case, -1 indicates perfect
+    specificity, where a species is associated with zero environmental variability.
+    In the euclidean sense, this could be a species that is always found at the
+    exact same elevation or the exact same pH. For species that have weaker specificity
+    than expected by chance, d is x minus the mean of simulated RQE values, where x is
+    the maximum possible dissimilarity observable given species weights. This d has 
+    other useful properties: scale invariance to env/hosts_phylo, insensitivity to 
+    the number of samples, insensitivity to occupancy, and strong sensitivity to 
+    specificity (DEFAULT).
+  }
+}}
+
 \item{diagnostic}{logical. If true, changes output to include different parts of SES. 
 This includes Pval, SES, raw, denom, emp, and all sim values with column labels as
 simN where N is the number of sims (DEFAULT: FALSE)}

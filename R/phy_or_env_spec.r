@@ -80,6 +80,7 @@
 #'       other useful properties: scale invariance to env/hosts_phylo, insensitivity to 
 #'       the number of samples, insensitivity to occupancy, and strong sensitivity to 
 #'       specificity (DEFAULT).
+#'     }
 #'   }
 #' @param diagnostic logical. If true, changes output to include different parts of SES. 
 #'   This includes Pval, SES, raw, denom, emp, and all sim values with column labels as

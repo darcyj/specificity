@@ -149,6 +149,7 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 	# p_adj="fdr"; seed=1234567; tails=1; verbose=TRUE
 	# denom_type="index"
 	# p_method <- "gamma_fit"
+	# diagnostic <- TRUE
 
 
 	require(ape)
@@ -250,12 +251,18 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 		# calculate max rao values for those cols in parallel
 		maxraos <- unlist(lapply_fun(X=emp_col_list, FUN=rao_sort_max, D=env))
 		# put newly calculated maxs where they belong (for spec > 0 otus)
-		denom[specs_emp >  spec_sim_means] <- maxraos
+		denom[specs_emp > spec_sim_means] <- maxraos
+		# for(j in otu_inds_4_max){
+		# 	denom[j] <- rao_sort_max(w=abunds_mat[,j], D=env)
+		# }
+	}else if(denom_type == "sim_mode"){
+		denom <- spec_sim_means
 	}else{
 		stop("Invalid denom_type.")
 	}
 
-	out_specs <- round(specs_emp - spec_sim_means, 4)/ round(denom, 4)
+	out_specs <- ((specs_emp - spec_sim_means)/ denom)
+	out_specs <- round(out_specs, 4)
 	
 	# format output object
 	output <- data.frame(Pval, Spec=out_specs)

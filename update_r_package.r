@@ -25,9 +25,11 @@ write("useDynLib(specificity, .registration=TRUE)", file="NAMESPACE", append=TRU
 write("exportPattern(\"^[[:alpha:]]+\")", file="NAMESPACE", append=TRUE)
 write("importFrom(Rcpp, evalCpp)", file="NAMESPACE", append=TRUE)
 
-
+# install
 setwd("../")
 install("specificity")
+
+# test
 setwd("specificity/tests/")
 ### doing tests can take a minute! ###
 capture.output(test_check("specificity"), file="../test_results.txt", split=TRUE)

@@ -29,7 +29,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // rao_sort_max
-double rao_sort_max(const NumericVector w, const NumericVector D);
+long double rao_sort_max(const NumericVector w, const NumericVector D);
 RcppExport SEXP _specificity_rao_sort_max(SEXP wSEXP, SEXP DSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -41,7 +41,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // rao_genetic_max
-List rao_genetic_max(const NumericVector w, const NumericVector D, const int term_cycles, const int maxiters, const int popsize, const int keep, const double prc);
+List rao_genetic_max(const NumericVector w, const NumericVector D, const int term_cycles, const int maxiters, const int popsize, const int keep, const long double prc);
 RcppExport SEXP _specificity_rao_genetic_max(SEXP wSEXP, SEXP DSEXP, SEXP term_cyclesSEXP, SEXP maxitersSEXP, SEXP popsizeSEXP, SEXP keepSEXP, SEXP prcSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -52,7 +52,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const int >::type maxiters(maxitersSEXP);
     Rcpp::traits::input_parameter< const int >::type popsize(popsizeSEXP);
     Rcpp::traits::input_parameter< const int >::type keep(keepSEXP);
-    Rcpp::traits::input_parameter< const double >::type prc(prcSEXP);
+    Rcpp::traits::input_parameter< const long double >::type prc(prcSEXP);
     rcpp_result_gen = Rcpp::wrap(rao_genetic_max(w, D, term_cycles, maxiters, popsize, keep, prc));
     return rcpp_result_gen;
 END_RCPP

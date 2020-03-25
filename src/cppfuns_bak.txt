@@ -65,8 +65,8 @@ NumericVector spec_core(const NumericMatrix w, const NumericVector D) {
 // rao_sort_max approximates the maximum possible rao value given a 
 // species weights vector w and a distance vector D. 
 // [[Rcpp::export]]
-long double rao_sort_max(const NumericVector w, const NumericVector D) {
-	long double out;
+double rao_sort_max(const NumericVector w, const NumericVector D) {
+	double out;
 	NumericVector W2 = pairwise_product(w);
 	std::sort(W2.begin(), W2.end());
 	NumericVector D2 = clone(D);
@@ -89,10 +89,10 @@ inline IntegerVector which_top_n (const NumericVector x, const int n){
 	int xs = x.size();
 	bool used[xs] = { 0 };
 	IntegerVector out(n);
-	long double m = min(x);
+	double m = min(x);
 	// for each of the n positions we want...
 	for(int i=0; i<n; i++){
-		long double best = 0 + m;
+		double best = 0 + m;
 		// for each value of x, check if its the highest.
 		for(int j=0; j<xs; j++){
 			if(x[j] > best && used[j] == 0){
@@ -122,7 +122,7 @@ inline IntegerVector seqrep (const int from, const int to, const int len){
 }
 
 // function for testing equality of doubles
-inline bool double_equals (const long double x1, const long double x2, const long double eps=0.001){
+inline bool double_equals (const double x1, const double x2, const double eps=0.001){
 	return std::abs(x1 - x2) < eps;
 }
 
@@ -130,7 +130,7 @@ inline bool double_equals (const long double x1, const long double x2, const lon
 // [[Rcpp::export]]
 List rao_genetic_max (const NumericVector w, const NumericVector D, 
 	const int term_cycles=10, const int maxiters = 400, 
-	const int popsize=300, const int keep=5, const long double prc = 0.001){
+	const int popsize=300, const int keep=5, const double prc = 0.001){
 	// check to make sure w and D are correct lengths
 	int ws = w.size();
 	int w_expctd = (ws * (ws - 1)) / 2;
@@ -144,7 +144,7 @@ List rao_genetic_max (const NumericVector w, const NumericVector D,
 	}
 
 	// set up counters and outputs for generations
-	long double last_best_rao = 0.0;
+	double last_best_rao = 0.0;
 	NumericVector iter_best_raos(maxiters, NA_REAL);
 	int n_gens_no_improvement = 0;
 	int iter = 0;

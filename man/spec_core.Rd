@@ -7,7 +7,7 @@ spec_core(w,D)
 }
 \arguments{
 \item{w}{numeric matrix with m rows and n columns.}
-\item{x}{numeric vector of length (n(n-1))/2.}
+\item{D}{numeric vector of length (n(n-1))/2.}
 }
 \value{
 Vector of Rao specificities corresponding to columns of w.

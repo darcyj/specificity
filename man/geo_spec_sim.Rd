@@ -4,9 +4,21 @@
 \alias{geo_spec_sim}
 \title{geo_spec_sim}
 \usage{
-geo_spec_sim(sdev, n_obs, grid, ideal_x = 0, ideal_y = 0,
-  ideal_x2 = 0, ideal_y2 = 0, ideal_x3 = 0, ideal_y3 = 0,
-  n_ideal = 1, up = 0, seed = 123456, n_cores = 2)
+geo_spec_sim(
+  sdev,
+  n_obs,
+  grid,
+  ideal_x = 0,
+  ideal_y = 0,
+  ideal_x2 = 0,
+  ideal_y2 = 0,
+  ideal_x3 = 0,
+  ideal_y3 = 0,
+  n_ideal = 1,
+  up = 0,
+  seed = 123456,
+  n_cores = 2
+)
 }
 \arguments{
 \item{sdev}{numeric vector. Standard deviation of the probability distribution
@@ -47,8 +59,6 @@ parallel computations, each with the same number of digits as seed
 (DEFAULT: 1234567).}
 
 \item{n_cores}{integer. Number of CPU cores for parallel computation (DEFAULT: 2).}
-
-\item{ideal_x3}{numeric vector. x-coordinate for secondary ideal location. Only used if n_ideal<2 (DEFAULT=0).}
 }
 \value{
 List object containing "matrix" and "params" objects:

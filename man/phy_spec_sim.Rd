@@ -4,9 +4,20 @@
 \alias{phy_spec_sim}
 \title{phy_spec_sim}
 \usage{
-phy_spec_sim(sdev, ideal, ideal2 = "", ideal3 = "", n_ideal = 1,
-  hosts, hosts_phylo, n_obs, up = 0, oceanp = 0, n_cores = 2,
-  seed = 1234567)
+phy_spec_sim(
+  sdev,
+  ideal,
+  ideal2 = "",
+  ideal3 = "",
+  n_ideal = 1,
+  hosts,
+  hosts_phylo,
+  n_obs,
+  up = 0,
+  oceanp = 0,
+  n_cores = 2,
+  seed = 1234567
+)
 }
 \arguments{
 \item{sdev}{numeric vector. Standard deviation of the probability distribution

@@ -4,8 +4,14 @@
 \alias{randomgrid}
 \title{randomgrid}
 \usage{
-randomgrid(n_samp = 1000, xmin = -100, xmax = 100, ymin = -100,
-  ymax = 100, seed = 123456)
+randomgrid(
+  n_samp = 1000,
+  xmin = -100,
+  xmax = 100,
+  ymin = -100,
+  ymax = 100,
+  seed = 123456
+)
 }
 \arguments{
 \item{n_samp}{number of sampling locations to output (DEFAULT=1000).}

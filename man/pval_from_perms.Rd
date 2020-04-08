@@ -4,8 +4,14 @@
 \alias{pval_from_perms}
 \title{pval_from_perms}
 \usage{
-pval_from_perms(emp, perm, tails, method = "raw", threshold = 30,
-  rounding = -1)
+pval_from_perms(
+  emp,
+  perm,
+  tails,
+  method = "raw",
+  threshold = 30,
+  rounding = -1
+)
 }
 \arguments{
 \item{emp}{Numeric scalar. An empirical test statistic value.}

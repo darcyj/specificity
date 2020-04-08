@@ -85,9 +85,13 @@ plot_specificities <- function(specs_list, n_bins=20, col_sig="black", col_nsig=
 		xmax <- m + (width/2)
 		split <- xmin + x$sig
 		# rectangle for sig, from xmin to split
-		rect(xmin, ymin, split, ymax, col=col_sig, border=col_bord, lwd=0.5)
+		if(x$sig > 0.0001){ # prevents width 0 rect, which is drawn as a line in some pdf viewers!
+			rect(xmin, ymin, split, ymax, col=col_sig, border=col_bord, lwd=0.5)
+		}
 		# rectangle for nsig, from split to xmax
-		rect(split, ymin, xmax, ymax, col=col_nsig, border=col_bord, lwd=0.5)
+		if(x$nsig > 0.0001){ # prevents width 0 rect, which is drawn as a line in some pdf viewers!
+			rect(split, ymin, xmax, ymax, col=col_nsig, border=col_bord, lwd=0.5)
+		}
 	}
 
 	# for each variable, plotboxes

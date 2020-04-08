@@ -4,11 +4,22 @@
 \alias{phy_or_env_spec}
 \title{phy_or_env_spec}
 \usage{
-phy_or_env_spec(abunds_mat, env = NULL, hosts = NULL,
-  hosts_phylo = NULL, n_sim = 1000, sim_fun = function(m) {    
-  m[sample(1:nrow(m)), ] }, p_adj = "fdr", seed = 1234567, tails = 1,
-  n_cores = 2, verbose = TRUE, p_method = "raw",
-  denom_type = "index", diagnostic = F)
+phy_or_env_spec(
+  abunds_mat,
+  env = NULL,
+  hosts = NULL,
+  hosts_phylo = NULL,
+  n_sim = 1000,
+  sim_fun = function(m) {     m[sample(1:nrow(m)), ] },
+  p_adj = "fdr",
+  seed = 1234567,
+  tails = 1,
+  n_cores = 2,
+  verbose = TRUE,
+  p_method = "raw",
+  denom_type = "index",
+  diagnostic = F
+)
 }
 \arguments{
 \item{abunds_mat}{matrix or data frame of numeric values. Columns represent 

@@ -4,8 +4,12 @@
 \alias{prop_abund}
 \title{prop_abund}
 \usage{
-prop_abund(m, to_int = FALSE,
-  max_int = floor(sqrt(.Machine$integer.max)), speciesRows = FALSE)
+prop_abund(
+  m,
+  to_int = FALSE,
+  max_int = floor(sqrt(.Machine$integer.max)),
+  speciesRows = FALSE
+)
 }
 \arguments{
 \item{m}{matrix or data frame of numeric values. Columns represent 

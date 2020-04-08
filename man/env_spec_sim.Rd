@@ -4,8 +4,19 @@
 \alias{env_spec_sim}
 \title{env_spec_sim}
 \usage{
-env_spec_sim(sdev, ideal, ideal2 = 0, ideal3 = 0, n_ideal = 1, env,
-  n_obs, up = 0, oceanp = 0, n_cores = 2, seed = 1234567)
+env_spec_sim(
+  sdev,
+  ideal,
+  ideal2 = 0,
+  ideal3 = 0,
+  n_ideal = 1,
+  env,
+  n_obs,
+  up = 0,
+  oceanp = 0,
+  n_cores = 2,
+  seed = 1234567
+)
 }
 \arguments{
 \item{sdev}{numeric vector. Standard deviation of the probability distribution

@@ -12,6 +12,8 @@ usethis::use_package("geiger")
 usethis::use_package("parallel")
 usethis::use_package("Rcpp")
 usethis::use_package("fields")
+usethis::use_package("fitdistrplus")
+
 
 # this looks for Rcpp::export in cpp files
 Rcpp::compileAttributes("./")
@@ -40,6 +42,7 @@ setwd(packwd)
 pack <- "specificity"
 path <- find.package(pack)
 system("rm specificity.pdf")
+# commmand below requires: texlive-fonts-extra, texinfo (install both with apt)
 system(paste(shQuote(file.path(R.home("bin"), "R")), "CMD", "Rd2pdf", shQuote(path)))
 
 

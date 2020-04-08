@@ -4,8 +4,15 @@
 \alias{plot_specificities}
 \title{plot_specificities}
 \usage{
-plot_specificities(specs_list, n_bins = 20, col_sig = "black",
-  col_nsig = "gray", col_bord = NA, alpha = 0.05, label_cex = 0.6)
+plot_specificities(
+  specs_list,
+  n_bins = 20,
+  col_sig = "black",
+  col_nsig = "gray",
+  col_bord = NA,
+  alpha = 0.05,
+  label_cex = 0.6
+)
 }
 \arguments{
 \item{specs_list}{list of data.frames. Each data.frame must be an output from

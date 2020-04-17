@@ -16,13 +16,15 @@
 #'
 #' @author John L. Darcy
 #' @references
-#' Allen B, Kon M, Bar-Yam Y (2009) A new phylogenetic diversity measure
-#'   generalizing the Shannon index and its application to Phyllostomid bats.
-#'   American Naturalist 174(2).
-#' Swenson NG (2014) Functional and Phylogenetic Ecology in R. 
-#'   Springer UseR! Series, Springer, New York, New York, U.S.A.
-#' Faith DP (1992) Conservation evaluation and phylogenetic diversity. Biological
-#'   Conservation 61.
+#' \itemize{
+#'   \item Allen B, Kon M, Bar-Yam Y (2009) A new phylogenetic diversity measure
+#'     generalizing the Shannon index and its application to Phyllostomid bats.
+#'     American Naturalist 174(2).
+#'   \item Swenson NG (2014) Functional and Phylogenetic Ecology in R. 
+#'     Springer UseR! Series, Springer, New York, New York, U.S.A.
+#'   \item Faith DP (1992) Conservation evaluation and phylogenetic diversity. 
+#'     Biological Conservation 61.
+#' }
 #' @seealso
 #'   rao_quad_ent, a phylogenetic diversity measure that uses a distance matrix
 #'   instead of a phylogenetic tree.
@@ -65,9 +67,9 @@
 #' @return Single WPD or PD value.
 #'
 #' @examples
-#'   library(geiger)
+#'   library(specificity)
 #'   set.seed(12345)
-#'   s_phylo <- get(data(geospiza))$phy
+#'   s_phylo <- get(data(endophyte))$supertree
 #'   w <- sample(c(0, 1), replace=T, size=10)
 #'   s <- sample(s_phylo$tip.label, replace=T, size=10)
 #'   wpd(s, s_phylo, w, metric="Hp")

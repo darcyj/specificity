@@ -6,16 +6,16 @@
 #'
 #' @author John L. Darcy
 #' @references
-#' Allen B, Kon M, Bar-Yam Y (2009) A new phylogenetic diversity measure
-#'   generalizing the Shannon index and its application to Phyllostomid bats.
-#'   American Naturalist 174(2).
-#' Swenson NG (2014) Functional and Phylogenetic Ecology in R. 
-#'   Springer UseR! Series, Springer, New York, New York, U.S.A.
-#' Faith DP (1992) Conservation evaluation and phylogenetic diversity. Biological
-#'   Conservation 61.
-#' Rao R (1982) Diversity: its measurement, decomposition, apportionment and
-#'   analysis. Sankhyā: The Indian Journal of Statistics 44(1).
-#'
+#' \itemize{
+#'   \item Allen B, Kon M, Bar-Yam Y (2009) A new phylogenetic diversity measure
+#'     generalizing the Shannon index and its application to Phyllostomid bats.
+#'     American Naturalist 174(2).
+#'   \item Swenson NG (2014) Functional and Phylogenetic Ecology in R. 
+#'     Springer UseR! Series, Springer, New York, New York, U.S.A.
+#'   \item Faith DP (1992) Conservation evaluation and phylogenetic diversity. 
+#'     Biological Conservation 61.
+#' }
+#' 
 #' @param m matrix of species observation vectors (s). See s argument of wpd().
 #' @param s_phylo phylo object. Tree containing all unique names in s as tips.
 #'   Must not contain duplicate tip labels.

@@ -9,13 +9,15 @@
 #' negative values indicate stronger specificity.
 #'
 #' @author John L. Darcy
-#' @references 
-#' Poulin et al. (2011) Host specificity in phylogenetic and geographic space. 
-#'   Trends Parasitol 8:355-361. doi: 10.1016/j.pt.2011.05.003
-#' Rao CR (2010) Quadratic entropy and analysis of diversity. Sankhya 72:70-80.
-#'   doi: 10.1007/s13171-010-0016-3
-#' Rao CR (1982) Diversity and dissimilarity measurements: A unified approach.
-#'   Theor Popul Biol 21:24-43.
+#' @references
+#' \itemize{
+#'   \item Poulin et al. (2011) Host specificity in phylogenetic and geographic
+#'     space. Trends Parasitol 8:355-361. doi: 10.1016/j.pt.2011.05.003
+#'   \item Rao CR (2010) Quadratic entropy and analysis of diversity. Sankhya 
+#'     72:70-80. doi: 10.1007/s13171-010-0016-3
+#'   \item Rao CR (1982) Diversity and dissimilarity measurements: A unified 
+#'     approach. Theor Popul Biol 21:24-43.
+#' }
 #'
 #' @param abunds_mat matrix or data frame of numeric values. Columns represent 
 #'   species, rows are samples. For columns where the value is nonzero for two or
@@ -151,9 +153,6 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 	# p_method <- "gamma_fit"
 	# diagnostic <- TRUE
 
-
-	require(ape)
-	require(geiger)
 
 	# little message function, to clean up code a bit
 	msg <- function(x){if(verbose){message(x)}}

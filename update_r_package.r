@@ -8,7 +8,6 @@ library(Rcpp)
 library(testthat)
 
 usethis::use_package("ape")
-usethis::use_package("geiger")
 usethis::use_package("parallel")
 usethis::use_package("Rcpp")
 usethis::use_package("fields")

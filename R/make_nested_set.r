@@ -16,7 +16,6 @@
 #'  
 #' @seealso 
 #'   ape::phylo
-#'   geiger::tips
 #'
 #' @param phy phylo object. Must be rooted, and sorted such that tip indices are
 #'   ordered. This is the default for rooted trees read in using ape's read.tree
@@ -34,10 +33,8 @@
 #'   }
 #'
 #' @examples
-#'   library(geiger)
-#'   library(ape)
-#'   library(parallel)
-#'   phy <- get(data(geospiza))$phy
+#'   library(specificity)
+#'   phy <- get(data(endophyte))$supertree
 #'   # check if tree is rooted:
 #'   is.rooted(phy)
 #'   # make nested set table:
@@ -47,17 +44,16 @@
 #'
 #' @export
 make_nested_set <- function(phy, n_cores=2){
-	require(geiger)		
 	require(ape)
 	require(parallel)
 	if( ! ape::is.rooted(phy)){
 		stop("ERROR: phylogeny is not rooted. Maybe try a midpoint root?")
 	}
-	# this function is just a wrapper for geiger's tips function, so that
+	# this function is just a wrapper for tips_from_node, so that
 	# it returns only the node, min, max, and errors
 	get_node_tip_range <- function(node){
 		# find indices of descendent tips
-		descs <- which(phy$tip.label %in% geiger::tips(phy=phy, node=node))
+		descs <- tips_from_node(node, anc=phy$edge[,1], des=phy$edge[,2])
 		min <- min(descs)
 		max <- max(descs)
 		# check to make sure descs are contiguous throughout range
@@ -89,3 +85,4 @@ make_nested_set <- function(phy, n_cores=2){
 
 	return(as.matrix(dfs))
 }
+

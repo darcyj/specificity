@@ -35,10 +35,8 @@ maximum tip index for each node, such that the descendents of that node are
 given by the inclusive range between those values.
 }
 \examples{
-  library(geiger)
-  library(ape)
-  library(parallel)
-  phy <- get(data(geospiza))$phy
+  library(specificity)
+  phy <- get(data(endophyte))$supertree
   # check if tree is rooted:
   is.rooted(phy)
   # make nested set table:
@@ -53,7 +51,6 @@ https://en.wikipedia.org/wiki/Nested_set_model
 }
 \seealso{
 ape::phylo
-  geiger::tips
 }
 \author{
 John L. Darcy

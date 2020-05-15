@@ -11,7 +11,6 @@ usethis::use_package("ape")
 usethis::use_package("parallel")
 usethis::use_package("Rcpp")
 usethis::use_package("fields")
-usethis::use_package("fitdistrplus")
 
 
 # this looks for Rcpp::export in cpp files

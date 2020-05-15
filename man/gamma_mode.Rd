@@ -23,7 +23,16 @@ mode of x, single value.
 Estimates mode by fitting a gamma distribution.
 }
 \examples{
-none yet written.
+  set.seed(12345)
+  # example that should work:
+  a <- (rgamma(100, 12, 1))
+  hist(a)
+  gamma_mode(a)
+  abline(v=gamma_mode(a), col="red")
+  # example that should NOT work:
+  a <- runif(100, 0, 1)
+  gamma_mode(a)
+  
 
 }
 \author{

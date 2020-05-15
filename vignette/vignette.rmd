@@ -12,7 +12,6 @@ In this example analysis, our goal is to analyze the extent to which microbes ha
 * `R` v. 3.5.0 or higher (untested on lower versions, but may still work?)
 * Other dependencies will be automatically installed with the package:
     - ape
-    - fitdistrplus
     - Rcpp
     - fields
 
@@ -21,6 +20,8 @@ To install `specificity`, first we need the `remotes` package, which is part of 
 ```{r echo = T, results = 'hide', eval = F}
   install.packages("remotes")
 ```
+
+You'll also need `Rcpp`, which compiles C++ functions and makes specificity 10 to 20 times faster. Apparently it's difficult to install on OS X, and (maybe?) more difficult on OS X Catalina. I didn't know this and wrote the whole package on Ubuntu Linux, where it's VERY easy to install Rcpp. I'm looking into making a pre-compiled version available for Macs, but don't hold your breath. In any case, see the Rcpp install notes here: https://teuder.github.io/rcpp4everyone_en/020_install.html. I'm also looking into breaking the package into two parts: specificity and specificity_cpp. The former will suggest the latter, and use C++ functions if they are available. As it stands now, you'll need a working `Rcpp` installation to install `specificity`. 
 
 Now, activate `remotes`  and install `specificity`.
 ```{r echo = T, results = 'hide', eval = F}
@@ -109,4 +110,8 @@ Our built-in visualization function takes a list of results from `phy_or_env_spe
 plot_specificities(specs_list, n_bins = 60)
 ```
 
-
+We can also see how species specificity correlates between variables:
+```{r}
+plot_pairwise_spec(specs_list)
+```
+From this, it looks like for most species, specificity to geographic distance strongly correlates with specificity to evapotranspiration. 

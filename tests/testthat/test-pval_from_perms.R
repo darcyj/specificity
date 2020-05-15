@@ -1,6 +1,5 @@
 library(specificity)
 library(testthat)
-library(parallel)
 
 set.seed(12345)
 perm <- rnorm(1000, mean=50, sd=20)
@@ -35,4 +34,8 @@ calculated_Ps <- simplify2array(mclapply(X=perms,
 p_fun <- round(mean(calculated_Ps),2)
 p_calc <- round(parametric_P, 2)
 test_that("pval matches calculated value (1 tail, gamma_fit)", { expect_identical(p_calc, p_fun) })
+
+
+
+
 

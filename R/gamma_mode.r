@@ -13,17 +13,25 @@
 #' @return mode of x, single value.
 #'
 #' @examples
-#' none yet written.
+#'   set.seed(12345)
+#'   # example that should work:
+#'   a <- (rgamma(100, 12, 1))
+#'   hist(a)
+#'   gamma_mode(a)
+#'   abline(v=gamma_mode(a), col="red")
+#'   # example that should NOT work:
+#'   a <- runif(100, 0, 1)
+#'   gamma_mode(a)
+#'   
 #' 
 #' @export
 gamma_mode <- function(x, mincor=0.85, fallback=mean){
-	require("fitdistrplus")
 
 	output <- tryCatch({
 		# fit gamma
-	   	gfit <- suppressWarnings(fitdistrplus::fitdist(data=x, distr="gamma", lower=c(1,0)))
-		shp <- gfit$estimate[names(gfit$estimate) == "shape"]
-		rte <- gfit$estimate[names(gfit$estimate) == "rate"]
+		gfit <- gamma_fit(x)
+		shp <- gfit[names(gfit) == "shape"]
+		rte <- gfit[names(gfit) == "rate"]
 
 		# user-interpretable goodness of fit
 		# basically, does fit dist's predictions correlate with hist(x)?
@@ -34,7 +42,8 @@ gamma_mode <- function(x, mincor=0.85, fallback=mean){
 
 		# check if fit is good enough
 		if(cxg < mincor){
-			warning("Gamma fit not good enough, using fallback.")
+			wn <- paste("Gamma fit not good enough, using fallback:", deparse(substitute(fallback)))
+			warning(wn)
 		}
 
 		list(warns=NULL, value=as.numeric((shp - 1) / rte))
@@ -42,7 +51,8 @@ gamma_mode <- function(x, mincor=0.85, fallback=mean){
 	}, warning = function(w) {
 		return(list(warn=w, value=fallback(x)))
 	}, error = function(e) {
-		return(list(warn="Gamma fit error, using fallback.", value=fallback(x)))
+		wn <- paste("Gamma fit error, using fallback:", deparse(substitute(fallback)))
+		return(list(warn=wn, value=fallback(x)))
 	}, finally = { })
 
 	if(! is.null(output$warn)){

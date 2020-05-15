@@ -39,7 +39,6 @@
 #' 
 #' @export
 pval_from_perms <- function(emp, perm, tails, method="raw", threshold=30, rounding=-1){
-	require("fitdistrplus")
 	# do rounding...?
 	if(rounding >= 0){
 		emp <- round(emp, rounding)
@@ -68,9 +67,9 @@ pval_from_perms <- function(emp, perm, tails, method="raw", threshold=30, roundi
 		LTP <- (sum(perm <= emp) + 1)/n
 		RTP <- (sum(perm >= emp) + 1)/n
 	}else if(method == "gamma_fit"){
-		gfit <- fitdistrplus::fitdist(data=perm, distr="gamma", lower=c(0,0))
-		shp <- gfit$estimate[names(gfit$estimate) == "shape"]
-		rte <- gfit$estimate[names(gfit$estimate) == "rate"]
+		gfit <- gamma_fit(perm)
+		shp <- gfit[1]
+		rte <- gfit[2]
 		LTP <- pgamma(q=emp, shape=shp, rate=rte)
 		RTP <- 1 - LTP
 	}else{

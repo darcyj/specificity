@@ -46,7 +46,7 @@ NumericVector pairwise_product(const NumericVector x) {
 // before use, make SURE that D is length (m(m-1))/2
 // [[Rcpp::export]]
 NumericVector spec_core(const NumericMatrix w, const NumericVector D) {
-	const int nrow = w.nrow();
+	// const int nrow = w.nrow(); //not sure why this was here, unused so commented out.
 	const int ncol = w.ncol();
 	NumericVector output(ncol);
 
@@ -87,7 +87,7 @@ inline NumericVector swapcol (const NumericVector x){
 // function to find which top n
 inline IntegerVector which_top_n (const NumericVector x, const int n){
 	int xs = x.size();
-	bool used[xs] = { 0 };
+	LogicalVector used(xs);
 	IntegerVector out(n);
 	long double m = min(x);
 	// for each of the n positions we want...

@@ -221,8 +221,12 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 	msg("Calculating P-values.")
 	Pval <- rep(-1, length(specs_emp))
 	for(i in 1:length(Pval)){
-		Pval[i] <- pval_from_perms(emp=specs_emp[i], perm=specs_sim_mat[,i], 
-			tails=tails, method=p_method, rounding=4)
+		Pval[i] <- pval_from_perms(
+			emp=specs_emp[i], 
+			perm=specs_sim_mat[,i], 
+			tails=tails, 
+			method=p_method
+		)
 	}
 	# adjust p-values
 	Pval <- p.adjust(Pval, method=p_adj)

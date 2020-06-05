@@ -17,6 +17,7 @@ phy_or_env_spec(
   n_cores = 2,
   verbose = TRUE,
   p_method = "raw",
+  center = "mean",
   denom_type = "index",
   diagnostic = F
 )
@@ -64,7 +65,12 @@ set to 1, lapply will be used instead of mclapply (DEFAULT: 2).}
 
 \item{verbose}{logical. Should status messages be displayed? (DEFAULT: TRUE).}
 
-\item{p_method}{string. method argument to pval_from_perms (DEFAULT: "raw").}
+\item{p_method}{string. "raw" for quantile method, or "gamma_fit" for calculating P
+by fitting a gamma distribution (DEFAULT: "raw").}
+
+\item{center}{string. Type of central tendency to use for simulated RQE values.
+Options are "mean", "median", and "mode". If mode is chosen, a reversible gamma
+distribution is fit and mode is calculated using that distribution (DEFAULT: mean).}
 
 \item{denom_type}{string. Type of denominator (d) to use (DEFAULT: "index"). Note
 that denominator type does NOT affect P-values.
@@ -92,11 +98,11 @@ that denominator type does NOT affect P-values.
     specificity, where a species is associated with zero environmental variability.
     In the euclidean sense, this could be a species that is always found at the
     exact same elevation or the exact same pH. For species that have weaker specificity
-    than expected by chance, d is x minus the mean of simulated RQE values, where x is
-    the maximum possible dissimilarity observable given species weights. This d has 
-    other useful properties: scale invariance to env/hosts_phylo, insensitivity to 
-    the number of samples, insensitivity to occupancy, and strong sensitivity to 
-    specificity (DEFAULT).
+    than expected by chance, d is x minus the center (see above) of simulated RQE 
+    values, where x is the maximum possible dissimilarity observable given species
+    weights. This d has other useful properties: scale invariance to env/hosts_phylo,
+    insensitivity to the number of samples, insensitivity to occupancy, and strong 
+    sensitivity to specificity (DEFAULT).
   }
 }}
 

@@ -31,9 +31,12 @@ z_elev_hi_all <- z_elev_hi + 2
 #     
 
 # calculate specificities of fake data above
+abunds_mat <- data.frame(z_flat, z_elev_lo, z_elev_med, z_elev_hi,
+		z_elev_lo_all, z_elev_med_all, z_elev_hi_all)
+abunds_mat <- abunds_mat / max(abunds_mat)
+
 spec_results <- phy_or_env_spec(
-	abunds_mat = data.frame(z_flat, z_elev_lo, z_elev_med, z_elev_hi,
-		z_elev_lo_all, z_elev_med_all, z_elev_hi_all),
+	abunds_mat,
 	env = metadata$Elevation,
 	n_sim = 100,
 	n_cores = 10,

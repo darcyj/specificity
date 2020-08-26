@@ -9,7 +9,9 @@ The word "specificity" is often used in the context of host-parasite interaction
 
 ## Installation
 There are two ways to install this package. The first is to compile it from source (this repository), and the second is to install a pre-compiled binary. Binaries are currently available for Mac OS (64 bit) and for Linux (64 bit).
+
 **Compiling:** To compile and install, make sure that R has packages `remotes` and `Rcpp` installed. `Remotes` is part of `devtools`, so if you have that, you should be good. You can install it by running `install.packages("remotes")`. For installing `Rcpp`, linux users should be fine with `install.packages("Rcpp")`, but apparently Mac OS users may experience difficulty and need to install with a pre-compiled binary instead. Otherwise, load `remotes` using `library("remotes")` and then install `specificity` using `install_github("darcyj/specificity")`. 
+
 **Pre-compiled:** To install `specificity` using a pre-compiled binary, head over to https://github.com/darcyj/specificity_builds. Download the build that matches your OS, and install it from terminal using `R CMD INSTALL specificity_blahblahblah_binary.tgz`. 
 
 ## Requirements

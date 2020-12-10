@@ -28,5 +28,12 @@ A full tutorial for `specificity` can be found in the `vignette` folder of this 
 ## Documentation
 Documentation for specific functions can be obtained within R using `?fun` where fun is the function you're interested in. There is also a full .pdf documentation file in this repository named `specificity.pdf`, which is a standard glossary of all functions in the package.
 
+## Contribute?
+If you'd like to contribute to this project, let me know! Right now, it would be nice to have:
+* more visualizations
+* vignette for advanced use (using your own null model)
+* vignette for integration of common data formats (i.e. phyloseq)
+* more builds at https://github.com/darcyj/specificity_builds
+
 ## Contact
 Send me an email if you'd like.

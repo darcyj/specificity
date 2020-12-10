@@ -2,8 +2,11 @@ language: r
 cache: packages
 warnings_are_errors: false
 
+# travis r package documentation:
+# https://docs.travis-ci.com/user/languages/r/
+
 r:
-  - master
+  - release
 
 
 # do not build vignettes...takes too long and times out on travis

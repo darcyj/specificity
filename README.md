@@ -12,13 +12,14 @@ There are two ways to install this package. The first is to compile it from sour
 
 **Compiling:** To compile and install, make sure that R has packages `remotes` and `Rcpp` installed. `Remotes` is part of `devtools`, so if you have that, you should be good. You can install it by running `install.packages("remotes")`. For installing `Rcpp`, linux users should be fine with `install.packages("Rcpp")`, but apparently Mac OS users may experience difficulty and need to install with a pre-compiled binary instead. Otherwise, load `remotes` using `library("remotes")` and then install `specificity` using `install_github("darcyj/specificity")`. 
 
-**Pre-compiled:** To install `specificity` using a pre-compiled binary, head over to https://github.com/darcyj/specificity_builds. Download the build that matches your OS, and install it from terminal using `R CMD INSTALL specificity_blahblahblah_binary.tgz`. 
+**Pre-compiled:** To install `specificity` using a pre-compiled binary, head over to https://github.com/darcyj/specificity_builds. Download the build that matches your OS, and install it from terminal using `R CMD INSTALL specificity_blahblahblah_binary.tgz`.
 
 ## Requirements
 `specificity` needs a few R packages to run. They should be installed automatically when you run the above. In case they aren't, you'll need:
 * `Rcpp` (In order to compile the C++ code in `specificity`. For users on Apple OS X, you may be asked by Rstudio to install "command line developer tools". If you're on OS X and not using Rstudio, you'll need to run `xcode-select --install` from terminal beforehand. If installing from Rstudio and asked whether to compile from source, you'll get best results if you say "yes")
 * `ape` (for phylogenetic stuff)
 * `fields` (for geographic stuff)
+
 For parallel processing you'll need to be using Linux or OS X, since R's parallelism doesn't work well on Windows. If you're using Windows, just set `n_cores` to 1 for any given paralellized function. OR if you're on Windows 10, running R through Windows Subsystem for Linux may give better multithreading results - please let me know if you try this.
 
 ## Tutorial Vignette

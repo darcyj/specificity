@@ -10,12 +10,12 @@
 #' @param to_int logical. Should output matrix be transformed into integers from
 #'   0 to max_int? Integers take up half as much space as doubles, and as weights
 #'   are equivalent for calculating specificity. The tradeoff is a little bit of
-#'   precision (DEFAULT: FALSE).
+#'   precision (default: FALSE).
 #' @param max_int integer. Maximum integer value used for to_int. If pairwise
 #'   geometric means will be calculated with these data, it is nice to keep this
 #'   value as the square root of the maximum integer size, which is the default.
 #' @param speciesRows logical. Do rows represent species (instead of samples)? 
-#'   (DEFAULT:FALSE)
+#'   (default:FALSE)
 #' @return matrix of proportional abundances.
 #'
 #' @examples

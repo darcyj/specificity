@@ -22,11 +22,11 @@ not provided but a weighted metric is specified, w will be set to 1 for each
 value of s. Thus, weights for each unique species in s would be equal to the
 number of times that species appears in s. w is not used for unweighted
 metrics (PD). Any NA values in w will be pairwise removed from w and s
-(DEFAULT: NULL).}
+(default: NULL).}
 
 \item{nested_set}{matrix. The output of make_nested_set(s_phylo). If not
 provided, will be calculated on the fly. Precalculation only provides speedup
-with very large trees (DEFAULT: NULL).}
+with very large trees (default: NULL).}
 
 \item{metric}{character. Abbreviated name of desired tree-based phylogenetic
 diversity metric. Available metrics are:
@@ -52,12 +52,9 @@ Single WPD or PD value.
 \description{
 Calculates weighted Phylogenetic Diversity for a vector s of species
 observations, weighted by the frequency of each species within s. For example,
-if S={a, a, b, a, b, c, a}, then species a will have weight 4, species b will
+if s={a, a, b, a, b, c, a}, then species a will have weight 4, species b will
 have weight 2, and species c will have weight 1. Unobserved species have weight
-zero.
-}
-\details{
-However, one may wish to exclude observations that do not meet some criterion,
+zero. However, one may wish to exclude observations that do not meet some criterion,
 such as co-observation of a symbiote or parasite. For this reason, a second set
 of weights w can be provided as a vector of numeric values that are paired with
 s. These weights are then implicitely combined with the weights discussed above 
@@ -84,10 +81,6 @@ Weighted Faith (WF), per-tip weights are averages of w.
   \item Faith DP (1992) Conservation evaluation and phylogenetic diversity. 
     Biological Conservation 61.
 }
-}
-\seealso{
-rao_quad_ent, a phylogenetic diversity measure that uses a distance matrix
-  instead of a phylogenetic tree.
 }
 \author{
 John L. Darcy

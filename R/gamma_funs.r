@@ -1,4 +1,5 @@
 
+# NOTE: These functions are internal. They don't have thorough documentation.
 # function to fit a gamma distribution to data
 # returns a list with par, log likelihood, and type - forward or reverse. for reverse,
 # also returns mx which is max(x), needed for reversing quantiles.

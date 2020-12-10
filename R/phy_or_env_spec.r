@@ -21,41 +21,33 @@
 #'
 #' @param abunds_mat matrix or data frame of numeric values. Columns represent 
 #'   species, rows are samples. For columns where the value is nonzero for two or
-#'   fewer data points, environmental SES cannot be calculated, and NAs will be 
+#'   fewer data points, specificity cannot be calculated, and NAs will be 
 #'   returned. Negative values in abunds_mat are not allowed (REQUIRED).
 #' @param env numeric vector, dist, or square matrix. Environmental variable 
 #'   corresponding to abunds. For example, temperature, or geographic distance.
-#'   Not required for computing phylogenetic specificity (DEFAULT: NULL).
+#'   Not required for computing phylogenetic specificity (default: NULL).
 #' @param hosts character vector. Host identities corresponding to abunds. Only
-#' required if calculating SES for phylogenetic specificity (DEFAULT: NULL).
+#' required if calculating phylogenetic specificity (default: NULL).
 #' @param hosts_phylo phylo object. Tree containing all unique hosts as tips. Only
-#' required if calculating SES for phylogenetic specificity (DEFAULT: NULL).
+#' required if calculating phylogenetic specificity (default: NULL).
 #' @param n_sim integer. Number of simulations of abunds_mat to do under the null 
 #'   hypothesis that host or environmental association is random. P-values will not
-#'   be calculated if n_sim < 100 (DEFAULT: 500).
-#' @param sim_fun function. A function f where f(abunds_mat) returns a matrix
-#'   object with the same number of rows and columns as abunds_mat. Default is
-#'   f=function(m){ m[sample(1:nrow(m)),]}, which just permutes the order of 
-#'   rows in abunds_mat. Users may wish to use a null model that is able to
-#'   preserve row and column totals such as the function permatswap() from the
-#'   vegan package or the function vaznull() from the bipartite package. Either
-#'   of these can be easily adapted to return only a single matrix (see examples). 
-#'   However, neither can accomodate non-integer matrices. 
+#'   be calculated if n_sim < 100 (default: 500).
 #' @param p_adj string. Type of multiple hypothesis testing correction performed
 #'   on P-values. Can take any valid method argument to p.adjust, including "none",
-#'   "bonferroni", "holm", "fdr", and others (DEFAULT: "fdr").
-#' @param seed integer. Seed to use so that this is repeatable (DEFAULT: 1234557).
+#'   "bonferroni", "holm", "fdr", and others (default: "fdr").
+#' @param seed integer. Seed to use so that this is repeatable (default: 1234557).
 #' @param tails integer. 1 = 1-tailed, test for specificity only. 2 = 2-tailed.
-#'   3 = 1-tailed, test for cosmopolitanism only. 0 = no test, P=1.0 (DEFAULT: 1).
+#'   3 = 1-tailed, test for cosmopolitanism only. 0 = no test, P=1.0 (default: 1).
 #' @param n_cores integer. Number of CPU cores to use for parallel operations. If
-#'   set to 1, lapply will be used instead of mclapply (DEFAULT: 2).
-#' @param verbose logical. Should status messages be displayed? (DEFAULT: TRUE).
+#'   set to 1, lapply will be used instead of mclapply (default: 2).
+#' @param verbose logical. Should status messages be displayed? (default: TRUE).
 #' @param p_method string. "raw" for quantile method, or "gamma_fit" for calculating P
-#'   by fitting a gamma distribution (DEFAULT: "raw").
+#'   by fitting a gamma distribution (default: "raw").
 #' @param center string. Type of central tendency to use for simulated RQE values.
 #'   Options are "mean", "median", and "mode". If mode is chosen, a reversible gamma
-#'   distribution is fit and mode is calculated using that distribution (DEFAULT: mean).
-#' @param denom_type string. Type of denominator (d) to use (DEFAULT: "index"). Note
+#'   distribution is fit and mode is calculated using that distribution (default: mean).
+#' @param denom_type string. Type of denominator (d) to use (default: "index"). Note
 #'   that denominator type does NOT affect P-values.
 #'   \describe{
 #'     \item{"ses":}{
@@ -85,12 +77,12 @@
 #'       values, where x is the maximum possible dissimilarity observable given species
 #'       weights. This d has other useful properties: scale invariance to env/hosts_phylo,
 #'       insensitivity to the number of samples, insensitivity to occupancy, and strong 
-#'       sensitivity to specificity (DEFAULT).
+#'       sensitivity to specificity (default).
 #'     }
 #'   }
-#' @param diagnostic logical. If true, changes output to include different parts of SES. 
-#'   This includes Pval, SES, raw, denom, emp, and all sim values with column labels as
-#'   simN where N is the number of sims (DEFAULT: FALSE)
+#' @param diagnostic logical. If true, changes output to include different parts of Spec. 
+#'   This includes Pval, Spec, raw, denom, emp, and all sim values with column labels as
+#'   simN where N is the number of sims (default: FALSE)
 #'
 #'
 #' @return data.frame where each row is an input species. First column is P-value
@@ -100,68 +92,79 @@
 #' # phylogenetic specificity using endophyte data set
 #' attach(endophyte)
 #' # only analyze species with occupancy >= 20
+#' specs_list <- list()
 #' m <- occ_threshold(prop_abund(zotutable), 20)
-#' ses_host <- phy_or_env_spec(
+#' specs_list$host <- phy_or_env_spec(
 #'     abunds_mat=m,
 #'     hosts=metadata$PlantGenus, 
 #'     hosts_phylo=supertree,
 #'     n_cores=12
 #' )
 #'
-#' # using vazquez null model from bipartite package as an alternate permutation:
-#' # note that the "creating permuted matrices" step will be slow.
-#' library(bipartite)
-#' ses_host_vaz <- phy_or_env_spec(
-#'     abunds_mat=m,
-#'     hosts=metadata$PlantGenus, 
-#'     hosts_phylo=supertree,
-#'     n_cores=12,
-#'     sim_fun=function(m){bipartite::vaznull(1, m)[[1]]},
-#' )
-#'
-#' # compare naive permutation vs. vazquez:
-#' plot(ses_host$Spec, ses_host_vaz$Spec, ylab="bipartite::vaznull", xlab="naive")
-#' abline(h=0);abline(v=0)
-#' hist(ses_host_vaz$Spec)
-#' hist(ses_host$Spec)
-#'
 #' # environmental specificity using elevation from endophyte data set:
-#' ses_elev <- phy_or_env_spec(
+#' specs_list$elev <- phy_or_env_spec(
 #'     abunds_mat=m,
 #'     env=metadata$Elevation,
 #'     n_cores=12
 #' )
 #' 
 #' # geographic specificity using spatial data from endophyte data set:
-#' ses_geo <- phy_or_env_spec(
+#' specs_list$geo <- phy_or_env_spec(
 #'     abunds_mat=m,
 #'     env=distcalc(metadata$Lat, metadata$Lon),
 #'     n_cores=12
 #' )
 #'
+#' plot_specificities(specs_list)
+#'
 #' @export
 phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL, 
-	hosts_phylo=NULL, n_sim=1000,  sim_fun=function(m){ m[sample(1:nrow(m)), ] }, 
-	p_adj="fdr", seed=1234567, tails=1, n_cores=2, verbose=TRUE,
-	p_method="raw", center="mean", denom_type="index", diagnostic=F){
+	hosts_phylo=NULL, n_sim=1000, p_adj="fdr", seed=1234567, 
+	tails=1, n_cores=2, verbose=TRUE, p_method="raw", center="mean", 
+	denom_type="index", diagnostic=F){
 
 	# debugging stuff:
 	# library(specificity); attach(endophyte)
 	# abunds_mat <- otutable[,colSums(otutable > 0) >= 10]
+	# abunds_mat <- prop_abund(abunds_mat)
 	# env = metadata$Elevation
 	# n_sim=100; n_cores=10
 	# hosts=NULL; hosts_phylo=NULL
-	# sim_fun=function(m){ m[sample(1:nrow(m)), ] }
 	# p_adj="fdr"; seed=1234567; tails=1; verbose=TRUE
 	# denom_type="index"
 	# p_method <- "gamma_fit"
 	# diagnostic <- TRUE
-
+	# center <- "mean"
+	# library(Rcpp)
+	# sourceCpp("rao_1spv2.cpp")
 
 	# little message function, to clean up code a bit
 	msg <- function(x){if(verbose){message(x)}}
 
-	msg("Checking inputs.")
+	# function to pretty format seconds from proc.time()
+	fms <- function(x){
+		secs <- x[3]
+		if(secs < 60){
+			return(paste(round(secs, 1), "seconds"))
+		}else if(secs < 60*60){
+			return(paste(round(secs/60, 1), "minutes"))
+		}else{
+			return(paste(round(secs/(60*60), 1), "hours"))
+		}
+	}
+
+	msg("Checking inputs...")
+	tt <- proc.time()
+
+	# replace NA/NaNs in abunds_mat with zeroes
+	nNAs <- sum(is.na(abunds_mat))
+	if(nNAs > 0){
+		abunds_mat[is.na(abunds_mat)] <- 0
+		warning(paste("Found", nNAs, "NA or NaN values in abunds_mat. Zero will be used in their place."))
+	}
+
+	# these checks are redundant with checks in calculate_spec_and_pval(), but they are done here
+	# so that user knows there's an error before waiting for calculations to be done!
 	# make sure p_adj is a real method
 	if(! p_adj %in% p.adjust.methods){
 		stop("p_adj not in p.adjust.methods.")
@@ -170,16 +173,21 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 	if(! center %in% c("mean", "median", "mode")){
 		stop(paste(center, "is not a valid argument for center. Use either \"mean\", \"median\", or \"mode\"."))
 	}
+	# make sure p_method is a valid argument
+	if(! p_method %in% c("raw", "gamma_fit")){
+		stop(paste(p_method, "is not a valid argument for p_method. Use \"raw\" or \"gamma_fit\"."))
+	}
+
 	# possible input types are: error, mat, dist, vec, phy
 	data_type <- check_pes_inputs(abunds_mat, env, hosts, hosts_phylo, verbose)
 	if(data_type == "error"){stop()}
 
 	# turn it all into a dist, no matter what.
 	if(data_type == "phy"){
-		msg("Converting tree to dist.")
+		msg("...Converting tree to dist...")
 		env <- tree2mat(tree=hosts_phylo, x=hosts, n_cores=n_cores, delim=";")
 	}else if(data_type == "vec"){
-		msg("Converting env vector to dist.")
+		msg("...Converting env vector to dist...")
 		env <- dist(env)
 	}else if(data_type == "mat"){
 		env <- as.dist(env)
@@ -191,12 +199,14 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 
 	# check if max rao is an int an if it's too large
 	col2check <- which.max(colSums(abunds_mat))
-	max2check <- rao_sort_max(w=abunds_mat[,col2check], D=env)
+	max2check <- rao_sort_max(abunds_mat[,col2check], D=env)
 	if(max2check > .Machine$integer.max){
-		warning("Maximum possible RAO value is greater than max integer value.
-			Consider using prop_abund() on abunds_mat, or dividing env by a scalar 
-			to remedy this. Trying anyway...")
+		stop("Maximum possible RAO value is greater than max integer value.
+			Use prop_abund() on abunds_mat, and/or divide env by a scalar 
+			to remedy this.")
 	}
+	msg(paste0("...done (took ", fms(proc.time()-tt), ")"))
+
 
 	# make wrapper for lapply/mclapply so with cores=1 it just uses lapply
 	# also for mapply
@@ -209,112 +219,27 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 		mapply_fun <- function(FUN, ...){mapply(FUN, ...)}
 	}
 
-	# generate n_sim daughter seeds for generation of each permuted matrix
-	seeds <- daughter_seeds(n=n_sim, s=seed)
+	# calculate empirical rao
+	msg(paste("Calculating emp RAO..."))
+	tt <- proc.time()
+	emp_raos <- apply(X=abunds_mat, MAR=2, FUN=rao1sp, D=env, perm=FALSE)
+	msg(paste0("...done (took ", fms(proc.time()-tt), ")"))
 
-	# function to generate matrix given seed:
-	perm_mat <- function(s){
-		set.seed(s)
-		return((sim_fun(abunds_mat)))
-	}
-	# create n_sim permuted matrices, but convert them into a list of column vectors.
-	msg(paste("Creating", n_sim, "permuted matrices."))
-	perm_cols <- do.call("cbind", lapply_fun(X=seeds, FUN=perm_mat))
+	# calculate sim rao
+	msg(paste("Calculating sim RAO..."))
+	tt <- proc.time()
+	# sim_raos <- lapply_fun(X=1:ncol(abunds_mat), FUN=function(x){
+	# 	replicate(n_sim, rao1sp(abunds_mat[,x], D=env, perm=T))
+	# })
+	sim_raos <- lapply_fun(X=1:ncol(abunds_mat), FUN=function(p){
+		raoperms(p=abunds_mat[,p], D=env, n_sim=n_sim, seed=seed)})
 
-	msg(paste("Calculating sim RAO."))
-	# split perm cols into a list of length n_cores
-	split_matrix <- function(m, g){
-		sp <- sort(rep(1:g, length.out=ncol(m)))
-		return(lapply(X=unique(sp), FUN=function(x){m[,sp==x, drop=FALSE]}))
-	}
-	sim_submats <- split_matrix(as.matrix(perm_cols), n_cores)
-	# calculate specs for perm_cols in parallel
-	specs_sim <- unlist(lapply_fun(X=sim_submats, FUN=spec_core, D=env))
-	specs_sim <- as.data.frame(matrix(specs_sim, ncol=ncol(abunds_mat), byrow = TRUE ))
-
-	# use spec_fun on empirical data
-	msg("Calculating emp RAO.")
-	emp_submats <- split_matrix(as.matrix(abunds_mat), n_cores)
-	specs_emp <- unlist(lapply_fun(X=emp_submats, FUN=spec_core, D=env))
-
-	# fit gamma distribution (incl reverse) to specs_sim
-	if(p_method == "gamma_fit" || center == "mode"){
-		msg("Fitting gamma distribution to sim RAO.")
-		gfits <- lapply_fun(X=as.list(specs_sim), FUN=fit_gamma_fwd_rev)
-	}
-	
-	# calculate p-values
-	msg("Calculating P-values.")
-	Pval_perm <- mapply_fun(FUN=p_from_perms_or_gfit, emp=specs_emp, perm=specs_sim, tails=tails)
-	if(p_method == "raw"){
-		Pval <- Pval_perm
-	}else if(p_method == "gamma_fit"){
-		Pval <- mapply_fun(FUN=p_from_perms_or_gfit, emp=specs_emp, gfit=gfits, 
-			fallback=Pval_perm, tails=tails)
-	}
-
-	# adjust p-values
-	Pval <- p.adjust(Pval, method=p_adj)
+	msg(paste0("...done (took ", fms(proc.time()-tt), ")"))
 
 	# calculate output specificity
-	msg("Calculating specificities.")
-	# calculate means as fallback for mode
-	spec_sim_means <- apply(X=specs_sim, MAR=2, FUN=mean)
-	if(center == "mean"){
-		spec_sim_centers <- spec_sim_means
-	}else if(center == "median"){
-		spec_sim_centers <- apply(X=specs_sim, MAR=2, FUN=median)
-	}else if(center == "mode"){
-		spec_sim_centers <- mapply_fun(FUN=mode_gamma_fwd_rev, fit=gfits, fallback=spec_sim_means)
-	}
-
-	# get denominator
-	if(denom_type == "ses"){
-		denom <- apply(X=specs_sim, MAR=2, FUN=sd)
-	}else if(denom_type == "raw"){
-		denom <- rep(1, ncol(specs_sim))
-	}else if(denom_type == "index"){
-		# initialize denominator to spec_sim_centers, which is correct denominator for spec <= 0 otus
-		denom <- spec_sim_centers
-		msg("Approximating max RAO values.")
-		# which otus are overdispersed and need maxs calculated? This gives their indices
-		otu_inds_4_max <- which(specs_emp >  spec_sim_centers)
-		# use above indices to make a list of corresponding column vectors from abunds mat
-		emp_col_list <- lapply(X=otu_inds_4_max, FUN=function(x){abunds_mat[,x]})
-		# calculate max rao values for those cols in parallel
-		maxraos <- unlist(lapply_fun(X=emp_col_list, FUN=rao_sort_max, D=env))
-		# put newly calculated maxs where they belong (for spec > 0 otus)
-		denom[specs_emp > spec_sim_centers] <- maxraos - spec_sim_centers[otu_inds_4_max]
-	}else if(denom_type == "sim_mode"){
-		denom <- spec_sim_centers
-	}else{
-		stop("Invalid denom_type.")
-	}
-
-	out_specs <- ((specs_emp - spec_sim_centers)/ denom)
-	out_specs <- round(out_specs, 4)
-	
-	# format output object
-	output <- data.frame(Pval, Spec=out_specs)
-	# if col names were input, use them for output too.
-	if( !is.null(colnames(abunds_mat))){
-		rownames(output) <- colnames(abunds_mat)
-	}
-
-	# if diagnostic output is desired, add columns to output
-	if(diagnostic){
-		specs_sim_mat_named <- t(specs_sim)
-		colnames(specs_sim_mat_named) <- paste0("sim", 1:ncol(specs_sim_mat_named))
-
-		output <- data.frame(output, 
-			raw=specs_emp - spec_sim_centers,
-			emp=specs_emp,
-			sim_mean=spec_sim_centers,
-			denom=denom,
-			specs_sim_mat_named
-		)
-	}
-
-	msg("Done.")
+	output <- calculate_spec_and_pval(emp_raos=emp_raos, sim_raos=sim_raos, 
+		abunds_mat=abunds_mat, env=env,
+		p_adj=p_adj, tails=tails, n_cores=n_cores, verbose=verbose, p_method=p_method,
+		center=center, denom_type=denom_type, diagnostic=diagnostic)
 	return(output)
 }

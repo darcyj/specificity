@@ -4,11 +4,11 @@
 #'
 #' @author John L. Darcy
 #'
-#' @param n_samp number of sampling locations to output (DEFAULT=1000).
-#' @param xmin minimum x-axis coordinate (DEFAULT=-100).
-#' @param xmax maximum x-axis coordinate (DEFAULT=100).
-#' @param ymin minimum y-axis coordinate (DEFAULT=-100).
-#' @param ymax maximum y-axis coordinate (DEFAULT=100).
+#' @param n_samp number of sampling locations to output (default: 1000).
+#' @param xmin minimum x-axis coordinate (default: -100).
+#' @param xmax maximum x-axis coordinate (default: 100).
+#' @param ymin minimum y-axis coordinate (default: -100).
+#' @param ymax maximum y-axis coordinate (default: 100).
 #' @param seed integer, seed for randomization.
 #'
 #' @return data.frame object with x and y columns, with n_samp rows.

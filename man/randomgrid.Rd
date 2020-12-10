@@ -14,15 +14,15 @@ randomgrid(
 )
 }
 \arguments{
-\item{n_samp}{number of sampling locations to output (DEFAULT=1000).}
+\item{n_samp}{number of sampling locations to output (default: 1000).}
 
-\item{xmin}{minimum x-axis coordinate (DEFAULT=-100).}
+\item{xmin}{minimum x-axis coordinate (default: -100).}
 
-\item{xmax}{maximum x-axis coordinate (DEFAULT=100).}
+\item{xmax}{maximum x-axis coordinate (default: 100).}
 
-\item{ymin}{minimum y-axis coordinate (DEFAULT=-100).}
+\item{ymin}{minimum y-axis coordinate (default: -100).}
 
-\item{ymax}{maximum y-axis coordinate (DEFAULT=100).}
+\item{ymax}{maximum y-axis coordinate (default: 100).}
 
 \item{seed}{integer, seed for randomization.}
 }

@@ -5,15 +5,19 @@ pairwise_product <- function(x) {
     .Call(`_specificity_pairwise_product`, x)
 }
 
-spec_core <- function(w, D) {
-    .Call(`_specificity_spec_core`, w, D)
+rao1sp <- function(p, D, perm = FALSE) {
+    .Call(`_specificity_rao1sp`, p, D, perm)
 }
 
-rao_sort_max <- function(w, D) {
-    .Call(`_specificity_rao_sort_max`, w, D)
+raoperms <- function(p, D, n_sim = 1000L, seed = 12345L) {
+    .Call(`_specificity_raoperms`, p, D, n_sim, seed)
 }
 
-rao_genetic_max <- function(w, D, term_cycles = 10L, maxiters = 400L, popsize = 300L, keep = 5L, prc = 0.001) {
-    .Call(`_specificity_rao_genetic_max`, w, D, term_cycles, maxiters, popsize, keep, prc)
+rao_sort_max <- function(p, D) {
+    .Call(`_specificity_rao_sort_max`, p, D)
+}
+
+rao_genetic_max <- function(p, D, term_cycles = 10L, maxiters = 400L, popsize = 300L, keep = 5L, prc = 0.001) {
+    .Call(`_specificity_rao_genetic_max`, p, D, term_cycles, maxiters, popsize, keep, prc)
 }
 

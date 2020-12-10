@@ -12,7 +12,7 @@ of sample locations. Can be artificial (generate with randomgrid()) or real.}
 
 \item{abunds}{abundances of a species, corresponding to rows in grid.}
 
-\item{pch}{pch character code to use for bottom of each abundance line (DEFAULT="")}
+\item{pch}{pch character code to use for bottom of each abundance line (default: "")}
 
 \item{...}{arguments to be passed to plot.}
 }

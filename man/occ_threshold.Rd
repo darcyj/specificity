@@ -14,7 +14,7 @@ species, rows are samples.}
 without being removed.}
 
 \item{max_absent}{float. Maximum abundance value at which a species will be
-considered absent (DEFAULT: 0).}
+considered absent (default: 0).}
 }
 \value{
 matrix with low-occupancy species removed.

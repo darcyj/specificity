@@ -15,9 +15,16 @@ using namespace Rcpp;
 //
 // @return vector of pairwise products, of length (l^2-l)/2,
 //   where l=length(x).
-
+// @examples
+// n <- 9
+// a <- matrix(0, nrow=n, ncol=n)
+// rownames(a) <- colnames(a) <- 1:n
+// pairwise_product(1:n)
+// a[lower.tri(a)] <- pairwise_product(1:n)
+// a
+// 
 // [[Rcpp::export]]
-NumericVector pairwise_product(const NumericVector x) {
+NumericVector pairwise_product(const NumericVector& x) {
 	// get number of pairwise points (npp) and initialize output vector
 	int n = x.size();
 	int npp = ((n * n) - n) / 2;
@@ -40,40 +47,136 @@ NumericVector pairwise_product(const NumericVector x) {
 }
 
 
-// spec_core is an internal function used by phy_or_env_spec(). 
-// w is a mxn matrix where rows are samples and cols are species (or perms)
+// rao1sp
+//
+// Calculates empirical rao for one species. 
+//
+// @author John L. Darcy
+// 
+// @param p numeric vector of species weights
+// @param D numeric vector (dist) of distances corresponding to a lower
+//   triangle of a matrix whose rows and cols correspond to p; i.e. an
+//   lxl matrix where l is length(p). R's dist() function does this for
+//   you!
+// @param perm bool; TRUE means permute p before calculation, FALSE means
+//   don't do it. IMPORTANT NOTE: this permutation does NOT respect R's 
+//   seed. To get deterministic permutations, use raoperms().
+//
+// @return A single rao value.
+//
+// @examples
+// data(endophyte); attach(endophyte)
+// otutable <- prop_abund(otutable)
+// rao1sp(p=otutable[,1], D=dist(metadata$Elevation), perm=FALSE)
+// set.seed(12345)
+// rao1sp(p=otutable[,1], D=dist(metadata$Elevation), perm=TRUE)
+// set.seed(666)
+// rao1sp(p=otutable[,1], D=dist(metadata$Elevation), perm=TRUE)
+// set.seed(12345)
+// rao1sp(p=otutable[,1], D=dist(metadata$Elevation), perm=TRUE)
+// [[Rcpp::export]]
+float rao1sp(const NumericVector& p, const NumericVector& D, bool perm=false){
+	// integer for how big p is (or rather, what the final index of p is)
+	int npm1 = p.size() - 1;
+	// pidx is a vector of indices for p, so that p doesn't need to
+	// be manipulated (copied) in this function. integers are much 
+	// more light weight than a vector of floats
+	IntegerVector pidx = seq(0, npm1);
+	// make rao output
+	float rao = 0;
+	// if permutation requested, permute pidx
+	if(perm){
+		
+		std::random_shuffle(pidx.begin(), pidx.end() );
+	}
+	// loop through p and D and create rao output
+	// i: row of D (as if it were a matrix)
+	// j: col of D (as if it were a matrix)
+	// k: index of vectorized D
+	int k = 0;
+	for(int j = 0; j < npm1; j++){
+		for(int i = j+1; i <= npm1; i++){
+			rao += p[pidx[i]] * p[pidx[j]] * D[k];
+			k++;
+		}
+	}
+	return(rao);
+}
+
+
+
+// rao1sp
+//
+// Calculates many sim (i.e. null) rao for one species. 
+//
+// @author John L. Darcy
+// 
+// @param p numeric vector of species weights
+// @param D numeric vector (dist) of distances corresponding to a lower
+//   triangle of a matrix whose rows and cols correspond to p; i.e. an
+//   lxl matrix where l is length(p). R's dist() function does this for
+//   you!
+// @param n_sim integer; number of raos to make
+// @param seed integer; seed for randomization and repeatability.
+//
+// @return n_sim rao values
+//
+// @examples
+// data(endophyte); attach(endophyte)
+// otutable <- prop_abund(otutable)
+// a <- raoperms(p=otutable[,1], D=dist(metadata$Elevation), n_sim=100, seed=777)
+// b <- raoperms(p=otutable[,1], D=dist(metadata$Elevation), n_sim=100, seed=666)
+// c <- raoperms(p=otutable[,1], D=dist(metadata$Elevation), n_sim=100, seed=777)
+// plot(a~c); abline(a=0,b=1,col="red")
+// plot(a~b); abline(a=0,b=1,col="red")
+// [[Rcpp::export]]
+NumericVector raoperms(const NumericVector& p, const NumericVector& D, const int n_sim=1000, int seed=12345){
+	NumericVector output(n_sim);
+	for(int i = 0; i<n_sim; i++){
+		srand(seed);
+		output[i] = rao1sp(p, D, true);
+		// increment seed to change it up for next time :)
+		seed++;
+	}
+	return(output);
+}
+
+
+// spec_core is an internal function used by rao_genetic_max(). It used to be
+// used by phy_or_env_spec() too, but now that's done by the much-improved
+// rao1sp() and raoperms(). 
+// p is a mxn matrix where rows are samples and cols are species (or perms)
 // D is a vector of distances
 // before use, make SURE that D is length (m(m-1))/2
-// [[Rcpp::export]]
-NumericVector spec_core(const NumericMatrix w, const NumericVector D) {
-	// const int nrow = w.nrow(); //not sure why this was here, unused so commented out.
-	const int ncol = w.ncol();
+NumericVector spec_core(const NumericMatrix& p, const NumericVector& D) {
+	const int ncol = p.ncol();
 	NumericVector output(ncol);
 
-	// for each column of w:
+	// for each column of p:
 	for(int col = 0; col < ncol; col++){
-		NumericVector rowi = w(_,col);
-		NumericVector W = pairwise_product(rowi);
+		NumericVector rowi = p(_,col);
+		NumericVector P2 = pairwise_product(rowi);
 		// calculate specificity using Rao
-		// output[col] = sum(W * D) / sum(W);
-		output[col] = sum(W * D);
+		// output[col] = sum(P2 * D) / sum(P2);
+		output[col] = sum(P2 * D);
 	}
 	return output;
 }
 
 
 // rao_sort_max approximates the maximum possible rao value given a 
-// species weights vector w and a distance vector D. 
+// species weights vector p and a distance vector D. 
 // [[Rcpp::export]]
-long double rao_sort_max(const NumericVector w, const NumericVector D) {
+long double rao_sort_max(const NumericVector& p, const NumericVector& D) {
 	long double out;
-	NumericVector W2 = pairwise_product(w);
-	std::sort(W2.begin(), W2.end());
+	NumericVector P2 = pairwise_product(p);
+	std::sort(P2.begin(), P2.end());
 	NumericVector D2 = clone(D);
 	std::sort(D2.begin(), D2.end());
-	out = sum(W2 * D2);
+	out = sum(P2 * D2);
 	return out;
 }
+
 
 // function that just swaps two items at random within a vector
 inline NumericVector swapcol (const NumericVector x){
@@ -126,21 +229,21 @@ inline bool double_equals (const long double x1, const long double x2, const lon
 	return std::abs(x1 - x2) < eps;
 }
 
-// genetic optimization algorithm for finding order of w that maximizes rao
+// genetic optimization algorithm for finding order of p that maximizes Rao
 // [[Rcpp::export]]
-List rao_genetic_max (const NumericVector w, const NumericVector D, 
+List rao_genetic_max (const NumericVector p, const NumericVector D, 
 	const int term_cycles=10, const int maxiters = 400, 
 	const int popsize=300, const int keep=5, const long double prc = 0.001){
-	// check to make sure w and D are correct lengths
-	int ws = w.size();
-	int w_expctd = (ws * (ws - 1)) / 2;
-	if(D.size() != w_expctd){
-		throw std::invalid_argument("w and D incompatible lengths.");
+	// check to make sure p and D are correct lengths
+	int ps = p.size();
+	int p_expctd = (ps * (ps - 1)) / 2;
+	if(D.size() != p_expctd){
+		throw std::invalid_argument("p and D incompatible lengths.");
 	}
-	// propagate initial matrix; each col is a w vector (a population of w vecs)
-	NumericMatrix pop = NumericMatrix(ws, popsize);
+	// propagate initial matrix; each col is a p vector (a population of p vecs)
+	NumericMatrix pop = NumericMatrix(ps, popsize);
 	for(int j=0; j<popsize; j++){
-		pop(_,j) = swapcol(w);
+		pop(_,j) = swapcol(p); 
 	}
 
 	// set up counters and outputs for generations
@@ -154,7 +257,7 @@ List rao_genetic_max (const NumericVector w, const NumericVector D,
 	// they never change size:
 	IntegerVector best_n_pos(keep);                   // stores which cols of pop are best
 	NumericVector pop_raos(popsize);                  // rao vals for each col of pop
-	NumericMatrix keepmat = NumericMatrix(ws, keep);  // stores best keep cols of pop while pop is overwritten
+	NumericMatrix keepmat = NumericMatrix(ps, keep);  // stores best keep cols of pop while pop is overwritten
 
 	// loop through iters
 	while(stopper == 0){
@@ -181,7 +284,7 @@ List rao_genetic_max (const NumericVector w, const NumericVector D,
 		}
 		// now do swap cols
 		IntegerVector col2do = seqrep(0, keep - 1, popsize);
-		NumericVector tempcol(ws);
+		NumericVector tempcol(ps);
 		for(int j=keep; j<popsize; j++){
 			pop(_,j) = swapcol(keepmat(_,col2do[j]));
 		}
@@ -209,14 +312,13 @@ List rao_genetic_max (const NumericVector w, const NumericVector D,
 
 	// make output list object
 	IntegerVector iterations = seq(0, maxiters - 1);
-	NumericVector best_w = pop(_,0);
+	NumericVector best_p = pop(_,0);
 	List ret;
 	ret["best_rao"] = last_best_rao;
 	ret["iter_raos"] = iter_best_raos;
 	ret["iterations"] = iterations;
-	ret["best_w"] = best_w;
+	ret["best_p"] = best_p;
 
 	return ret;
 
 }
-

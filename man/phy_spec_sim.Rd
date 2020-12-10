@@ -44,7 +44,7 @@ be in hosts_phylo. Can be blank ("") if corresponding n_ideal < 3. Can be
 length 1 or n (default: "").}
 
 \item{n_ideal}{integer vector. number of ideal hosts to use. Must be 1, 2, or
-3 (DEFAULT=1).}
+3 (default: 1).}
 
 \item{hosts}{character vector. Real of fake host identities. All must be 
 tips within hosts_phylo. Analogous to env argument to env_spec_sim.}
@@ -63,11 +63,11 @@ up, and the weight for the normal distribution will be 1-up (default: 0).}
 
 \item{oceanp}{numeric vector. See ?env_spec_sim for help.}
 
-\item{n_cores}{integer. Number of CPU cores for parallel computation (DEFAULT: 2).}
+\item{n_cores}{integer. Number of CPU cores for parallel computation (default: 2).}
 
 \item{seed}{integer. Seed for randomization. Daughter seeds will be generated for
 parallel computations, each with the same number of digits as seed 
-(DEFAULT: 1234567).}
+(default: 1234567).}
 }
 \value{
 List object containing "matrix" and "params" objects:

@@ -9,14 +9,14 @@
 #' 
 #' @param sl "specs list" list of outputs from phy_or_env_spec as described above.
 #' @param label_cex float. Size of variable labels, which will be displayed along the
-#'   plot's diagonal. Use cex units; see ?par (DEFAULT: 1).
+#'   plot's diagonal. Use cex units; see ?par (default: 1).
 #' @param point_cex float. Size of points in the plot's lower triangle. Useful to reduce
-#'   this if you are plotting lots of species. Use cex units; see ?par (DEFAULT: 1).
+#'   this if you are plotting lots of species. Use cex units; see ?par (default: 1).
 #' @param cor_cex float. Size of text for correlations displayed in plot's upper
-#'   triangle. Use cex units; see ?par (DEFAULT: 1).
+#'   triangle. Use cex units; see ?par (default: 1).
 #' @param cor_red_lim float. Correlation coefficients will be shown in red if they are
-#'   equal to or more extreme than this value (DEFAULT: 0.70). 
-#' @param method string. Preferred correlation method. see ?cor for options (DEFAULT: 
+#'   equal to or more extreme than this value (default: 0.70). 
+#' @param method string. Preferred correlation method. see ?cor for options (default: 
 #'   "pearson").
 #' @return Returns nothing. Plots correlations in a square matrix of subplots, where
 #'   variable names are shown in the diagonal, pairwise specificities are plotted in

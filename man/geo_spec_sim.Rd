@@ -35,17 +35,17 @@ observed. Will be the sum of the species' output column. Can be length 1 or n.}
 \item{grid}{data frame with columns x and y, representing cartesian coordinates
 of sample locations. Can be artificial (generate with randomgrid()) or real.}
 
-\item{ideal_x}{numeric vector. x-coordinate of the ideal spatial location for species (DEFAULT=0).}
+\item{ideal_x}{numeric vector. x-coordinate of the ideal spatial location for species (default:0).}
 
-\item{ideal_y}{numeric vector. y-coordinate of the ideal spatial location for species (DEFAULT=0).}
+\item{ideal_y}{numeric vector. y-coordinate of the ideal spatial location for species (default:0).}
 
-\item{ideal_x2}{numeric vector. x-coordinate for secondary ideal location. Only used if n_ideal<1 (DEFAULT=0).}
+\item{ideal_x2}{numeric vector. x-coordinate for secondary ideal location. Only used if n_ideal<1 (default:0).}
 
-\item{ideal_y2}{numeric vector. y-coordinate for secondary ideal location. Only used if n_ideal<1 (DEFAULT=0).}
+\item{ideal_y2}{numeric vector. y-coordinate for secondary ideal location. Only used if n_ideal<1 (default:0).}
 
-\item{ideal_x3}{numeric vector. x-coordinate for secondary ideal location. Only used if n_ideal<2 (DEFAULT=0).}
+\item{ideal_x3}{numeric vector. x-coordinate for secondary ideal location. Only used if n_ideal<2 (default:0).}
 
-\item{n_ideal}{integer vector.  number of ideal locations to use. Must be 1, 2, or 3 (DEFAULT=1).}
+\item{n_ideal}{integer vector. Number of ideal locations to use. Must be 1, 2, or 3 (default:1).}
 
 \item{up}{numeric vector. up=uniform proportion. This is the proportion of
 the probability distribution P(species) that is composed of a uniform
@@ -56,9 +56,9 @@ up, and the weight for the normal distribution will be 1-up (default: 0).}
 
 \item{seed}{integer. Seed for randomization. Daughter seeds will be generated for
 parallel computations, each with the same number of digits as seed 
-(DEFAULT: 1234567).}
+(default: 1234567).}
 
-\item{n_cores}{integer. Number of CPU cores for parallel computation (DEFAULT: 2).}
+\item{n_cores}{integer. Number of CPU cores for parallel computation (default: 2).}
 }
 \value{
 List object containing "matrix" and "params" objects:

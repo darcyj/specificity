@@ -10,7 +10,7 @@
 #' @param threshold integer. Minimum number of samples a species can occupy
 #'   without being removed.
 #' @param max_absent float. Maximum abundance value at which a species will be
-#'   considered absent (DEFAULT: 0). 
+#'   considered absent (default: 0). 
 #' 
 #' @return matrix with low-occupancy species removed.
 #' 

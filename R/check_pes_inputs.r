@@ -10,7 +10,7 @@
 #' @param env (required, can be NULL, see phy_or_env_spec)
 #' @param hosts (required, can be NULL, see phy_or_env_spec)
 #' @param hosts_phylo (required, can be NULL, see phy_or_env_spec)
-#' @param verbose logical. Should status messages be displayed? (DEFAULT: TRUE).
+#' @param verbose logical. Should status messages be displayed? (default: TRUE).
 #' 
 #' @return string. either "mat", "dist", "vec", "phy", or "error".
 #' 
@@ -54,6 +54,12 @@ check_pes_inputs <- function(abunds_mat, env, hosts, hosts_phylo, verbose=TRUE){
 		msg("Error: Mystery error.")
 	}
 
+	# check for NA or NAN values in abunds_mat
+	if(anyNA(abunds_mat)){
+		data_type <- "error"
+		msg("Error: NA or NaN values in abunds_mat.")
+	}
+
 	# check for errors specific to 2D data:
 	if(data_type %in% c("mat", "dist")){
 		# if it's a dist, just convert to mat. all same checks apply.
@@ -72,6 +78,10 @@ check_pes_inputs <- function(abunds_mat, env, hosts, hosts_phylo, verbose=TRUE){
 		}else if(nrow(env) != nrow(abunds_mat)){
 			data_type <- "error"
 			msg("Error: env and abunds_mat have incompatible dimensions.")
+		# are there NA/NaN values in env?
+		}else if(anyNA(env)){
+			data_type <- "error"
+			msg("Error: env contains NA or NaN values.")
 		}
 	}
 
@@ -85,13 +95,21 @@ check_pes_inputs <- function(abunds_mat, env, hosts, hosts_phylo, verbose=TRUE){
 		}else if(length(env) != nrow(abunds_mat)){
 			data_type <- "error"
 			msg("Error: env and abunds_mat have incompatible dimensions.")
+		# are there NA/NaN values in env?
+		}else if(anyNA(env)){
+			data_type <- "error"
+			msg("Error: env contains NA or NaN values.")
 		}
 	}
 
 	# check for errors specific to phylogenetic data:
 	if(data_type == "phy"){
+		# are there NA/NaN values in hosts?
+		if(anyNA(hosts)){
+			data_type <- "error"
+			msg("Error: hosts contains NA or NaN values.")
 		# are all the right tips in hosts_phylo?
-		if(! all(hosts %in% hosts_phylo$tip.label)){
+		}else if(! all(hosts %in% hosts_phylo$tip.label)){
 			data_type <- "error"
 			msg("Some hosts are missing from hosts_phylo.")
 		# is hosts the right length?

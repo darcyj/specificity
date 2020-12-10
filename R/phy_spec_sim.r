@@ -33,7 +33,7 @@
 #'   be in hosts_phylo. Can be blank ("") if corresponding n_ideal < 3. Can be
 #'   length 1 or n (default: "").
 #' @param n_ideal integer vector. number of ideal hosts to use. Must be 1, 2, or
-#'   3 (DEFAULT=1).
+#'   3 (default: 1).
 #' @param hosts character vector. Real of fake host identities. All must be 
 #'   tips within hosts_phylo. Analogous to env argument to env_spec_sim.
 #' @param hosts_phylo phylo object. Tree containing all unique hosts as tips.
@@ -46,10 +46,10 @@
 #'   and a uniform distribution. The weight for the uniform distribution will be
 #'   up, and the weight for the normal distribution will be 1-up (default: 0).
 #' @param oceanp numeric vector. See ?env_spec_sim for help.
-#' @param n_cores integer. Number of CPU cores for parallel computation (DEFAULT: 2).
+#' @param n_cores integer. Number of CPU cores for parallel computation (default: 2).
 #' @param seed integer. Seed for randomization. Daughter seeds will be generated for
 #'   parallel computations, each with the same number of digits as seed 
-#'   (DEFAULT: 1234567).
+#'   (default: 1234567).
 #'
 #' @return List object containing "matrix" and "params" objects:
 #'   \describe{

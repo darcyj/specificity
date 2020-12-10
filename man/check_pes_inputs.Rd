@@ -15,7 +15,7 @@ check_pes_inputs(abunds_mat, env, hosts, hosts_phylo, verbose = TRUE)
 
 \item{hosts_phylo}{(required, can be NULL, see phy_or_env_spec)}
 
-\item{verbose}{logical. Should status messages be displayed? (DEFAULT: TRUE).}
+\item{verbose}{logical. Should status messages be displayed? (default: TRUE).}
 }
 \value{
 string. either "mat", "dist", "vec", "phy", or "error".

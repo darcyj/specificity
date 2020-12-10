@@ -4,12 +4,12 @@
 #' an artificial (or real) environmental variable. That distribution has a mean
 #' at the "ideal" environmental value for the simulated species, and the standard
 #' deviation of that distribution controls the extent to which the species is
-#' specific to the variable. A high SD means less specificity, and a low SD means
-#' more specificity. 
+#' specific to the variable. A high SD means weaker specificity, and a low SD 
+#' means stronger specificity. 
 #'
 #' Since this process can result in failures (if a species is requested that's
 #' highly specific to a region of env that isn't samples), some output species
-#' will be failures. Default operation is to remove those failures from output
+#' will be failures. default operation is to remove those failures from output
 #' matrix and output params data frame, but this can be changed.
 #'
 #' @author John L. Darcy
@@ -29,6 +29,10 @@
 #' @param ideal3 numeric vector. Value of env that is the third ideal for the 
 #'   simulated species. Only used if n_ideal = 3. This is the third mode of the
 #'   probability distribution P(species). Can be length 1 or n.
+#' @param n_ideal integer vector. Number of ideal values for the simulated species,
+#'   i.e. modality of that species' distribution across env; 1 for unimodal, etc.
+#'   Only can ue values 1, 2, or 3, which correspond to ideal, ideal2, and ideal3.
+#'   Can be length 1 or n (default: 1).
 #' @param env numeric vector. Real or fake environmental variable.
 #' @param n_obs integer vector. Number of positive observations to make, i.e.
 #'   occupancy of simulated species. Can be length 1 or n (default: 1).
@@ -45,10 +49,10 @@
 #'   the temperature is 17C (great for cows). But cows are not found in the ocean.
 #'   This proportion is used to randomly select ocean sites within env, and then
 #'   p(s|env|ocean) = up. Can be length 1 or n (default: 0).
-#' @param n_cores integer. Number of CPU cores for parallel computation (DEFAULT: 2).
+#' @param n_cores integer. Number of CPU cores for parallel computation (default: 2).
 #' @param seed integer. Seed for randomization. Daughter seeds will be generated for
 #'   parallel computations, each with the same number of digits as seed 
-#'   (DEFAULT: 1234567).
+#'   (default: 1234567).
 #'
 #' @return List object containing "matrix" and "params" objects:
 #'   \describe{

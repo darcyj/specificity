@@ -7,7 +7,7 @@
 #' @param grid data frame with columns x and y, representing cartesian coordinates
 #'   of sample locations. Can be artificial (generate with randomgrid()) or real.
 #' @param abunds abundances of a species, corresponding to rows in grid.
-#' @param pch pch character code to use for bottom of each abundance line (DEFAULT="")
+#' @param pch pch character code to use for bottom of each abundance line (default: "")
 #' @param ... arguments to be passed to plot.
 #'
 #' @return returns nothing, just makes a plot. 

@@ -16,11 +16,11 @@ once.}
 
 \item{n_cores}{integer. Number of cores to use for parallel computation. No
 parallelization will be done if n_cores = 1. Multithreading should only be used
-for large trees where x has low redundancy (DEFAULT =1).}
+for large trees where x has low redundancy (default: 1).}
 
 \item{delim}{string. Delimiter character or string for internal use. Must not be
 present in tree$tip.label. This is checked by the function and will return an
-error otherwise (DEFAULT: ";").}
+error otherwise (default: ";").}
 }
 \value{
 dist object, of vector length equal to (l^2-l)/2 where l is length(x); i.e. 

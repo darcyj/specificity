@@ -3,10 +3,10 @@
 \alias{rao_genetic_max}
 \title{rao_genetic_max}
 \usage{
-rao_genetic_max(w, D)
+rao_genetic_max(p, D)
 }
 \arguments{
-\item{w}{numeric vector of length n - a species weights vector.}
+\item{p}{numeric vector of length n - a species weights vector.}
 \item{D}{numeric vector of length n(n-1)/2 - i.e. a dist object whose full matrix is nxn.}
 \item{term_cycles}{integer, number of cycles with no improvement to trigger termination (DEFAULT=10).}
 \item{maxiters}{integer, maximum number of iterations to run algorithm (DEFAULT=400).}
@@ -26,18 +26,18 @@ List object containing results of genetic algorithm:
     \item{iterations:}{
       Iteration numbers, corresponding to iter_raos.
     }
-    \item{best_w:}{
-      The best permutation of w found (corresponds to best_rao).
+    \item{best_p:}{
+      The best permutation of p found (corresponds to best_rao).
     }
   }
 }\description{
-Uses a genetic algorithm to find the optimum permutation of w to maximize Rao(w,D). 
+Uses a genetic algorithm to find the optimum permutation of p to maximize Rao(p,D). 
 }
 \examples{
   set.seed(12345)
-  w <- runif(100) * 20
-  D <- dist(sample(w))
-  a <- rao_genetic_max(w,D)
+  p <- runif(100) * 20
+  D <- dist(sample(p))
+  a <- rao_genetic_max(p,D)
   plot(a$iter_raos ~ a$iterations)
 }
 \author{

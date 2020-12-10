@@ -21,7 +21,7 @@
 #'   Must not contain duplicate tip labels.
 #' @param nested_set matrix. The output of make_nested_set(s_phylo). If not
 #'   provided, will be calculated on the fly. Precalculation only provides speedup
-#'   with very large trees (DEFAULT: NULL). 
+#'   with very large trees (default: NULL). 
 #' @param metric character. Abbreviated name of desired tree-based phylogenetic
 #'   diversity metric. Available metrics are:
 #'   \describe{

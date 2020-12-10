@@ -3,19 +3,22 @@
 \alias{rao_sort_max}
 \title{rao_sort_max}
 \usage{
-rao_sort_max(w, D)
+rao_sort_max(p, D)
 }
 \arguments{
-\item{w}{numeric vector of length n - a species weights vector.}
+\item{p}{numeric vector of length n - a species weights vector.}
 \item{D}{numeric vector of length n(n-1)/2 - i.e. a dist object whose full matrix is nxn.}
 }
 \value{
-A single value, approximating maximum rao under permutations of w.
+A single value, approximating maximum rao under permutations of p.
 }\description{
-Sorts pairwise_product(w) and D to approximate the maximum of Rao(w,D) under permutations of w.
+Sorts pairwise_product(p) and D to approximate the maximum of Rao(p,D) under permutations of p.
 }
 \examples{
-  # none yet written.
+  # data(endophyte)
+  # p <- prop_abund(endophyte$otutable)[,1]
+  # D <- dist(endophyte$metadata$Elevation)
+  # rsm <- rao_sort_max(p,D)
 }
 \author{
 John L. Darcy

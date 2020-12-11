@@ -2,6 +2,7 @@
 % Please edit documentation in R/plot_specificities.r
 \name{plot_specs_stacks}
 \alias{plot_specs_stacks}
+\alias{plot_specificities}
 \title{plot_specs_stacks}
 \usage{
 plot_specs_stacks(
@@ -42,11 +43,14 @@ Visualizes results from phy_or_env_spec as stacked histograms. Aliased to
 plot_specificities() for backward compatibility.
 }
 \examples{
-data(endophyte); attach(endophyte)
-otutable <- occ_threshold(prop_abund(otutable), 10)
-elev_spec <- phy_or_env_spec(otutable, env=metadata$Elevation, n_sim=100, p_method="gamma_fit")
-ndvi_spec <- phy_or_env_spec(otutable, env=metadata$NDVI, n_sim=100, p_method="gamma_fit")
-plot_specs_stacks(list(Elevation=elev_spec, NDVI=ndvi_spec))
+# # example commented out since they are computationally intense
+# # this is so they don't cause testing the package to take forever.
+# library(specificity)
+# attach(endophyte)
+# otutable <- occ_threshold(prop_abund(otutable), 10)
+# elev_spec <- phy_or_env_spec(otutable, env=metadata$Elevation, n_sim=100, p_method="gamma_fit")
+# ndvi_spec <- phy_or_env_spec(otutable, env=metadata$NDVI, n_sim=100, p_method="gamma_fit")
+# plot_specs_stacks(list(Elevation=elev_spec, NDVI=ndvi_spec))
 
 }
 \author{

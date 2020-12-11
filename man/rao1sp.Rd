@@ -8,7 +8,7 @@ rao1sp(p, D, perm)
 \arguments{
 \item{p}{numeric vector of length n - a species weights vector.}
 \item{D}{numeric vector of length n(n-1)/2 - i.e. a dist object whose full matrix is nxn.}
-\item{perm}{bool. Whether or not the permute order of p before calculating Rao.}
+\item{perm}{bool. Whether or not the permute order of p before calculating Rao (default: FALSE).}
 }
 \value{
 A single Rao value.
@@ -16,9 +16,10 @@ A single Rao value.
 Calculate's Rao's quadratic entropy for one species (rao1sp = "rao one species"). 
 }
 \examples{
-  # p <- 1:5/sum(1:5)
-  # D <- dist(6:10)
-  # rao1sp(p, D)
+  library(specificity)
+  p <- 1:5/sum(1:5)
+  D <- dist(6:10)
+  rao1sp(p, D)
 }
 \author{
 John L. Darcy

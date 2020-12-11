@@ -54,24 +54,27 @@ divided such that lighter colors represent density of non-significant features,
 and darker colors represent statistically significant features.
 }
 \examples{
-data(endophyte); attach(endophyte)
-otutable <- occ_threshold(prop_abund(otutable), 10)
-elev_spec <- phy_or_env_spec(otutable, env=metadata$Elevation, 
-  n_sim=100, p_method="gamma_fit")
-ndvi_spec <- phy_or_env_spec(otutable, env=metadata$NDVI, 
-  n_sim=100, p_method="gamma_fit")
-# default black
-plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec))
-# with colors
-plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec), 
-  cols=c("orange", "forestgreen"))
-# with border colors
-plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec), 
-  cols=c("orange", "forestgreen"), 
-  cols_bord=c("blue", "red"))
-# with thicker borders (arg "lwd" is passed to polygon())
-plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec), 
-  cols=c("orange", "forestgreen"), cols_bord="black", lwd=3)
+# # example commented out since they are computationally intense
+# # this is so they don't cause testing the package to take forever.
+# library(specificity)
+# attach(endophyte)
+# otutable <- occ_threshold(prop_abund(otutable), 10)
+# elev_spec <- phy_or_env_spec(otutable, env=metadata$Elevation, 
+#   n_sim=100, p_method="gamma_fit")
+# ndvi_spec <- phy_or_env_spec(otutable, env=metadata$NDVI, 
+#   n_sim=100, p_method="gamma_fit")
+# # default black
+# plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec))
+# # with colors
+# plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec), 
+#   cols=c("orange", "forestgreen"))
+# # with border colors
+# plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec), 
+#   cols=c("orange", "forestgreen"), 
+#   cols_bord=c("blue", "red"))
+# # with thicker borders (arg "lwd" is passed to polygon())
+# plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec), 
+#   cols=c("orange", "forestgreen"), cols_bord="black", lwd=3)
 }
 \author{
 John L. Darcy

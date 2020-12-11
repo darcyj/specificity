@@ -21,6 +21,8 @@ A newick (nwk) format string.
 Converts an ontology (higherarchical categories) into a nwk phylogeny.
 }
 \examples{
+library(specificity)
+library(ape)
 df <- data.frame(
 l1 = c( "a", "a", "a", "a", "a", "a", "a", "b", "b", "b", "b", "b", "b", "c", "d"),
 l2 = c( "e", "e", "e", "e", "f", "f", "g", "h", "h", "h", "i", "j", "j", "k", "l"),

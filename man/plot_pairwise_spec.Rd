@@ -44,18 +44,18 @@ where each object within the list is an output of phy_or_env_spec, and all were
 created using the same abunds_mat object (see: ?phy_or_env_spec).
 }
 \examples{
-  
-library(specificity)
-attach(endophyte)
-otutable_over10 <- occ_threshold(otutable, threshold = 10)
-specs_list <- list()
-specs_list$NDVI <- phy_or_env_spec(otutable_over10, env=metadata$NDVI, 
-  n_cores=10, n_sim=100, p_method="gamma_fit")
-specs_list$Evapotranspiration <- phy_or_env_spec(otutable_over10,
-  env=metadata$Evapotranspiration, n_cores=10, n_sim=100, p_method="gamma_fit")
-specs_list$Rainfall <- phy_or_env_spec(otutable_over10, env=metadata$Rainfall,
-  n_cores=10, n_sim=100, p_method="gamma_fit")
-plot_pairwise_spec(specs_list)
+# # example commented out since they are computationally intense
+# # this is so they don't cause testing the package to take forever.
+# attach(endophyte)
+# otutable_over10 <- occ_threshold(otutable, threshold = 10)
+# specs_list <- list()
+# specs_list$NDVI <- phy_or_env_spec(otutable_over10, env=metadata$NDVI, 
+#   n_cores=10, n_sim=100, p_method="gamma_fit")
+# specs_list$Evapotranspiration <- phy_or_env_spec(otutable_over10,
+#   env=metadata$Evapotranspiration, n_cores=10, n_sim=100, p_method="gamma_fit")
+# specs_list$Rainfall <- phy_or_env_spec(otutable_over10, env=metadata$Rainfall,
+#   n_cores=10, n_sim=100, p_method="gamma_fit")
+# plot_pairwise_spec(specs_list)
 
 }
 \author{

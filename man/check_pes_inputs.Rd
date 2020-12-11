@@ -27,3 +27,13 @@ make sure there are no problems. This could include missing species in trees,
 incompatible dimensions, non-numeric inputs, etc. Returns an input type, which
 is just a string that can be "mat", "dist", "vec", "phy", or "error".
 }
+\examples{
+library(specificity)
+attach(endophyte)
+m <- occ_threshold(prop_abund(otutable), threshold=10)
+check_pes_inputs(m, env=metadata$Elevation, hosts=NULL, hosts_phylo=NULL)
+check_pes_inputs(m, env=NULL, hosts=metadata$PlantGenus, hosts_phylo=supertree)
+aspect_dis <- circularize2dist(metadata$Aspect, 360)
+check_pes_inputs(m, env=aspect_dis, hosts=NULL, hosts_phylo=NULL)
+
+}

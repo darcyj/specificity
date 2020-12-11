@@ -4,13 +4,23 @@
 \alias{wpd_table}
 \title{wpd_table}
 \usage{
-wpd_table(m, s_phylo, nested_set, metric = "Hp", ncores = 4)
+wpd_table(
+  m,
+  s_phylo,
+  s_names = NULL,
+  nested_set = NULL,
+  metric = "Hp",
+  ncores = 4
+)
 }
 \arguments{
-\item{m}{matrix of species observation vectors (s). See s argument of wpd().}
+\item{m}{numeric matrix or data.frame of weights, where columns are species and
+rows are samples.}
 
 \item{s_phylo}{phylo object. Tree containing all unique names in s as tips.
 Must not contain duplicate tip labels.}
+
+\item{s_names}{species names for m if not colnames(m). NULL will use colnames (default: NULL)}
 
 \item{nested_set}{matrix. The output of make_nested_set(s_phylo). If not
 provided, will be calculated on the fly. Precalculation only provides speedup
@@ -33,6 +43,8 @@ diversity metric. Available metrics are:
     lengths in your tree (but only for taxa in s). Faith 1992.
   }
 }}
+
+\item{ncores}{integer. Number of CPU cores to use for parallel operations (default: 4).}
 }
 \value{
 multiple WPD or PD values, one for each column of m.
@@ -43,7 +55,18 @@ observations within matrix m, weighted by the frequency of each species within
 s. Can also calculate Faith's PD.
 }
 \examples{
-  none yet written.
+  library(specificity)
+  set.seed(12345)
+  s_phylo <- get(data(endophyte))$supertree
+  w <- sample(c(0, 1), replace=TRUE, size=10)
+  nspec <- 12
+  m <- t(as.matrix(data.frame(
+    a=runif(nspec, 0, 100),
+    b=runif(nspec, 0, 100),
+    c=runif(nspec, 0, 100)
+  )))
+  colnames(m) <- sample(s_phylo$tip.label, ncol(m))
+  wpd_table(m, s_phylo)
 
 }
 \references{

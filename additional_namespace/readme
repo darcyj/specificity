@@ -1,0 +1,8 @@
+This folder contains additional lines for the NAMESPACE of this R package.
+Those lines are not automatically added by document(), but are important
+for the package to pass R CMD check (note: the package WILL WORK if built
+without those lines...). 
+
+These lines are added to NAMESPACE when update_r_package.r is run, which
+should be done line-by-line in interactive mode whenever changes are made
+to the package. 

@@ -15,10 +15,11 @@
 #' @return matrix with low-occupancy species removed.
 #' 
 #' @examples
+#' library(specificity)
 #' attach(endophyte)
-#' dim(zotutable)
-#' zotutable_over25 <- occ_threshold(zotutable, 25)
-#' dim(zotutable_over25)
+#' dim(otutable)
+#' otutable_over25 <- occ_threshold(otutable, 25)
+#' dim(otutable_over25)
 #' 
 #' @export 
 occ_threshold <- function(m, threshold, max_absent=0){

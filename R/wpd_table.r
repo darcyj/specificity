@@ -16,7 +16,9 @@
 #'     Biological Conservation 61.
 #' }
 #' 
-#' @param m matrix of species observation vectors (s). See s argument of wpd().
+#' @param m numeric matrix or data.frame of weights, where columns are species and
+#'   rows are samples.
+#' @param s_names species names for m if not colnames(m). NULL will use colnames (default: NULL)
 #' @param s_phylo phylo object. Tree containing all unique names in s as tips.
 #'   Must not contain duplicate tip labels.
 #' @param nested_set matrix. The output of make_nested_set(s_phylo). If not
@@ -39,20 +41,54 @@
 #'       lengths in your tree (but only for taxa in s). Faith 1992.
 #'     }
 #'   }
+#' @param ncores integer. Number of CPU cores to use for parallel operations (default: 4).
+#' 
 #' @return multiple WPD or PD values, one for each column of m.
 #'
 #' @examples
-#'   none yet written.
+#'   library(specificity)
+#'   set.seed(12345)
+#'   s_phylo <- get(data(endophyte))$supertree
+#'   w <- sample(c(0, 1), replace=TRUE, size=10)
+#'   nspec <- 12
+#'   m <- t(as.matrix(data.frame(
+#'     a=runif(nspec, 0, 100),
+#'     b=runif(nspec, 0, 100),
+#'     c=runif(nspec, 0, 100)
+#'   )))
+#'   colnames(m) <- sample(s_phylo$tip.label, ncol(m))
+#'   wpd_table(m, s_phylo)
 #'
 #' @export
-wpd_table <- function(m, s_phylo, nested_set, metric="Hp", ncores=4){
-	wpd_vec <- function(x, names, s_phylo, nested_set, metric){
-		wpd(s=names, s_phylo=s_phylo, w=x, nested_set=nested_set, metric=metric)
+wpd_table <- function(m, s_phylo, s_names=NULL, nested_set=NULL, metric="Hp", ncores=4){
+	# handle s_names == NULL
+	if(is.null(s_names)){s_names <- colnames(m)}
+	# check all names occur in tree
+	if( ! all(s_names %in% s_phylo$tip.label) ){
+		stop("Not all s_names (or colnames(m) if s_names was NULL) are in s_phylo")
 	}
+	# make nested set?
+	if(is.null(nested_set)){
+		s_phylo <- ape::keep.tip(phy=s_phylo, tip=s_names)
+		nested_set <- make_nested_set(s_phylo, ncores)
+	}
+	samp_list <- as.list(as.data.frame(t(m)))
 
-	samp_list <- as.list(as.data.frame(m))
-
-	output <- simplify2array(mclapply2(X=samp_list, FUN=wpd_vec, names=rownames(m), s_phylo=s_phylo, nested_set=nested_set, metric=metric, mc.cores=ncores))
+	if(ncores <= 1){
+		output <- sapply(
+			X=samp_list, 
+			FUN=function(w){
+				wpd(s=s_names, s_phylo=s_phylo, w=w, nested_set=nested_set, metric=metric) 
+			}
+		)
+	}else{
+		output <- simplify2array(parallel::mclapply(
+			X=samp_list, 
+			FUN=function(w){
+				wpd(s=s_names, s_phylo=s_phylo, w=w, nested_set=nested_set, metric=metric) 
+			},
+			mc.cores=ncores
+		))
+	}
 	return(output)
 }
-

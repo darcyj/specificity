@@ -97,7 +97,7 @@ will be failures. default operation is to remove those failures from output
 matrix and output params data frame, but this can be changed.
 }
 \examples{
-  none yet written.
+  # none yet written.
 
 }
 \author{

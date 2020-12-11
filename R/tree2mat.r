@@ -25,6 +25,8 @@
 #'   values are the lower triangle of a patristic distance matrix with rows=x and cols=x. 
 #'
 #' @examples
+#'   library(specificity)
+#'   library(ape)
 #'   example_tree <- ape::read.tree(text=" ((((a:1,b:1):1,c:2):1,d:3):1,(e:1,f:1):3);")
 #'   example_x <- c("a", "a", "a", "b", "c", "d", "c", "a", "f")
 #'   # unique patristic distance matrix:
@@ -36,13 +38,10 @@
 #'   tree2mat(tree=example_tree, x=example_x, delim="@")
 #'   tree2mat(tree=example_tree, x=example_x, delim="i love cats")
 #'   # should fail since "a" is in a tip name:
-#'   tree2mat(tree=example_tree, x=example_x, delim="a")
+#'   # tree2mat(tree=example_tree, x=example_x, delim="a")
 #' 
 #' @export
 tree2mat <- function(tree, x, n_cores=1, delim=";"){
-	require(ape)
-	require(parallel)
-
 	# check that each species in x is in tree exactly once
 	times_in_tree <- sapply(x, FUN=function(x){sum(tree$tip.label %in% x)})
 	if(0 %in% times_in_tree){ stop("ERROR: some species in x not in tree.") }
@@ -68,7 +67,7 @@ tree2mat <- function(tree, x, n_cores=1, delim=";"){
 	comp_pairs <- sapply(X=comp_pairs, FUN=unorder)
 
 	# drop tips in tree not in x
-	tree <- keep.tip(tree, x)
+	tree <- ape::keep.tip(tree, x)
 
 	# make nested set object
 	ns <- make_nested_set(tree)
@@ -85,7 +84,7 @@ tree2mat <- function(tree, x, n_cores=1, delim=";"){
 	if(n_cores <= 1){
 		u_dists <- as.vector(sapply(X=u_comp_pairs, FUN=d_ab))
 	}else{
-		u_dists <- simplify2array(mclapply(X=u_comp_pairs, FUN=d_ab, mc.cores=n_cores))
+		u_dists <- simplify2array(parallel::mclapply(X=u_comp_pairs, FUN=d_ab, mc.cores=n_cores))
 	}
 
 	# put u_dists into the right places in output

@@ -75,9 +75,9 @@
 #'   ($Pval), second column is specificity ($Spec).
 #'
 #' @examples
-#' None yet. Forthcoming examples:
-#' 1. calculating regular old elevational specificity the hard way
-#' 2. same thing, but using vazquez null model from bipartite package
+#' # None yet. Forthcoming examples:
+#' # 1. calculating regular old elevational specificity the hard way
+#' # 2. same thing, but using vazquez null model from bipartite package
 #'
 #' @export
 calculate_spec_and_pval <- function(emp_raos, sim_raos, abunds_mat, env,
@@ -103,9 +103,8 @@ calculate_spec_and_pval <- function(emp_raos, sim_raos, abunds_mat, env,
 
 	# apply function for parallelism or not:
 	if(n_cores > 1){
-		require("parallel")
-		lapply_fun <- function(X, FUN, ...){mclapply(X, FUN, mc.cores=n_cores, ...)}
-		mapply_fun <- function(FUN, ...){mcmapply(FUN, mc.cores=n_cores, ...)}
+		lapply_fun <- function(X, FUN, ...){parallel::mclapply(X, FUN, mc.cores=n_cores, ...)}
+		mapply_fun <- function(FUN, ...){parallel::mcmapply(FUN, mc.cores=n_cores, ...)}
 	}else{
 		lapply_fun <- function(X, FUN, ...){lapply(X, FUN, ...)}
 		mapply_fun <- function(FUN, ...){mapply(FUN, ...)}
@@ -170,7 +169,7 @@ calculate_spec_and_pval <- function(emp_raos, sim_raos, abunds_mat, env,
 		# which species are overdispersed and need maxs calculated? This gives their indices
 		species_inds_4_max <- which(emp_raos >  sim_rao_centers)
 		# approximate max rao for each species indexed by species_inds_4_max
-		max_raos <- apply(X=abunds_mat[,species_inds_4_max, drop=F], MAR=2, 
+		max_raos <- apply(X=abunds_mat[,species_inds_4_max, drop=F], MARGIN=2, 
 			FUN=rao_sort_max, D=env)
 		# put newly calculated maxs where they belong (for spec > 0 otus)
 		denom[species_inds_4_max] <- max_raos - sim_rao_centers[species_inds_4_max]

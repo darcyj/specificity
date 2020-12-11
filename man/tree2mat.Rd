@@ -35,6 +35,8 @@ produces a distance matrix containing only unique pairwise patristic distances
 within the phylogeny.
 }
 \examples{
+  library(specificity)
+  library(ape)
   example_tree <- ape::read.tree(text=" ((((a:1,b:1):1,c:2):1,d:3):1,(e:1,f:1):3);")
   example_x <- c("a", "a", "a", "b", "c", "d", "c", "a", "f")
   # unique patristic distance matrix:
@@ -46,7 +48,7 @@ within the phylogeny.
   tree2mat(tree=example_tree, x=example_x, delim="@")
   tree2mat(tree=example_tree, x=example_x, delim="i love cats")
   # should fail since "a" is in a tip name:
-  tree2mat(tree=example_tree, x=example_x, delim="a")
+  # tree2mat(tree=example_tree, x=example_x, delim="a")
 
 }
 \author{

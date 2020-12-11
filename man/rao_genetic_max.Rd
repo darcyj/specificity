@@ -3,16 +3,16 @@
 \alias{rao_genetic_max}
 \title{rao_genetic_max}
 \usage{
-rao_genetic_max(p, D)
+rao_genetic_max(p, D, term_cycles, maxiters, popsize, keep, prc)
 }
 \arguments{
 \item{p}{numeric vector of length n - a species weights vector.}
 \item{D}{numeric vector of length n(n-1)/2 - i.e. a dist object whose full matrix is nxn.}
-\item{term_cycles}{integer, number of cycles with no improvement to trigger termination (DEFAULT=10).}
-\item{maxiters}{integer, maximum number of iterations to run algorithm (DEFAULT=400).}
-\item{popsize}{integer, population size for genetic algorithm (DEFAULT=300).}
-\item{keep}{integer, number of individuals to keep during each iteration (DEFAULT=5).}
-\item{prc}{double, precision for calculating termination with term_cycles (DEFAULT=0.001).}
+\item{term_cycles}{integer, number of cycles with no improvement to trigger termination (default: 10).}
+\item{maxiters}{integer, maximum number of iterations to run algorithm (default: 400).}
+\item{popsize}{integer, population size for genetic algorithm (default: 300).}
+\item{keep}{integer, number of individuals to keep during each iteration (default: 5).}
+\item{prc}{double, precision for calculating termination with term_cycles (default: 0.001).}
 }
 \value{
 List object containing results of genetic algorithm:
@@ -34,8 +34,9 @@ List object containing results of genetic algorithm:
 Uses a genetic algorithm to find the optimum permutation of p to maximize Rao(p,D). 
 }
 \examples{
+  library(specificity)
   set.seed(12345)
-  p <- runif(100) * 20
+  p <- runif(100)
   D <- dist(sample(p))
   a <- rao_genetic_max(p,D)
   plot(a$iter_raos ~ a$iterations)

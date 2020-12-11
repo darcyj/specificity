@@ -96,7 +96,7 @@ baseline probability to P(s). The standard deviation of P(s) can be raised or
 lowered to simulate cosmopolitanism or specificity.
 }
 \examples{
-  none yet written.
+  # none yet written.
 
 }
 \author{

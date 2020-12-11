@@ -35,9 +35,10 @@ Calculates proportional abundance of each species (columns) across samples
 (rows) in community data matrix m. Row sums of output matrix will all be 1.
 }
 \examples{
+library(specificity)
 attach(endophyte)
-m_dbl <- prop_abund(zotutable)
-m_int <- prop_abund(zotutable, to_int=TRUE)
+m_dbl <- prop_abund(otutable)
+m_int <- prop_abund(otutable, to_int=TRUE)
 head(rowSums(m_dbl))
 head(rowSums(m_int))
 # note that they are off by a little bit. This small loss in precision is OK.

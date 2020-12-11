@@ -22,7 +22,8 @@ Calculates pairwise geographic distance between locations on earth. Just a
 convenient wrapper for fields::rdist.earth().
 }
 \examples{
-data(endophyte)
+library(specificity)
+attach(endophyte)
 geo_dists <- distcalc(metadata$Lat, metadata$Lon, metadata$SampleID)
 all(rownames(geo_dists) == metadata$SampleID)
 

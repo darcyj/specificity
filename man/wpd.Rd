@@ -66,8 +66,8 @@ Weighted Faith (WF), per-tip weights are averages of w.
   library(specificity)
   set.seed(12345)
   s_phylo <- get(data(endophyte))$supertree
-  w <- sample(c(0, 1), replace=T, size=10)
-  s <- sample(s_phylo$tip.label, replace=T, size=10)
+  w <- sample(c(0, 1), replace=TRUE, size=10)
+  s <- sample(s_phylo$tip.label, replace=TRUE, size=10)
   wpd(s, s_phylo, w, metric="Hp")
 
 }

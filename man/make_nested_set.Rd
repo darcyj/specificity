@@ -36,9 +36,10 @@ given by the inclusive range between those values.
 }
 \examples{
   library(specificity)
+  library(ape)
   phy <- get(data(endophyte))$supertree
   # check if tree is rooted:
-  is.rooted(phy)
+  ape::is.rooted(phy)
   # make nested set table:
   phy_ns <- make_nested_set(phy)
   # show that nested set table matches up with edges table in phy:

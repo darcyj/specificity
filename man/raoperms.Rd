@@ -3,20 +3,28 @@
 \alias{raoperms}
 \title{raoperms}
 \usage{
-raoperms(p,D,nsim,seed)
+raoperms(p,D,n_sim,seed)
 }
 \arguments{
 \item{p}{numeric vector of species weights.}
 \item{D}{numeric vector (dist) of distances corresponding to a lower triangle of a matrix whose rows and cols correspond to p; i.e. an lxl matrix where l is length(p). R's dist() function does this for you!}
-\item{nsim}{integer. number of sims to do}
-\item{seed}{integer. seed for randomization}
+\item{n_sim}{integer. number of sims to do (default: 1000).}
+\item{seed}{integer. seed for randomization (default: 12345).}
 }
 \value{
-Vector of Rao values, length = nsim.
+Vector of Rao values, length = n_sim.
 }
 \description{
 C++ function used by phy_or_env_spec(). Not meant for use otherwise.
 }
+\examples{
+  library(specificity)
+  p <- runif(100) 
+  D <- dist(runif(100))
+  a <- raoperms(p,D,100,12345)
+  hist(a)
+}
+
 \author{
 John L. Darcy
 }

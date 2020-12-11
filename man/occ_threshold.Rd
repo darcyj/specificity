@@ -24,10 +24,11 @@ removes species (columns) from a matrix that don't meet a minimum occupancy,
 defined as the number of samples in which that species was observed.
 }
 \examples{
+library(specificity)
 attach(endophyte)
-dim(zotutable)
-zotutable_over25 <- occ_threshold(zotutable, 25)
-dim(zotutable_over25)
+dim(otutable)
+otutable_over25 <- occ_threshold(otutable, 25)
+dim(otutable_over25)
 
 }
 \author{

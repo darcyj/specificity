@@ -65,8 +65,8 @@
 #'   library(specificity)
 #'   set.seed(12345)
 #'   s_phylo <- get(data(endophyte))$supertree
-#'   w <- sample(c(0, 1), replace=T, size=10)
-#'   s <- sample(s_phylo$tip.label, replace=T, size=10)
+#'   w <- sample(c(0, 1), replace=TRUE, size=10)
+#'   s <- sample(s_phylo$tip.label, replace=TRUE, size=10)
 #'   wpd(s, s_phylo, w, metric="Hp")
 #'
 #' @export
@@ -160,7 +160,7 @@ wpd <- function(s, s_phylo, w=NULL, nested_set=NULL, metric="Hp"){
 		}
 
 		# from Allen et al. 2009, Equation 1
-		pb <- apply(X=nested_set, MAR=1, FUN=wfun, rw=w_tips)
+		pb <- apply(X=nested_set, MARGIN=1, FUN=wfun, rw=w_tips)
 		lb <- s_phylo$edge.length
 		# since Hp is insensitive to zeroes (like Shannon), just turn all NAs
 		# into zeroes.
@@ -173,7 +173,7 @@ wpd <- function(s, s_phylo, w=NULL, nested_set=NULL, metric="Hp"){
 			return(mean_naig(unlist(rw[ nsb[2]:nsb[3] ])))
 		}
 		# from Swenson 2014, pp. 36
-		a <- apply(X=nested_set, MAR=1, FUN=wfun, rw=w_tips)
+		a <- apply(X=nested_set, MARGIN=1, FUN=wfun, rw=w_tips)
 		n <- sum(!is.na(a))
 		l <- s_phylo$edge.length
 		return(n * sum_naig(a * l) / sum_naig(a))
@@ -191,7 +191,7 @@ wpd <- function(s, s_phylo, w=NULL, nested_set=NULL, metric="Hp"){
 				return(1)
 			}
 		}
-		branch01 <- apply(X=nested_set, MAR=1, FUN=wfun, rw=w_tips)
+		branch01 <- apply(X=nested_set, MARGIN=1, FUN=wfun, rw=w_tips)
 		# from Faith 1992
 		return(sum(s_phylo$edge.length * branch01))
 	}else{

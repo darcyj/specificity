@@ -1,8 +1,20 @@
-
-# NOTE: These functions are internal. They don't have thorough documentation.
-# function to fit a gamma distribution to data
-# returns a list with par, log likelihood, and type - forward or reverse. for reverse,
-# also returns mx which is max(x), needed for reversing quantiles.
+#' fit_gamma_fwd_rev
+#'
+#' Fits reversible gamma distribution to x where x is a vector of data.
+#' Internal function for phy_or_env_spec() or calculate_pec_and_pval().
+#'
+#' @author John L. Darcy
+#' @keywords internal
+#'
+#' @param x numeric vector.
+#' @param lower_prop float. proportion of gamma max likelihood estimator
+#'   to use as lower boundary for fitting (default: 0.10).
+#' @param upper_prop float. proportion of gamma max likelihood estimator
+#'   to use as upper boundary for fitting (default: 10.0).
+#' 
+#' @return a list with par, log likelihood, and type - forward or reverse.
+#'   for reverse, also returns mx which is max(x), needed for reversing
+#'   quantiles.
 fit_gamma_fwd_rev <- function(x, lower_prop=0.10, upper_prop=10){
 	# lower_prop <- 0.10
 	# upper_prop <- 10
@@ -10,7 +22,7 @@ fit_gamma_fwd_rev <- function(x, lower_prop=0.10, upper_prop=10){
 	skewx <- (sqrt(n) * sum(xc^3)/(sum(xc^2)^(3/2))) * ((1 - 1/n))^(3/2) 
 
 	if(is.null(skewx) || is.na(skewx) || is.nan(skewx)){
-		# likely case where skew can't be calculated because var=0.
+		# likely case where skew can't be calculated because var(x)==0.
 		# return fit that tells downstream functions to use meaan(x)
 		# instead of mode (because they are the same) and to use
 		# quantile method for p (because p=0 or 1).
@@ -113,8 +125,19 @@ fit_gamma_fwd_rev <- function(x, lower_prop=0.10, upper_prop=10){
 
 
 
-# user-interpretable check of goodness of fit for distribution
-# x is perms, fit is result of fit_gamma_fwd_rev
+#' fit_gamma_fwd_rev
+#'
+#' Calculates user-interpretable check of goodness of fit for gamma
+#'   distribution where x is data, and fit is an object returned by
+#'   fit_gamma_fwd_rev().
+#' 
+#' @author John L. Darcy
+#' @keywords internal
+#'
+#' @param x numeric vector.
+#' @param fit object returned by fit_gamma_fwd_rev().
+#' 
+#' @return a single correlation coefficient.
 gamma_hist_cor <- function(x, fit){
 	# because of bug in hist() with fake numbers, here is a fake hist.
 	fakehist <- function(x){
@@ -141,10 +164,21 @@ gamma_hist_cor <- function(x, fit){
 }
 
 
-# calculates mode for a given gamma distribution fit
-# can handle fwd or reverse fits.
-# fit is just the object returned by fit_gamma_fwd_rev.
-# fallback is what to return if fit failed
+
+
+#' mode_gamma_fwd_rev
+#'
+#' calculates mode for a given gamma distribution fit, as produced by
+#' fit_gamma_fwd_rev(). If that function failed, fallback is what to
+#' return if that function instead (as a passthrough).
+#' 
+#' @author John L. Darcy
+#' @keywords internal
+#'
+#' @param fit object returned by fit_gamma_fwd_rev().
+#' @param fallback anything. what to return if fit failed.
+#' 
+#' @return either a single value (a mode), or fallback.
 mode_gamma_fwd_rev <- function(fit, fallback){
 	mo <- (fit$par[1] - 1) / fit$par[2]
 	if(fit$type == "reverse"){
@@ -158,10 +192,18 @@ mode_gamma_fwd_rev <- function(fit, fallback){
 }
 
 
-# same as pgamma but for custom fit objects returned by fit_gamma_fwd_rev.
-# q - a quantile (in non-reversed orientation)
-# fit - an object from fit_gamma_fwd_rev\
-# fallback - what to return if fit failed
+#' p_gamma_fwd_rev
+#'
+#' same as pgamma() but for custom fit objects returned by fit_gamma_fwd_rev.
+#' 
+#' @author John L. Darcy
+#' @keywords internal
+#'
+#' @param q  a quantile (in non-reversed orientation).
+#' @param fit object returned by fit_gamma_fwd_rev().
+#' @param fallback anything. what to return if fit failed.
+#' 
+#' @return either a single value (a P-value), or fallback.
 p_gamma_fwd_rev <- function(q, fit, fallback){
 	if(fit$type == "reverse"){
 		q_r <- fit$mx - q  # reverse the quantile, then plug in
@@ -173,13 +215,22 @@ p_gamma_fwd_rev <- function(q, fit, fallback){
 	}
 }
 
-# calculates a p-value either for permutations or from a gfit object (from fit_gamma_fwd_rev )
-# emp - an empirical value
-# perm - values from permutation
-# gfit - gamma fit from fit_gamma_fwd_rev (use this OR perm, not both)
-# tails - 1=left, 2=both, 3=right
-# threshold - minimum number of perm values to return a P
-# fallback - p to use instead of gamma p if gamma fit didn't work
+
+#' p_from_perms_or_gfit
+#'
+#' calculates a P-value either from permutations (via the regular quantile approach)
+#' or from a fit_gamma_fwd_rev() fit.
+#' 
+#' @author John L. Darcy
+#' @keywords internal
+#'
+#' @param emp an empirical value (a quantile).
+#' @param perm numeric vector of values (use this OR gfit, not both. default: NULL).
+#' @param gfit object returned by fit_gamma_fwd_rev() (use this OR perm, not both. default: NULL).
+#' @param fallback anything. what to return if gfit failed (default: 1)
+#' @param tails integer, 1, 2, or 3. 1 means left tail, 2 means both tails, 3 means right (default: 1).
+#' @param threshold integer. minimum number of perms required to return a P-value (default: 30).
+#' @return either a single value (a P-value), or fallback.
 p_from_perms_or_gfit <- function(emp, perm=NULL, gfit=NULL, fallback=1, 
 	tails=1, threshold=30){
 

@@ -17,6 +17,7 @@
 #' @return a vector of differences, ordered identically to a "dist" object.
 #'
 #' @examples
+#' library(specificity)
 #' # make some fake data to represent months of the year
 #' months <- c(1, 4, 11)
 #' # run circularize2dist() on the months. Must specify that

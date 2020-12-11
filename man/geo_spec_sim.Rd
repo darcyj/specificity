@@ -45,6 +45,8 @@ of sample locations. Can be artificial (generate with randomgrid()) or real.}
 
 \item{ideal_x3}{numeric vector. x-coordinate for secondary ideal location. Only used if n_ideal<2 (default:0).}
 
+\item{ideal_y3}{numeric vector. y-coordinate for secondary ideal location. Only used if n_ideal<2 (default:0).}
+
 \item{n_ideal}{integer vector. Number of ideal locations to use. Must be 1, 2, or 3 (default:1).}
 
 \item{up}{numeric vector. up=uniform proportion. This is the proportion of
@@ -81,20 +83,21 @@ species specific to geographic space. A high SD means less specificity, and a
 low SD means more specificity.
 }
 \examples{
-  g1 <- randomgrid()
-  plot(g1)
-  a1 <- geo_spec_sim(sdev=c(30, 30, 30, 30), n_obs=1000, grid=g1, up=c(0, 0.20, 0.40, 0.60))
-  par(mfrow=c(2,2))
-  plot_grid_abunds(g1, a1$matrix[,1])
-  plot_grid_abunds(g1, a1$matrix[,2])
-  plot_grid_abunds(g1, a1$matrix[,3])
-  plot_grid_abunds(g1, a1$matrix[,4])
-  a2 <- geo_spec_sim(sdev=c(10, 20, 30, 40), n_obs=1000, grid=g1, ideal_x=-50, ideal_x2=50, n_ideal=2)
-  par(mfrow=c(2,2))
-  plot_grid_abunds(g1, a2$matrix[,1], main="sd=10")
-  plot_grid_abunds(g1, a2$matrix[,2], main="sd=20")
-  plot_grid_abunds(g1, a2$matrix[,3], main="sd=30")
-  plot_grid_abunds(g1, a2$matrix[,4], main="sd=40")
+library(specificity)
+g1 <- randomgrid()
+plot(g1)
+a1 <- geo_spec_sim(sdev=c(30, 30, 30, 30), n_obs=1000, grid=g1, up=c(0, 0.20, 0.40, 0.60))
+par(mfrow=c(2,2))
+plot_grid_abunds(g1, a1$matrix[,1])
+plot_grid_abunds(g1, a1$matrix[,2])
+plot_grid_abunds(g1, a1$matrix[,3])
+plot_grid_abunds(g1, a1$matrix[,4])
+a2 <- geo_spec_sim(sdev=c(10, 20, 30, 40), n_obs=1000, grid=g1, ideal_x=-50, ideal_x2=50, n_ideal=2)
+par(mfrow=c(2,2))
+plot_grid_abunds(g1, a2$matrix[,1], main="sd=10")
+plot_grid_abunds(g1, a2$matrix[,2], main="sd=20")
+plot_grid_abunds(g1, a2$matrix[,3], main="sd=30")
+plot_grid_abunds(g1, a2$matrix[,4], main="sd=40")
 
 }
 \author{

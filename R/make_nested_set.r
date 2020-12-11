@@ -34,9 +34,10 @@
 #'
 #' @examples
 #'   library(specificity)
+#'   library(ape)
 #'   phy <- get(data(endophyte))$supertree
 #'   # check if tree is rooted:
-#'   is.rooted(phy)
+#'   ape::is.rooted(phy)
 #'   # make nested set table:
 #'   phy_ns <- make_nested_set(phy)
 #'   # show that nested set table matches up with edges table in phy:
@@ -44,8 +45,6 @@
 #'
 #' @export
 make_nested_set <- function(phy, n_cores=2){
-	require(ape)
-	require(parallel)
 	if( ! ape::is.rooted(phy)){
 		stop("ERROR: phylogeny is not rooted. Maybe try a midpoint root?")
 	}
@@ -69,15 +68,10 @@ make_nested_set <- function(phy, n_cores=2){
 	if(n_cores <= 1){
 		dfs <- lapply(X=phy$edge[,2], FUN=get_node_tip_range)
 	}else{
-		dfs <- mclapply(X=phy$edge[,2], FUN=get_node_tip_range, mc.cores=n_cores)
+		dfs <- parallel::mclapply(X=phy$edge[,2], FUN=get_node_tip_range, mc.cores=n_cores)
 	}
-	# combine data frames. if data.table is available, use that since it's FAST
-	# otherwise just use do.call
-	if(requireNamespace("data.table", quietly=TRUE)){
-		dfs <- as.data.frame(data.table::rbindlist(dfs))
-	}else{
-		dfs <- do.call("rbind", dfs)
-	}
+	# combine data frames.
+	dfs <- do.call("rbind", dfs)
 	# if there was an contiguity error, do a warning
 	if( ! all(dfs$contig) ){
 		warning("One or more nodes did not contain contiguous tip ranges.")

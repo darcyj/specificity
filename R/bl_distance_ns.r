@@ -14,6 +14,7 @@
 #' @return Distance between tipa and tipb.
 #'
 #' @examples
+#'   library(specificity)
 #'   library(ape)
 #'   example_tree <- ape::read.tree(text=" ((((a:1,b:1):1,c:2):1,d:3):1,(e:1,f:1):3);")
 #'   plot(example_tree); axis(side=1)

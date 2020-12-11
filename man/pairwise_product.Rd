@@ -18,7 +18,7 @@ lower triangle of matrix with rows and columns x.
 }
 \examples{
   x <- 1:6
-  y_cpp <- pairwise_geo_mean(x)
+  y_cpp <- pairwise_product(x)
   y_r <- as.dist(outer(x, x, function(x,y){x*y}))
   print("Calculated with R's outer() function:")
   y_r

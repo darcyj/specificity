@@ -89,33 +89,36 @@
 #'   ($Pval), second column is specificity ($Spec).
 #'
 #' @examples
-#' # phylogenetic specificity using endophyte data set
-#' attach(endophyte)
-#' # only analyze species with occupancy >= 20
-#' specs_list <- list()
-#' m <- occ_threshold(prop_abund(zotutable), 20)
-#' specs_list$host <- phy_or_env_spec(
-#'     abunds_mat=m,
-#'     hosts=metadata$PlantGenus, 
-#'     hosts_phylo=supertree,
-#'     n_cores=12
-#' )
-#'
-#' # environmental specificity using elevation from endophyte data set:
-#' specs_list$elev <- phy_or_env_spec(
-#'     abunds_mat=m,
-#'     env=metadata$Elevation,
-#'     n_cores=12
-#' )
-#' 
-#' # geographic specificity using spatial data from endophyte data set:
-#' specs_list$geo <- phy_or_env_spec(
-#'     abunds_mat=m,
-#'     env=distcalc(metadata$Lat, metadata$Lon),
-#'     n_cores=12
-#' )
-#'
-#' plot_specificities(specs_list)
+#' # # example commented out since they are computationally intense
+#' # # this is so they don't cause testing the package to take forever.
+#' # # phylogenetic specificity using endophyte data set
+#' # library(specificity)
+#' # attach(endophyte)
+#' # # only analyze species with occupancy >= 20
+#' # specs_list <- list()
+#' # m <- occ_threshold(prop_abund(otutable), 20)
+#' # specs_list$host <- phy_or_env_spec(
+#' #     abunds_mat=m,
+#' #     hosts=metadata$PlantGenus, 
+#' #     hosts_phylo=supertree,
+#' #     n_cores=4
+#' # )
+#' # 
+#' # # environmental specificity using elevation from endophyte data set:
+#' # specs_list$elev <- phy_or_env_spec(
+#' #     abunds_mat=m,
+#' #     env=metadata$Elevation,
+#' #     n_cores=4
+#' # )
+#' # 
+#' # # geographic specificity using spatial data from endophyte data set:
+#' # specs_list$geo <- phy_or_env_spec(
+#' #     abunds_mat=m,
+#' #     env=distcalc(metadata$Lat, metadata$Lon),
+#' #     n_cores=4
+#' # )
+#' # 
+#' # plot_specs_violin(specs_list)
 #'
 #' @export
 phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL, 
@@ -211,9 +214,8 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 	# make wrapper for lapply/mclapply so with cores=1 it just uses lapply
 	# also for mapply
 	if(n_cores > 1){
-		require("parallel")
-		lapply_fun <- function(X, FUN, ...){mclapply(X, FUN, mc.cores=n_cores, ...)}
-		mapply_fun <- function(FUN, ...){mcmapply(FUN, mc.cores=n_cores, ...)}
+		lapply_fun <- function(X, FUN, ...){parallel::mclapply(X, FUN, mc.cores=n_cores, ...)}
+		mapply_fun <- function(FUN, ...){parallel::mcmapply(FUN, mc.cores=n_cores, ...)}
 	}else{
 		lapply_fun <- function(X, FUN, ...){lapply(X, FUN, ...)}
 		mapply_fun <- function(FUN, ...){mapply(FUN, ...)}
@@ -222,7 +224,7 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 	# calculate empirical rao
 	msg(paste("Calculating emp RAO..."))
 	tt <- proc.time()
-	emp_raos <- apply(X=abunds_mat, MAR=2, FUN=rao1sp, D=env, perm=FALSE)
+	emp_raos <- apply(X=abunds_mat, MARGIN=2, FUN=rao1sp, D=env, perm=FALSE)
 	msg(paste0("...done (took ", fms(proc.time()-tt), ")"))
 
 	# calculate sim rao

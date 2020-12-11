@@ -19,9 +19,10 @@
 #' @return matrix of proportional abundances.
 #'
 #' @examples
+#' library(specificity)
 #' attach(endophyte)
-#' m_dbl <- prop_abund(zotutable)
-#' m_int <- prop_abund(zotutable, to_int=TRUE)
+#' m_dbl <- prop_abund(otutable)
+#' m_int <- prop_abund(otutable, to_int=TRUE)
 #' head(rowSums(m_dbl))
 #' head(rowSums(m_int))
 #' # note that they are off by a little bit. This small loss in precision is OK.

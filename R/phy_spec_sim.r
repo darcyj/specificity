@@ -66,13 +66,12 @@
 #'   }
 #'
 #' @examples
-#'   none yet written.
+#'   # none yet written.
 #'
 #' @export
 phy_spec_sim <- function(sdev, ideal, ideal2="", ideal3="", n_ideal=1, hosts, hosts_phylo, 
 	n_obs, up=0, oceanp=0, n_cores=2, seed=1234567){
 
-	require("parallel")
 	# make sure hosts is character and not factor
 	hosts <- as.character(hosts)
 	# deal with variable inputs by constructing table for each simulated species
@@ -110,7 +109,7 @@ phy_spec_sim <- function(sdev, ideal, ideal2="", ideal3="", n_ideal=1, hosts, ho
 	)
 	ideal_v$i2v[var_df$n_ideal < 2] <- TRUE # OK to have invalid ideal2 if n_ideal < 2
 	ideal_v$i3v[var_df$n_ideal < 3] <- TRUE # OK to have invalid ideal3 if n_ideal < 3
-	badspecies <- apply(X=!ideal_v, MAR=1, FUN=any)
+	badspecies <- apply(X=!ideal_v, MARGIN=1, FUN=any)
 	if(any(badspecies)){
 		stop("One or more species had invalid ideal/ideal2/ideal3 values.")
 	}
@@ -141,11 +140,11 @@ phy_spec_sim <- function(sdev, ideal, ideal2="", ideal3="", n_ideal=1, hosts, ho
 		dists2ideal <- sapply(X=hosts, FUN=function(x){ bl_distance_ns(tipa=x, tipb=params$ideal, tree=hosts_phylo, ns=nested_set) } )
 		if(params$n_ideal == 2){
 			dists2ideal2 <- sapply(X=hosts, FUN=function(x){ bl_distance_ns(tipa=x, tipb=params$ideal2, tree=hosts_phylo, ns=nested_set) } )
-			dists2ideal <- apply(X=cbind(dists2ideal, dists2ideal2), MAR=1, FUN=min)
+			dists2ideal <- apply(X=cbind(dists2ideal, dists2ideal2), MARGIN=1, FUN=min)
 		}else if(params$n_ideal == 3){
 			dists2ideal2 <- sapply(X=hosts, FUN=function(x){ bl_distance_ns(tipa=x, tipb=params$ideal2, tree=hosts_phylo, ns=nested_set) } )
 			dists2ideal3 <- sapply(X=hosts, FUN=function(x){ bl_distance_ns(tipa=x, tipb=params$ideal3, tree=hosts_phylo, ns=nested_set) } )
-			dists2ideal <- apply(X=cbind(dists2ideal, dists2ideal2, dists2ideal3), MAR=1, FUN=min)
+			dists2ideal <- apply(X=cbind(dists2ideal, dists2ideal2, dists2ideal3), MARGIN=1, FUN=min)
 		}
 		# get probability of observing species with distance to ideal dists2ideal[i],
 		# given that the species is observed exactly once.
@@ -158,7 +157,8 @@ phy_spec_sim <- function(sdev, ideal, ideal2="", ideal3="", n_ideal=1, hosts, ho
 		#return(as.vector(rmultinom(n=1, size=params$n_obs, prob=probs_1obs)))
 	}
 
-	out_matrix <- simplify2array(mclapply(X=var_list, FUN=phy_spec_sim_1species, mc.cores=n_cores))
+	out_matrix <- simplify2array(parallel::mclapply(X=var_list, 
+		FUN=phy_spec_sim_1species, mc.cores=n_cores))
 
 	return(list(
 		matrix=out_matrix, 

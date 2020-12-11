@@ -105,9 +105,9 @@ of this function as the final component of "build your own phy_or_env_spec()".
 Note that for this custom approach, the environmental variable must be a dist.
 }
 \examples{
-None yet. Forthcoming examples:
-1. calculating regular old elevational specificity the hard way
-2. same thing, but using vazquez null model from bipartite package
+# None yet. Forthcoming examples:
+# 1. calculating regular old elevational specificity the hard way
+# 2. same thing, but using vazquez null model from bipartite package
 
 }
 \author{

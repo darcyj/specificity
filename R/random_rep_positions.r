@@ -12,6 +12,19 @@
 #' 
 #' @return integer vector of positions that were selected
 #' 
+#' @examples
+#' library(specificity)
+#' attach(endophyte)
+#' m_dbl <- prop_abund(otutable)
+#' m_int <- prop_abund(otutable, to_int=TRUE)
+#' head(rowSums(m_dbl))
+#' head(rowSums(m_int))
+#' # note that they are off by a little bit. This small loss in precision is OK.
+#' object.size(m_dbl)
+#' object.size(m_int)
+#' random_positions <- random_rep_positions(m_dbl, 100)
+#' plot(m_int[random_positions] ~ m_dbl[random_positions])
+#' 
 #' @export
 random_rep_positions <- function(x, nbins=50){
 	breaks <- seq(from=min(x), to=max(x), length.out=50)

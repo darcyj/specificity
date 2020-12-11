@@ -66,11 +66,10 @@
 ##'    }
 #'   }
 #' @examples
-#'   none yet written.
+#'   # none yet written.
 #'
 #' @export
 env_spec_sim <- function(sdev, ideal, ideal2=0, ideal3=0, n_ideal=1, env,  n_obs, up=0, oceanp=0, n_cores=2, seed=1234567){
-	require("parallel")
 	# force n_obs to be integer
 	n_obs <- round(n_obs)
 	# deal with variable inputs by constructing table for each simulated species
@@ -127,7 +126,8 @@ env_spec_sim <- function(sdev, ideal, ideal2=0, ideal3=0, n_ideal=1, env,  n_obs
 		return(as.vector(rmultinom(n=1, size=params$n_obs, prob=probs_1obs)))
 	}
 
-	out_matrix <- simplify2array(mclapply(X=var_list, FUN=env_spec_sim_1species, mc.cores=n_cores))
+	out_matrix <- simplify2array(parallel::mclapply(X=var_list, 
+		FUN=env_spec_sim_1species, mc.cores=n_cores))
 
 	return(list(
 		matrix=out_matrix, 

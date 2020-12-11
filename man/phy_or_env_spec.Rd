@@ -114,33 +114,36 @@ values such that Spec=0 indicates random assortment (null hypothesis), and more
 negative values indicate stronger specificity.
 }
 \examples{
-# phylogenetic specificity using endophyte data set
-attach(endophyte)
-# only analyze species with occupancy >= 20
-specs_list <- list()
-m <- occ_threshold(prop_abund(zotutable), 20)
-specs_list$host <- phy_or_env_spec(
-    abunds_mat=m,
-    hosts=metadata$PlantGenus, 
-    hosts_phylo=supertree,
-    n_cores=12
-)
-
-# environmental specificity using elevation from endophyte data set:
-specs_list$elev <- phy_or_env_spec(
-    abunds_mat=m,
-    env=metadata$Elevation,
-    n_cores=12
-)
-
-# geographic specificity using spatial data from endophyte data set:
-specs_list$geo <- phy_or_env_spec(
-    abunds_mat=m,
-    env=distcalc(metadata$Lat, metadata$Lon),
-    n_cores=12
-)
-
-plot_specificities(specs_list)
+# # example commented out since they are computationally intense
+# # this is so they don't cause testing the package to take forever.
+# # phylogenetic specificity using endophyte data set
+# library(specificity)
+# attach(endophyte)
+# # only analyze species with occupancy >= 20
+# specs_list <- list()
+# m <- occ_threshold(prop_abund(otutable), 20)
+# specs_list$host <- phy_or_env_spec(
+#     abunds_mat=m,
+#     hosts=metadata$PlantGenus, 
+#     hosts_phylo=supertree,
+#     n_cores=4
+# )
+# 
+# # environmental specificity using elevation from endophyte data set:
+# specs_list$elev <- phy_or_env_spec(
+#     abunds_mat=m,
+#     env=metadata$Elevation,
+#     n_cores=4
+# )
+# 
+# # geographic specificity using spatial data from endophyte data set:
+# specs_list$geo <- phy_or_env_spec(
+#     abunds_mat=m,
+#     env=distcalc(metadata$Lat, metadata$Lon),
+#     n_cores=4
+# )
+# 
+# plot_specs_violin(specs_list)
 
 }
 \references{

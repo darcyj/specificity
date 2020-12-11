@@ -18,13 +18,17 @@
 #'   col_sig and col_nsig above (default: 0.05).
 #' @param label_cex float. Used to change size of x-axis labels (default: 1).
 #' @return returns nothing (a plot is made).
+#' @aliases plot_specificities
 #'
 #' @examples
-#' data(endophyte); attach(endophyte)
-#' otutable <- occ_threshold(prop_abund(otutable), 10)
-#' elev_spec <- phy_or_env_spec(otutable, env=metadata$Elevation, n_sim=100, p_method="gamma_fit")
-#' ndvi_spec <- phy_or_env_spec(otutable, env=metadata$NDVI, n_sim=100, p_method="gamma_fit")
-#' plot_specs_stacks(list(Elevation=elev_spec, NDVI=ndvi_spec))
+#' # # example commented out since they are computationally intense
+#' # # this is so they don't cause testing the package to take forever.
+#' # library(specificity)
+#' # attach(endophyte)
+#' # otutable <- occ_threshold(prop_abund(otutable), 10)
+#' # elev_spec <- phy_or_env_spec(otutable, env=metadata$Elevation, n_sim=100, p_method="gamma_fit")
+#' # ndvi_spec <- phy_or_env_spec(otutable, env=metadata$NDVI, n_sim=100, p_method="gamma_fit")
+#' # plot_specs_stacks(list(Elevation=elev_spec, NDVI=ndvi_spec))
 #'
 #' @export
 plot_specs_stacks <- plot_specificities <- function(specs_list, n_bins=20, 
@@ -144,24 +148,27 @@ plot_specs_stacks <- plot_specificities <- function(specs_list, n_bins=20,
 #' @return returns nothing (a plot is made).
 #'
 #' @examples
-#' data(endophyte); attach(endophyte)
-#' otutable <- occ_threshold(prop_abund(otutable), 10)
-#' elev_spec <- phy_or_env_spec(otutable, env=metadata$Elevation, 
-#'   n_sim=100, p_method="gamma_fit")
-#' ndvi_spec <- phy_or_env_spec(otutable, env=metadata$NDVI, 
-#'   n_sim=100, p_method="gamma_fit")
-#' # default black
-#' plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec))
-#' # with colors
-#' plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec), 
-#'   cols=c("orange", "forestgreen"))
-#' # with border colors
-#' plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec), 
-#'   cols=c("orange", "forestgreen"), 
-#'   cols_bord=c("blue", "red"))
-#' # with thicker borders (arg "lwd" is passed to polygon())
-#' plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec), 
-#'   cols=c("orange", "forestgreen"), cols_bord="black", lwd=3)
+#' # # example commented out since they are computationally intense
+#' # # this is so they don't cause testing the package to take forever.
+#' # library(specificity)
+#' # attach(endophyte)
+#' # otutable <- occ_threshold(prop_abund(otutable), 10)
+#' # elev_spec <- phy_or_env_spec(otutable, env=metadata$Elevation, 
+#' #   n_sim=100, p_method="gamma_fit")
+#' # ndvi_spec <- phy_or_env_spec(otutable, env=metadata$NDVI, 
+#' #   n_sim=100, p_method="gamma_fit")
+#' # # default black
+#' # plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec))
+#' # # with colors
+#' # plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec), 
+#' #   cols=c("orange", "forestgreen"))
+#' # # with border colors
+#' # plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec), 
+#' #   cols=c("orange", "forestgreen"), 
+#' #   cols_bord=c("blue", "red"))
+#' # # with thicker borders (arg "lwd" is passed to polygon())
+#' # plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec), 
+#' #   cols=c("orange", "forestgreen"), cols_bord="black", lwd=3)
 #' @export
 plot_specs_violin <- function(specs_list, cols="black", cols_bord="white", 
 	alpha=0.05, label_cex=1, nsig_trans=0.30, minval=-1, maxval=1, ylab="Spec", ...){
@@ -178,8 +185,8 @@ plot_specs_violin <- function(specs_list, cols="black", cols_bord="white",
 	yvals <- densities_all[[1]]$x
 	# convert densities mats to proportion, just in case density has some variation
 	# in total densities due to missing data etc
-	densities_all_mat <- apply(X=densities_all_mat, MAR=2, FUN=function(x){x/sum(x)})
-	densities_sig_mat <- apply(X=densities_sig_mat, MAR=2, FUN=function(x){x/sum(x)})
+	densities_all_mat <- apply(X=densities_all_mat, MARGIN=2, FUN=function(x){x/sum(x)})
+	densities_sig_mat <- apply(X=densities_sig_mat, MARGIN=2, FUN=function(x){x/sum(x)})
 	# proportionalize densities_sig
 	sig_props <- sapply(X=specs_list, FUN=function(x){sum(x$Pval < alpha) / nrow(x)})
 	for(i in 1:ncol(densities_sig_mat)){

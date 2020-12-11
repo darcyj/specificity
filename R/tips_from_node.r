@@ -22,9 +22,10 @@
 #'
 #' @examples
 #'   library(specificity)
+#'   library(ape)
 #'   phy <- get(data(endophyte))$supertree
 #'   # check if tree is rooted:
-#'   is.rooted(phy)
+#'   ape::is.rooted(phy)
 #'   # which tips are in the Cucurbitales?
 #'   plot(phy) # need to stretch out the plot to see...
 #'   nodelabels(adj=c(0,-1), bg="yellow") # node numbers

@@ -13,14 +13,16 @@
 #' @return returns nothing, just makes a plot. 
 #'
 #' @examples
-#'   g1 <- randomgrid()
-#'   plot(g1)
-#'   a1 <- geo_spec_sim(sdev=c(30, 30, 30, 30), n_obs=1000, grid=g1, up=c(0, 0.20, 0.40, 0.60))
-#'   par(mfrow=c(2,2))
-#'   plot_grid_abunds(g1, a1$matrix[,1])
-#'   plot_grid_abunds(g1, a1$matrix[,2])
-#'   plot_grid_abunds(g1, a1$matrix[,3])
-#'   plot_grid_abunds(g1, a1$matrix[,4])
+#' library(specificity)
+#' g1 <- randomgrid()
+#' plot(g1)
+#' a1 <- geo_spec_sim(sdev=c(30, 30, 30, 30), n_obs=1000, 
+#'   grid=g1, up=c(0, 0.20, 0.40, 0.60))
+#' par(mfrow=c(2,2))
+#' plot_grid_abunds(g1, a1$matrix[,1])
+#' plot_grid_abunds(g1, a1$matrix[,2])
+#' plot_grid_abunds(g1, a1$matrix[,3])
+#' plot_grid_abunds(g1, a1$matrix[,4])
 #'
 #' @export
 plot_grid_abunds <- function(grid, abunds, pch="", ...){

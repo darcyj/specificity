@@ -1,0 +1,5 @@
+
+# Rcpp namespace stuff, added by update_r_package.r
+useDynLib(specificity, .registration=TRUE)
+exportPattern("^[[:alpha:]]+")
+importFrom(Rcpp, evalCpp)

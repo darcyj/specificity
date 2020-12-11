@@ -25,7 +25,7 @@
 #' @param ideal_x2 numeric vector. x-coordinate for secondary ideal location. Only used if n_ideal<1 (default:0).
 #' @param ideal_y2 numeric vector. y-coordinate for secondary ideal location. Only used if n_ideal<1 (default:0).
 #' @param ideal_x3 numeric vector. x-coordinate for secondary ideal location. Only used if n_ideal<2 (default:0).
-#' @param ideal_x3 numeric vector. x-coordinate for secondary ideal location. Only used if n_ideal<2 (default:0).
+#' @param ideal_y3 numeric vector. y-coordinate for secondary ideal location. Only used if n_ideal<2 (default:0).
 #' @param n_ideal integer vector. Number of ideal locations to use. Must be 1, 2, or 3 (default:1).
 #' @param up numeric vector. up=uniform proportion. This is the proportion of
 #'   the probability distribution P(species) that is composed of a uniform
@@ -50,26 +50,25 @@
 #'   }
 #'
 #' @examples
-#'   g1 <- randomgrid()
-#'   plot(g1)
-#'   a1 <- geo_spec_sim(sdev=c(30, 30, 30, 30), n_obs=1000, grid=g1, up=c(0, 0.20, 0.40, 0.60))
-#'   par(mfrow=c(2,2))
-#'   plot_grid_abunds(g1, a1$matrix[,1])
-#'   plot_grid_abunds(g1, a1$matrix[,2])
-#'   plot_grid_abunds(g1, a1$matrix[,3])
-#'   plot_grid_abunds(g1, a1$matrix[,4])
-#'   a2 <- geo_spec_sim(sdev=c(10, 20, 30, 40), n_obs=1000, grid=g1, ideal_x=-50, ideal_x2=50, n_ideal=2)
-#'   par(mfrow=c(2,2))
-#'   plot_grid_abunds(g1, a2$matrix[,1], main="sd=10")
-#'   plot_grid_abunds(g1, a2$matrix[,2], main="sd=20")
-#'   plot_grid_abunds(g1, a2$matrix[,3], main="sd=30")
-#'   plot_grid_abunds(g1, a2$matrix[,4], main="sd=40")
+#' library(specificity)
+#' g1 <- randomgrid()
+#' plot(g1)
+#' a1 <- geo_spec_sim(sdev=c(30, 30, 30, 30), n_obs=1000, grid=g1, up=c(0, 0.20, 0.40, 0.60))
+#' par(mfrow=c(2,2))
+#' plot_grid_abunds(g1, a1$matrix[,1])
+#' plot_grid_abunds(g1, a1$matrix[,2])
+#' plot_grid_abunds(g1, a1$matrix[,3])
+#' plot_grid_abunds(g1, a1$matrix[,4])
+#' a2 <- geo_spec_sim(sdev=c(10, 20, 30, 40), n_obs=1000, grid=g1, ideal_x=-50, ideal_x2=50, n_ideal=2)
+#' par(mfrow=c(2,2))
+#' plot_grid_abunds(g1, a2$matrix[,1], main="sd=10")
+#' plot_grid_abunds(g1, a2$matrix[,2], main="sd=20")
+#' plot_grid_abunds(g1, a2$matrix[,3], main="sd=30")
+#' plot_grid_abunds(g1, a2$matrix[,4], main="sd=40")
 #'
 #' @export
 geo_spec_sim <- function(sdev, n_obs, grid,	ideal_x=0, ideal_y=0, ideal_x2=0, 
 	ideal_y2=0, ideal_x3=0, ideal_y3=0,	n_ideal=1, up=0, seed=123456, n_cores=2){
-
-	require(parallel)
 
 	# for testing:
 	if(FALSE){
@@ -107,11 +106,11 @@ geo_spec_sim <- function(sdev, n_obs, grid,	ideal_x=0, ideal_y=0, ideal_x2=0,
 		d2i <- sqrt( ((par$ideal_x - g$x)^2) + ((par$ideal_y - g$y)^2) )
 		if(par$n_ideal == 2){
 			d2i2 <- sqrt( ((par$ideal_x2 - g$x)^2) + ((par$ideal_y2 - g$y)^2) )
-			d2i <- apply(X=rbind(d2i, d2i2), MAR=2, FUN=min)
+			d2i <- apply(X=rbind(d2i, d2i2), MARGIN=2, FUN=min)
 		}else if(par$n_ideal == 3){
 			d2i2 <- sqrt( ((par$ideal_x2 - g$x)^2) + ((par$ideal_y2 - g$y)^2) )
-			d2i3 <- sqrt( ((par$ideal_x3 - g$x)^2) + ((par$ideal_y3 - generate$y)^2) )
-			d2i <- apply(X=rbind(d2i, d2i2, d2i3), MAR=2, FUN=min)
+			d2i3 <- sqrt( ((par$ideal_x3 - g$x)^2) + ((par$ideal_y3 - g$y)^2) )
+			d2i <- apply(X=rbind(d2i, d2i2, d2i3), MARGIN=2, FUN=min)
 		}
 
 		# turn distances into probabilities
@@ -126,7 +125,8 @@ geo_spec_sim <- function(sdev, n_obs, grid,	ideal_x=0, ideal_y=0, ideal_x2=0,
 
 	# apply geo_spec_sim_1species to all the pars
 
-	out_matrix <- simplify2array(mclapply(X=var_list, FUN=geo_spec_sim_1species, mc.cores=n_cores))
+	out_matrix <- simplify2array(parallel::mclapply(X=var_list, 
+		FUN=geo_spec_sim_1species, mc.cores=n_cores))
 
 	return(list(
 		matrix=out_matrix, 

@@ -133,6 +133,9 @@ float rao1sp(const NumericVector& p, const NumericVector& D, bool perm=false){
 NumericVector raoperms(const NumericVector& p, const NumericVector& D, const int n_sim=1000, int seed=12345){
 	NumericVector output(n_sim);
 	for(int i = 0; i<n_sim; i++){
+		// nobody likes srand :( alternative solution maybe from stackoverflow:
+		// https://stackoverflow.com/questions/50243461/stl-random-shuffle-generates-highly-correlated-sequences
+		// see comment by Justin and response by Baum mit Augen
 		srand(seed);
 		output[i] = rao1sp(p, D, true);
 		// increment seed to change it up for next time :)

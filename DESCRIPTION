@@ -18,3 +18,5 @@ Imports:
     stats
 LinkingTo: 
     Rcpp
+Suggests: 
+    testthat

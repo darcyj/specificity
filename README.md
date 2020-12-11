@@ -1,9 +1,10 @@
 # specificity
 R package for analyzing specificity in ecological data
+
 [![Build Status](https://travis-ci.org/darcyj/specificity.svg?branch=master)](https://travis-ci.org/darcyj/specificity)
 
 by John L. Darcy
-Updated 25 AUG 2020
+Updated 10 DEC 2020
 
 ## What is "specificity"?
 The word "specificity" is often used in the context of host-parasite interactions. For example, a parasite may be "specific" to a narrow phylogenetic group of hosts. This is phylogenetic specificity. However, in this R package I define specificity more broadly: a species has specificity to a variable when that species occupies a limited range of that variable. A species may have specificity to elevation if it can only be found within a narrow elevational band. With this software, you can compute specificity for many species at once, to different types of variables including 1-dimensional variables (e.g. elevation), 2-dimensional variables (e.g. geographic distance), and phylogenies. This R package can be used to analyze patterns of ecological specificity, particularly in microbiome data. Please check out the tutorial vignette in the `vignette` folder of this repository, which will walk you through the use of this software. 

@@ -190,22 +190,27 @@ plot_specs_violin <- function(specs_list, cols="black", cols_bord="white",
 		density(x$Spec, bw="SJ", n=500, from=minval, to=maxval)})
 	densities_sig <- lapply(X=specs_list, FUN=function(x){
 		density(x$Spec[x$Pval < alpha], bw="SJ", n=500, from=minval, to=maxval)})
+	densities_nsig <- lapply(X=specs_list, FUN=function(x){
+		density(x$Spec[x$Pval >= alpha], bw="SJ", n=500, from=minval, to=maxval)})
 	# simplify objects
-	densities_all_mat <- sapply(X=densities_all, FUN=function(x){x$y}, simplify="array")
-	densities_sig_mat <- sapply(X=densities_sig, FUN=function(x){x$y}, simplify="array")
 	yvals <- densities_all[[1]]$x
-	# convert densities mats to proportion, just in case density has some variation
-	# in total densities due to missing data etc
-	densities_all_mat <- apply(X=densities_all_mat, MARGIN=2, FUN=function(x){x/sum(x)})
-	densities_sig_mat <- apply(X=densities_sig_mat, MARGIN=2, FUN=function(x){x/sum(x)})
-	# proportionalize densities_sig
+	densities_all  <- sapply(X=densities_all,  FUN=function(x){x$y}, simplify="array")
+	densities_sig  <- sapply(X=densities_sig,  FUN=function(x){x$y}, simplify="array")
+	densities_nsig <- sapply(X=densities_nsig, FUN=function(x){x$y}, simplify="array")
+	# proportionalize densities
 	sig_props <- sapply(X=specs_list, FUN=function(x){sum(x$Pval < alpha) / nrow(x)})
-	for(i in 1:ncol(densities_sig_mat)){
-		densities_sig_mat[,i] <- densities_sig_mat[,i] * sig_props[i]
+	for(i in 1:ncol(densities_sig)){
+		densities_sig[,i] <- densities_sig[,i] * sig_props[i]
 	}
-	# reconcile larger sig densities than all
-	sig_higher <- densities_sig_mat > densities_all_mat
-	densities_sig_mat[sig_higher] <- densities_all_mat[sig_higher]
+	nsig_props <- sapply(X=specs_list, FUN=function(x){sum(x$Pval >= alpha) / nrow(x)})
+	for(i in 1:ncol(densities_nsig)){
+		densities_nsig[,i] <- densities_nsig[,i] * nsig_props[i]
+	}
+
+	# compute ratio of sig:(sig+nsig)
+	ratio_sig2nsig <- densities_sig / (densities_sig + densities_nsig)
+	ratio_sig2nsig[is.na(ratio_sig2nsig)] <- 0
+
 	# handle colors
 	if(length(cols) == 1){
 		cols <- rep(cols, n)
@@ -221,7 +226,7 @@ plot_specs_violin <- function(specs_list, cols="black", cols_bord="white",
 	}else{
 		stop("cols_bord must be length 1, or same length as specs_list")
 	}
-	max_dens <- max(densities_all_mat)
+	max_dens <- max(densities_all)
 	# calculate plot yaxis limits
 	min_spec <- min(sapply(X=specs_list, FUN=function(x){min(x$Spec)}))
 	max_spec <- min(sapply(X=specs_list, FUN=function(x){max(x$Spec)}))
@@ -234,8 +239,8 @@ plot_specs_violin <- function(specs_list, cols="black", cols_bord="white",
 		bty="n")
 	# for each variable, draw a violin
 	for(i in 1:n){
-		x_all <- (densities_all_mat[,i] / max_dens) / 2
-		x_sig <- (densities_sig_mat[,i] / max_dens) / 2
+		x_all <- (densities_all[,i] / max_dens) / 2
+		x_sig <- x_all * ratio_sig2nsig[,i]
 
 		x_mid <- i - 0.5
 		# "all" polygon
@@ -258,7 +263,3 @@ plot_specs_violin <- function(specs_list, cols="black", cols_bord="white",
 	var_names <- names(specs_list)
 	mtext(var_names, side=1, at=((1:length(var_names))-0.5), cex=label_cex )
 }
-
-
-
-

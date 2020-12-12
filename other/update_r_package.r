@@ -1,16 +1,17 @@
-# RUN FROM THIS FOLDER
+#!/usr/bin/env Rscript
+
+# RUN FROM MAIN PACKAGE FOLDER, i.e. "specificity"
 packwd <- getwd()
+if(!file.exists("DESCRIPTION")){
+	stop("Wrong directory!")
+}
 
 # add files to .Rbuildignore (files ignored during package building)
 write("^specificity\\.Rproj$",     file=".Rbuildignore",append=FALSE)
 write("^\\.Rproj\\.user$",         file=".Rbuildignore",append=TRUE)
 write("^vignette$",                file=".Rbuildignore",append=TRUE)
-write("^changelog.txt$",           file=".Rbuildignore",append=TRUE)
-write("^github_stuff.sh$",         file=".Rbuildignore",append=TRUE)
 write("^\\.travis.yml$",           file=".Rbuildignore",append=TRUE)
-write("^test_results.txt$",        file=".Rbuildignore",append=TRUE)
-write("^makedata$",                file=".Rbuildignore",append=TRUE)
-
+write("^other$",                   file=".Rbuildignore",append=TRUE)
 
 
 library(devtools)
@@ -31,7 +32,7 @@ document()
 
 # ADD C++ namespace stuff to NAMESPACE file, because document() above OVERWRITES it:
 # originally made via Rcpp::compileAttributes("./") above
-lines2add <- readLines("additional_namespace/rcpp_namespace.txt")
+lines2add <- readLines("other/additional_namespace/rcpp_namespace.txt")
 write(lines2add, file="NAMESPACE", append=TRUE)
 
 # add stuff to namespace that's not in BASE R but sure is in VANILLA R
@@ -40,7 +41,7 @@ write(lines2add, file="NAMESPACE", append=TRUE)
 #   R CMD build specificity
 #   R CMD check specificity_0.1.0.9000.tar.gz 
 # look at specificity.Rcheck/00check.log
-lines2add <- readLines("additional_namespace/vanillaR_namespace.txt")
+lines2add <- readLines("other/additional_namespace/vanillaR_namespace.txt")
 write(lines2add, file="NAMESPACE", append=TRUE)
 
 
@@ -52,7 +53,7 @@ install("specificity")
 # test
 setwd("specificity/tests/")
 ### doing tests can take a minute! ###
-capture.output(test_check("specificity"), file="../test_results.txt", split=TRUE)
+capture.output(test_check("specificity"), file="../other/test_results.txt", split=TRUE)
 
 # make pdf manual
 # texinfo required: sudo apt-get install texinfo

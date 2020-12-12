@@ -11,5 +11,9 @@
   * added cpp funs rao1sp() and raoperms() which replace spec_core()
   * various documentation improvements
   * new visuzlization for combo violins = plot_specs_violin()
-
+0.1.1.9000 // 2020 DEC 11
+  * changed srand and std::random_shuffle in C++ code to a new implementation
+    that doesn't make R CMD check angry
+  * updated documentation, made examples nicer and made examples actually run on check
+  * re-organized extra stuff in package directory into folder "other"
   

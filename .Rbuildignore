@@ -1,2 +1,5 @@
 ^specificity\.Rproj$
 ^\.Rproj\.user$
+^vignette$
+^\.travis.yml$
+^other$

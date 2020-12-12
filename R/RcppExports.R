@@ -5,8 +5,8 @@ pairwise_product <- function(x) {
     .Call(`_specificity_pairwise_product`, x)
 }
 
-rao1sp <- function(p, D, perm = FALSE) {
-    .Call(`_specificity_rao1sp`, p, D, perm)
+rao1sp <- function(p, D, perm = FALSE, seed = 0L) {
+    .Call(`_specificity_rao1sp`, p, D, perm, seed)
 }
 
 raoperms <- function(p, D, n_sim = 1000L, seed = 12345L) {

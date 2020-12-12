@@ -54,27 +54,32 @@ divided such that lighter colors represent density of non-significant features,
 and darker colors represent statistically significant features.
 }
 \examples{
-# # example commented out since they are computationally intense
-# # this is so they don't cause testing the package to take forever.
-# library(specificity)
-# attach(endophyte)
-# otutable <- occ_threshold(prop_abund(otutable), 10)
-# elev_spec <- phy_or_env_spec(otutable, env=metadata$Elevation, 
-#   n_sim=100, p_method="gamma_fit")
-# ndvi_spec <- phy_or_env_spec(otutable, env=metadata$NDVI, 
-#   n_sim=100, p_method="gamma_fit")
-# # default black
-# plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec))
-# # with colors
-# plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec), 
-#   cols=c("orange", "forestgreen"))
-# # with border colors
-# plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec), 
-#   cols=c("orange", "forestgreen"), 
-#   cols_bord=c("blue", "red"))
-# # with thicker borders (arg "lwd" is passed to polygon())
-# plot_specs_violin(list(Elevation=elev_spec, NDVI=ndvi_spec), 
-#   cols=c("orange", "forestgreen"), cols_bord="black", lwd=3)
+library(specificity)
+attach(endophyte)
+# only analyze species with occupancy >= 20
+m <- occ_threshold(prop_abund(otutable), 20)
+# create list to hold phy_or_env_spec outputs
+specs_list <- list()
+specs_list$NDVI <- phy_or_env_spec(m, env=metadata$NDVI, 
+  n_cores=10, n_sim=50, p_method="gamma_fit")
+specs_list$Evapotranspiration <- phy_or_env_spec(m,
+  env=metadata$Evapotranspiration, n_cores=10, 
+  n_sim=100, p_method="gamma_fit")
+specs_list$Rainfall <- phy_or_env_spec(m, env=metadata$Rainfall,
+  n_cores=10, n_sim=50, p_method="gamma_fit")
+# default black
+plot_specs_violin(specs_list)
+# with colors
+plot_specs_violin(specs_list, cols=c("forestgreen", "gold", "blue"))
+# with border colors
+plot_specs_violin(specs_list, cols=c("forestgreen", "gold", "blue"),
+  cols_bord=c("red", "blue", "black"))
+# with thicker borders (arg "lwd" is passed to polygon())
+plot_specs_violin(specs_list, cols=c("forestgreen", "gold", "blue"),
+  cols_bord="black", lwd=3)
+# with NO borders
+plot_specs_violin(specs_list, cols=c("forestgreen", "gold", "blue"),
+  cols_bord=NA)
 }
 \author{
 John L. Darcy

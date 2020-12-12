@@ -17,15 +17,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // rao1sp
-float rao1sp(const NumericVector& p, const NumericVector& D, bool perm);
-RcppExport SEXP _specificity_rao1sp(SEXP pSEXP, SEXP DSEXP, SEXP permSEXP) {
+float rao1sp(const NumericVector& p, const NumericVector& D, bool perm, int seed);
+RcppExport SEXP _specificity_rao1sp(SEXP pSEXP, SEXP DSEXP, SEXP permSEXP, SEXP seedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const NumericVector& >::type p(pSEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type D(DSEXP);
     Rcpp::traits::input_parameter< bool >::type perm(permSEXP);
-    rcpp_result_gen = Rcpp::wrap(rao1sp(p, D, perm));
+    Rcpp::traits::input_parameter< int >::type seed(seedSEXP);
+    rcpp_result_gen = Rcpp::wrap(rao1sp(p, D, perm, seed));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -75,7 +76,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_specificity_pairwise_product", (DL_FUNC) &_specificity_pairwise_product, 1},
-    {"_specificity_rao1sp", (DL_FUNC) &_specificity_rao1sp, 3},
+    {"_specificity_rao1sp", (DL_FUNC) &_specificity_rao1sp, 4},
     {"_specificity_raoperms", (DL_FUNC) &_specificity_raoperms, 4},
     {"_specificity_rao_sort_max", (DL_FUNC) &_specificity_rao_sort_max, 2},
     {"_specificity_rao_genetic_max", (DL_FUNC) &_specificity_rao_genetic_max, 7},

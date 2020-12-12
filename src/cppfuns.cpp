@@ -1,27 +1,13 @@
 #include <Rcpp.h>
+#include <random>
 using namespace Rcpp;
 //
-// THE FOLLOWING DOCUMENTATION IS AVAILABLE IN ../man/pairwise_product.Rd
 // pairwise_product
 //
 // Calculates products means from unique 2-element
 // combinations of vector x. Written in C++ because R slow. 
 // The output vector is the same length and same order
 // as a lower triangle of matrix with rows and columns x.
-//
-// @author John L. Darcy
-// 
-// @param x numeric vector.
-//
-// @return vector of pairwise products, of length (l^2-l)/2,
-//   where l=length(x).
-// @examples
-// n <- 9
-// a <- matrix(0, nrow=n, ncol=n)
-// rownames(a) <- colnames(a) <- 1:n
-// pairwise_product(1:n)
-// a[lower.tri(a)] <- pairwise_product(1:n)
-// a
 // 
 // [[Rcpp::export]]
 NumericVector pairwise_product(const NumericVector& x) {
@@ -46,36 +32,31 @@ NumericVector pairwise_product(const NumericVector& x) {
 	return output;
 }
 
+// shuffle function to replace std::random_shuffle because R CMD check doesn't
+// like rand. lines where std::random_shuffle is used are commented out for easy
+// reversion. This function copied *almost* directly from stackoverflow, thx
+// justin: https://stackoverflow.com/questions/50243461/stl-random-shuffle-generates-highly-correlated-sequences
+// modified by me to have default behavior of only setting seed if seed > 0, 
+// otherwise just nondeterministic random
+void shuffle_ints_so(IntegerVector &x, int seed=0)
+{
+	thread_local std::mt19937 engine;
+
+	if(seed > 0){
+		engine.seed(seed);
+	}
+
+	std::shuffle(x.begin(), x.end(), engine);
+}
+
+
 
 // rao1sp
 //
 // Calculates empirical rao for one species. 
 //
-// @author John L. Darcy
-// 
-// @param p numeric vector of species weights
-// @param D numeric vector (dist) of distances corresponding to a lower
-//   triangle of a matrix whose rows and cols correspond to p; i.e. an
-//   lxl matrix where l is length(p). R's dist() function does this for
-//   you!
-// @param perm bool; TRUE means permute p before calculation, FALSE means
-//   don't do it. IMPORTANT NOTE: this permutation does NOT respect R's 
-//   seed. To get deterministic permutations, use raoperms().
-//
-// @return A single rao value.
-//
-// @examples
-// data(endophyte); attach(endophyte)
-// otutable <- prop_abund(otutable)
-// rao1sp(p=otutable[,1], D=dist(metadata$Elevation), perm=FALSE)
-// set.seed(12345)
-// rao1sp(p=otutable[,1], D=dist(metadata$Elevation), perm=TRUE)
-// set.seed(666)
-// rao1sp(p=otutable[,1], D=dist(metadata$Elevation), perm=TRUE)
-// set.seed(12345)
-// rao1sp(p=otutable[,1], D=dist(metadata$Elevation), perm=TRUE)
 // [[Rcpp::export]]
-float rao1sp(const NumericVector& p, const NumericVector& D, bool perm=false){
+float rao1sp(const NumericVector& p, const NumericVector& D, bool perm=false, int seed=0){
 	// integer for how big p is (or rather, what the final index of p is)
 	int npm1 = p.size() - 1;
 	// pidx is a vector of indices for p, so that p doesn't need to
@@ -86,8 +67,8 @@ float rao1sp(const NumericVector& p, const NumericVector& D, bool perm=false){
 	float rao = 0;
 	// if permutation requested, permute pidx
 	if(perm){
-		
-		std::random_shuffle(pidx.begin(), pidx.end() );
+		// std::random_shuffle(pidx.begin(), pidx.end(); // old way, R CMD check didn't like it
+		shuffle_ints_so(pidx, seed);
 	}
 	// loop through p and D and create rao output
 	// i: row of D (as if it were a matrix)
@@ -104,31 +85,10 @@ float rao1sp(const NumericVector& p, const NumericVector& D, bool perm=false){
 }
 
 
-
 // rao1sp
 //
 // Calculates many sim (i.e. null) rao for one species. 
 //
-// @author John L. Darcy
-// 
-// @param p numeric vector of species weights
-// @param D numeric vector (dist) of distances corresponding to a lower
-//   triangle of a matrix whose rows and cols correspond to p; i.e. an
-//   lxl matrix where l is length(p). R's dist() function does this for
-//   you!
-// @param n_sim integer; number of raos to make
-// @param seed integer; seed for randomization and repeatability.
-//
-// @return n_sim rao values
-//
-// @examples
-// data(endophyte); attach(endophyte)
-// otutable <- prop_abund(otutable)
-// a <- raoperms(p=otutable[,1], D=dist(metadata$Elevation), n_sim=100, seed=777)
-// b <- raoperms(p=otutable[,1], D=dist(metadata$Elevation), n_sim=100, seed=666)
-// c <- raoperms(p=otutable[,1], D=dist(metadata$Elevation), n_sim=100, seed=777)
-// plot(a~c); abline(a=0,b=1,col="red")
-// plot(a~b); abline(a=0,b=1,col="red")
 // [[Rcpp::export]]
 NumericVector raoperms(const NumericVector& p, const NumericVector& D, const int n_sim=1000, int seed=12345){
 	NumericVector output(n_sim);
@@ -136,10 +96,14 @@ NumericVector raoperms(const NumericVector& p, const NumericVector& D, const int
 		// nobody likes srand :( alternative solution maybe from stackoverflow:
 		// https://stackoverflow.com/questions/50243461/stl-random-shuffle-generates-highly-correlated-sequences
 		// see comment by Justin and response by Baum mit Augen
-		srand(seed);
-		output[i] = rao1sp(p, D, true);
+		// srand(seed);
+		// output[i] = rao1sp(p, D, true);
+		output[i] = rao1sp(p, D, true, seed);
 		// increment seed to change it up for next time :)
-		seed++;
+		// only do this if seed > 0. 0 means nondeterministic random.
+		if(seed > 0){
+			seed++;
+		}
 	}
 	return(output);
 }
@@ -167,8 +131,11 @@ NumericVector spec_core(const NumericMatrix& p, const NumericVector& D) {
 }
 
 
-// rao_sort_max approximates the maximum possible rao value given a 
+// rao_sort_max 
+//
+// approximates the maximum possible rao value given a 
 // species weights vector p and a distance vector D. 
+//
 // [[Rcpp::export]]
 long double rao_sort_max(const NumericVector& p, const NumericVector& D) {
 	long double out;
@@ -185,7 +152,8 @@ long double rao_sort_max(const NumericVector& p, const NumericVector& D) {
 inline NumericVector swapcol (const NumericVector x){
 	NumericVector xout = clone(x);
 	IntegerVector xpos = seq(0, xout.size() - 1);
-	std::random_shuffle(xpos.begin(), xpos.end() );
+	shuffle_ints_so(xpos); // seed argument ommitted, default is just to not set a seed
+	//std::random_shuffle(xpos.begin(), xpos.end() ); // old way, R CMD check didn't like it
 	std::swap(xout[xpos[0]], xout[xpos[1]]);
 	return xout;
 }

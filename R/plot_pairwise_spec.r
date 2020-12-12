@@ -24,18 +24,20 @@
 #'   triangle. For plots in the lower triangle, each point represents a species.
 #'
 #' @examples
-#' # # example commented out since they are computationally intense
-#' # # this is so they don't cause testing the package to take forever.
-#' # attach(endophyte)
-#' # otutable_over10 <- occ_threshold(otutable, threshold = 10)
-#' # specs_list <- list()
-#' # specs_list$NDVI <- phy_or_env_spec(otutable_over10, env=metadata$NDVI, 
-#' #   n_cores=10, n_sim=100, p_method="gamma_fit")
-#' # specs_list$Evapotranspiration <- phy_or_env_spec(otutable_over10,
-#' #   env=metadata$Evapotranspiration, n_cores=10, n_sim=100, p_method="gamma_fit")
-#' # specs_list$Rainfall <- phy_or_env_spec(otutable_over10, env=metadata$Rainfall,
-#' #   n_cores=10, n_sim=100, p_method="gamma_fit")
-#' # plot_pairwise_spec(specs_list)
+#' library(specificity)
+#' attach(endophyte)
+#' # only analyze species with occupancy >= 20
+#' m <- occ_threshold(prop_abund(otutable), 20)
+#' # create list to hold phy_or_env_spec outputs
+#' specs_list <- list()
+#' specs_list$NDVI <- phy_or_env_spec(m, env=metadata$NDVI, 
+#'   n_cores=10, n_sim=50, p_method="gamma_fit")
+#' specs_list$Evapotranspiration <- phy_or_env_spec(m,
+#'   env=metadata$Evapotranspiration, n_cores=10, 
+#'   n_sim=100, p_method="gamma_fit")
+#' specs_list$Rainfall <- phy_or_env_spec(m, env=metadata$Rainfall,
+#'   n_cores=10, n_sim=50, p_method="gamma_fit")
+#' plot_pairwise_spec(specs_list)
 #'
 #' @export
 plot_pairwise_spec <- function(sl, label_cex=1, point_cex=1, cor_cex=2, cor_red_lim=0.70, method="pearson"){

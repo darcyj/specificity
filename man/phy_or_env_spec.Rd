@@ -45,7 +45,11 @@ be calculated if n_sim < 100 (default: 500).}
 on P-values. Can take any valid method argument to p.adjust, including "none",
 "bonferroni", "holm", "fdr", and others (default: "fdr").}
 
-\item{seed}{integer. Seed to use so that this is repeatable (default: 1234557).}
+\item{seed}{integer. Seed to use so that this is repeatable. Same seed will be
+used for each species in abunds_mat, so all species will experience the same 
+permutations. This can be disabled by setting seed=0, which will make permutation
+is both non deterministic (not repeatable) AND each species will experience
+different permutations (default: 1234557).}
 
 \item{tails}{integer. 1 = 1-tailed, test for specificity only. 2 = 2-tailed.
 3 = 1-tailed, test for cosmopolitanism only. 0 = no test, P=1.0 (default: 1).}
@@ -114,36 +118,39 @@ values such that Spec=0 indicates random assortment (null hypothesis), and more
 negative values indicate stronger specificity.
 }
 \examples{
-# # example commented out since they are computationally intense
-# # this is so they don't cause testing the package to take forever.
-# # phylogenetic specificity using endophyte data set
-# library(specificity)
-# attach(endophyte)
-# # only analyze species with occupancy >= 20
-# specs_list <- list()
-# m <- occ_threshold(prop_abund(otutable), 20)
-# specs_list$host <- phy_or_env_spec(
-#     abunds_mat=m,
-#     hosts=metadata$PlantGenus, 
-#     hosts_phylo=supertree,
-#     n_cores=4
-# )
-# 
-# # environmental specificity using elevation from endophyte data set:
-# specs_list$elev <- phy_or_env_spec(
-#     abunds_mat=m,
-#     env=metadata$Elevation,
-#     n_cores=4
-# )
-# 
-# # geographic specificity using spatial data from endophyte data set:
-# specs_list$geo <- phy_or_env_spec(
-#     abunds_mat=m,
-#     env=distcalc(metadata$Lat, metadata$Lon),
-#     n_cores=4
-# )
-# 
-# plot_specs_violin(specs_list)
+library(specificity)
+attach(endophyte)
+# only analyze species with occupancy >= 20
+m <- occ_threshold(prop_abund(otutable), 20)
+# create list to hold phy_or_env_spec outputs
+specs_list <- list()
+
+# phylogenetic specificity using endophyte data set
+specs_list$host <- phy_or_env_spec(
+    abunds_mat=m,
+    hosts=metadata$PlantGenus, 
+    hosts_phylo=supertree,
+    n_sim=100, p_method="gamma_fit",
+    n_cores=4
+)
+
+# environmental specificity using elevation from endophyte data set:
+specs_list$elev <- phy_or_env_spec(
+    abunds_mat=m,
+    env=metadata$Elevation,
+    n_sim=100, p_method="gamma_fit",
+    n_cores=4
+)
+
+# geographic specificity using spatial data from endophyte data set:
+specs_list$geo <- phy_or_env_spec(
+    abunds_mat=m,
+    env=distcalc(metadata$Lat, metadata$Lon),
+    n_sim=100, p_method="gamma_fit",
+    n_cores=4
+)
+
+plot_specs_violin(specs_list, cols=c("forestgreen", "red", "black"))
 
 }
 \references{

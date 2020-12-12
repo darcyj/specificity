@@ -9,7 +9,7 @@ raoperms(p,D,n_sim,seed)
 \item{p}{numeric vector of species weights.}
 \item{D}{numeric vector (dist) of distances corresponding to a lower triangle of a matrix whose rows and cols correspond to p; i.e. an lxl matrix where l is length(p). R's dist() function does this for you!}
 \item{n_sim}{integer. number of sims to do (default: 1000).}
-\item{seed}{integer. seed for randomization (default: 12345).}
+\item{seed}{integer. a seed to be used for permutation. setting seed=0 will give nondeterministic random results, as if no seed were set (default: 0).}
 }
 \value{
 Vector of Rao values, length = n_sim.

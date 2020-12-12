@@ -43,14 +43,20 @@ Visualizes results from phy_or_env_spec as stacked histograms. Aliased to
 plot_specificities() for backward compatibility.
 }
 \examples{
-# # example commented out since they are computationally intense
-# # this is so they don't cause testing the package to take forever.
-# library(specificity)
-# attach(endophyte)
-# otutable <- occ_threshold(prop_abund(otutable), 10)
-# elev_spec <- phy_or_env_spec(otutable, env=metadata$Elevation, n_sim=100, p_method="gamma_fit")
-# ndvi_spec <- phy_or_env_spec(otutable, env=metadata$NDVI, n_sim=100, p_method="gamma_fit")
-# plot_specs_stacks(list(Elevation=elev_spec, NDVI=ndvi_spec))
+library(specificity)
+attach(endophyte)
+# only analyze species with occupancy >= 20
+m <- occ_threshold(prop_abund(otutable), 20)
+# create list to hold phy_or_env_spec outputs
+specs_list <- list()
+specs_list$NDVI <- phy_or_env_spec(m, env=metadata$NDVI, 
+  n_cores=10, n_sim=50, p_method="gamma_fit")
+specs_list$Evapotranspiration <- phy_or_env_spec(m,
+  env=metadata$Evapotranspiration, n_cores=10, 
+  n_sim=100, p_method="gamma_fit")
+specs_list$Rainfall <- phy_or_env_spec(m, env=metadata$Rainfall,
+  n_cores=10, n_sim=50, p_method="gamma_fit")
+plot_specs_stacks(specs_list)
 
 }
 \author{

@@ -3,7 +3,7 @@ Title: Calculate Environmental or Host Phylogenetic Specificity
 Version: 0.1.0.9000
 Authors@R: person(given=c("John", "L"), family="Darcy", email = "darcyj@colorado.edu", role = c("aut", "cre"))
 Description: The purpose of this package is to calculate phylogenetic and environmental specificity of species. I wrote this software to analyze specificity of microbes to hosts or to environment, but there is no reason that this software wouldn't work with macroorganisms as well.
-License: GPL + file LICENSE
+License: GPL
 Depends: R (>= 3.5.0)
 Encoding: UTF-8
 LazyData: true

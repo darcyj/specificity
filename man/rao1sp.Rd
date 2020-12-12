@@ -3,12 +3,13 @@
 \alias{rao1sp}
 \title{rao1sp}
 \usage{
-rao1sp(p, D, perm)
+rao1sp(p, D, perm, seed)
 }
 \arguments{
-\item{p}{numeric vector of length n - a species weights vector.}
-\item{D}{numeric vector of length n(n-1)/2 - i.e. a dist object whose full matrix is nxn.}
+\item{p}{numeric vector of length n. a species weights vector.}
+\item{D}{numeric vector of length n(n-1)/2. i.e. a dist object whose full matrix is nxn.}
 \item{perm}{bool. Whether or not the permute order of p before calculating Rao (default: FALSE).}
+\item{seed}{integer. a seed to be used if perm=TRUE. setting seed=0 will give nondeterministic random results, as if no seed were set (default: 0).}
 }
 \value{
 A single Rao value.

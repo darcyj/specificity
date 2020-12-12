@@ -1,11 +1,5 @@
-# run once:
-# git init
-# git add .
-# git commit -m "first commit"
-# git remote add origin https://github.com/darcyj/specificity.git
-# git push -u origin master
-
-
 git add .
-git commit -m 04sept2019 #(or whatever today's date is)
+git add .Rbuildignore
+git add .travis.yml
+git commit -m "some comment here"
 git push origin master

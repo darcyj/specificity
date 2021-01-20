@@ -24,6 +24,10 @@ usethis::use_package("parallel")
 usethis::use_package("Rcpp")
 usethis::use_package("fields")
 
+if(packageVersion("Rcpp") < "1.0.0"){
+  stop("Rcpp needs to be updated to 1.0.0 or above.")
+}
+
 
 # this looks for Rcpp::export in cpp files
 Rcpp::compileAttributes("./")
@@ -54,10 +58,25 @@ install("specificity")
 setwd("specificity/tests/")
 ### doing tests can take a minute! ###
 capture.output(test_check("specificity"), file="../other/test_results.txt", split=TRUE)
+setwd(packwd)
+
+# document packageVersions used for this test and build:
+pkgvers_fp <- "other/package_versions.txt"
+write("Pagage versions used in this build and tests:", file=pkgvers_fp)
+writepkgvers <- function(pkgname, fp=pkgvers_fp){
+	write(paste0(pkgname, "=", packageVersion(pkgname)), file=fp, append=T)
+}
+writepkgvers("devtools")
+writepkgvers("roxygen2")
+writepkgvers("Rcpp")
+writepkgvers("testthat")
+writepkgvers("ape")
+writepkgvers("parallel")
+writepkgvers("fields")
+writepkgvers("specificity")
 
 # make pdf manual
 # texinfo required: sudo apt-get install texinfo
-setwd(packwd)
 pack <- "specificity"
 path <- find.package(pack)
 system("rm specificity.pdf")

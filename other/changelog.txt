@@ -16,4 +16,6 @@
     that doesn't make R CMD check angry
   * updated documentation, made examples nicer and made examples actually run on check
   * re-organized extra stuff in package directory into folder "other"
-  
+0.1.2.9000 // 2020 JAN 20
+  * added Rcpp heder line so that C++11 will be used during compilation by default
+  * added log for what package versions were used during a build in other/  

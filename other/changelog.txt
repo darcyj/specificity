@@ -1,21 +1,20 @@
 0.1.0.9000 // 2020 DEC 09
   * This changelog was created
   * all functions now refer to species weights as p (perviously w was used sometimes)
-  * new strategy for calculating sim specificities (as opposed to emp). uses MUCH
-    less memory. however, this made use of custom null models more difficlt. So the
-    function phy_or_env_spec() was changed such that the actual calculation of 
-    specificity is its own function called calculate_spec_and_pval(). in the distant
-    future, a tutorial for "build your own specificity" may be written, maybe. 
+  * new strategy for calculating sim specificities (as opposed to emp). uses MUCH less memory. however, this made use of custom null models more difficlt. So the function phy_or_env_spec() was changed such that the actual calculation of specificity is its own function called calculate_spec_and_pval(). in the distant future, a tutorial for "build your own specificity" may be written, maybe. 
   * added function onto2nwk()
   * added function circularize2dist()
   * added cpp funs rao1sp() and raoperms() which replace spec_core()
   * various documentation improvements
   * new visuzlization for combo violins = plot_specs_violin()
 0.1.1.9000 // 2020 DEC 11
-  * changed srand and std::random_shuffle in C++ code to a new implementation
-    that doesn't make R CMD check angry
+  * changed srand and std::random_shuffle in C++ code to a new implementation that doesn't make R CMD check angry
   * updated documentation, made examples nicer and made examples actually run on check
   * re-organized extra stuff in package directory into folder "other"
 0.1.2.9000 // 2020 JAN 20
   * added Rcpp heder line so that C++11 will be used during compilation by default
   * added log for what package versions were used during a build in other/  
+0.1.3.9000 // 2020 JAN 21
+  * reverted C++11 header because it isn't necessary and actually slowed stuff down
+  * added chunking for sim RAO computation
+  * parallelized 

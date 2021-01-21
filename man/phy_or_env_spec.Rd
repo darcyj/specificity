@@ -18,7 +18,8 @@ phy_or_env_spec(
   p_method = "raw",
   center = "mean",
   denom_type = "index",
-  diagnostic = F
+  diagnostic = F,
+  chunksize = 1000
 )
 }
 \arguments{
@@ -103,6 +104,11 @@ that denominator type does NOT affect P-values.
 \item{diagnostic}{logical. If true, changes output to include different parts of Spec. 
 This includes Pval, Spec, raw, denom, emp, and all sim values with column labels as
 simN where N is the number of sims (default: FALSE)}
+
+\item{chunksize}{integer. If greater than zero, computation of sim RAO values will be
+done using chunked evaluation, which lowers memory use considerably for larger data
+sets. Can be disabled by setting to 0. Default value is 1000 species per chunk
+(default: 1000).}
 }
 \value{
 data.frame where each row is an input species. First column is P-value

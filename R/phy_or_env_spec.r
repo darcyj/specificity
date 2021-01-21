@@ -87,6 +87,10 @@
 #' @param diagnostic logical. If true, changes output to include different parts of Spec. 
 #'   This includes Pval, Spec, raw, denom, emp, and all sim values with column labels as
 #'   simN where N is the number of sims (default: FALSE)
+#' @param chunksize integer. If greater than zero, computation of sim RAO values will be
+#'   done using chunked evaluation, which lowers memory use considerably for larger data
+#'   sets. Can be disabled by setting to 0. Default value is 1000 species per chunk
+#'   (default: 1000).
 #'
 #'
 #' @return data.frame where each row is an input species. First column is P-value
@@ -131,7 +135,7 @@
 phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL, 
 	hosts_phylo=NULL, n_sim=1000, p_adj="fdr", seed=1234567, 
 	tails=1, n_cores=2, verbose=TRUE, p_method="raw", center="mean", 
-	denom_type="index", diagnostic=F){
+	denom_type="index", diagnostic=F, chunksize=1000){
 
 	# debugging stuff:
 	# library(specificity); attach(endophyte)
@@ -145,8 +149,7 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 	# p_method <- "gamma_fit"
 	# diagnostic <- TRUE
 	# center <- "mean"
-	# library(Rcpp)
-	# sourceCpp("rao_1spv2.cpp")
+	# chunksize <- 50
 
 	# little message function, to clean up code a bit
 	msg <- function(x){if(verbose){message(x)}}
@@ -231,17 +234,41 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 	# calculate empirical rao
 	msg(paste("Calculating emp RAO..."))
 	tt <- proc.time()
-	emp_raos <- apply(X=abunds_mat, MARGIN=2, FUN=rao1sp, D=env, perm=FALSE)
+	# emp_raos <- apply(X=abunds_mat, MARGIN=2, FUN=rao1sp, D=env, perm=FALSE)
+	emp_raos <- unlist(lapply_fun(X=1:ncol(abunds_mat), FUN=function(x){
+		rao1sp(abunds_mat[,x], D=env, perm=FALSE)
+	}))
 	msg(paste0("...done (took ", fms(proc.time()-tt), ")"))
 
 	# calculate sim rao
 	msg(paste("Calculating sim RAO..."))
 	tt <- proc.time()
-	# sim_raos <- lapply_fun(X=1:ncol(abunds_mat), FUN=function(x){
-	# 	replicate(n_sim, rao1sp(abunds_mat[,x], D=env, perm=T))
-	# })
-	sim_raos <- lapply_fun(X=1:ncol(abunds_mat), FUN=function(p){
-		raoperms(p=abunds_mat[,p], D=env, n_sim=n_sim, seed=seed)})
+	# handle chunksize - don't chunk if chunksize is too large or is 0
+	if(chunksize > ncol(abunds_mat) || chunksize<=0){
+		sim_raos <- lapply_fun(X=1:ncol(abunds_mat), FUN=function(p){
+			raoperms(p=abunds_mat[,p], D=env, n_sim=n_sim, seed=seed)})
+	}else{
+		# list of chunks by column index, i.e. first item in list is all indices of
+		# features (columns) that are to be used in first chunk
+		msg(paste("...Chunking..."))
+		nchunks <- ceiling(ncol(abunds_mat) / chunksize)
+		chunks <- split(1:ncol(abunds_mat), rep(1:nchunks, each=chunksize,
+			length.out=ncol(abunds_mat)))
+
+		msg(paste("...Calculating..."))
+		sim_raos <- list()
+		if(verbose){pb <- txtProgressBar(min=0, max=length(chunks), style=3)}
+		for(ch in 1:length(chunks)){
+			sim_raos[[ch]] <- lapply_fun(X=chunks[[ch]], FUN=function(p){
+				raoperms(p=abunds_mat[,p], D=env, n_sim=n_sim, seed=seed)})
+			if(verbose){setTxtProgressBar(pb, ch)}
+		}
+		if(verbose){close(pb)}
+
+		msg(paste("...Unchunking..."))
+		# de-chunk
+		sim_raos <- unlist(sim_raos, recursive=FALSE)
+	}
 
 	msg(paste0("...done (took ", fms(proc.time()-tt), ")"))
 
@@ -252,3 +279,4 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 		center=center, denom_type=denom_type, diagnostic=diagnostic)
 	return(output)
 }
+

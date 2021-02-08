@@ -17,4 +17,7 @@
 0.1.3.9000 // 2020 JAN 21
   * reverted C++11 header because it isn't necessary and actually slowed stuff down
   * added chunking for sim RAO computation
-  * parallelized 
+  * parallelized
+0.1.3.9000 // 2020 FEB 08
+  * fixed bug in plot_specs_violin() where it wouldn't work unless >3 significant features
+  * added note in update script to update this changelot

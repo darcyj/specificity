@@ -1,5 +1,10 @@
 #!/usr/bin/env Rscript
 
+
+# to do before running this script:
+# 1. increase version number in ../DESCRIPTION
+# 2. describe changes in changelog.txt
+
 # RUN FROM MAIN PACKAGE FOLDER, i.e. "specificity"
 packwd <- getwd()
 if(!file.exists("DESCRIPTION")){

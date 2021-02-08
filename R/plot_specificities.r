@@ -184,49 +184,96 @@ plot_specs_stacks <- plot_specificities <- function(specs_list, n_bins=20,
 plot_specs_violin <- function(specs_list, cols="black", cols_bord="white", 
 	alpha=0.05, label_cex=1, nsig_trans=0.30, minval=-1, maxval=1, ylab="Spec", ...){
 	n <- length(specs_list)
-	# for each spec result in specs_list, make a density fit using
-	# the exact same "x" (soon to be y) scale.
-	densities_all <- lapply(X=specs_list, FUN=function(x){
-		density(x$Spec, bw="SJ", n=500, from=minval, to=maxval)})
-	densities_sig <- lapply(X=specs_list, FUN=function(x){
-		density(x$Spec[x$Pval < alpha], bw="SJ", n=500, from=minval, to=maxval)})
-	densities_nsig <- lapply(X=specs_list, FUN=function(x){
-		density(x$Spec[x$Pval >= alpha], bw="SJ", n=500, from=minval, to=maxval)})
-	# simplify objects
-	yvals <- densities_all[[1]]$x
-	densities_all  <- sapply(X=densities_all,  FUN=function(x){x$y}, simplify="array")
-	densities_sig  <- sapply(X=densities_sig,  FUN=function(x){x$y}, simplify="array")
-	densities_nsig <- sapply(X=densities_nsig, FUN=function(x){x$y}, simplify="array")
-	# proportionalize densities
-	sig_props <- sapply(X=specs_list, FUN=function(x){sum(x$Pval < alpha) / nrow(x)})
-	for(i in 1:ncol(densities_sig)){
-		densities_sig[,i] <- densities_sig[,i] * sig_props[i]
+	res <- 500 # should be a user parameter; number of points to use for density fits
+
+	# check specs_list is a list
+	if(!is.list(specs_list)){
+		stop("specs_list needs to be a list")
 	}
-	nsig_props <- sapply(X=specs_list, FUN=function(x){sum(x$Pval >= alpha) / nrow(x)})
-	for(i in 1:ncol(densities_nsig)){
-		densities_nsig[,i] <- densities_nsig[,i] * nsig_props[i]
+	# check for names in list
+	if(any(is.null(names(specs_list))) | any("" %in% names(specs_list))){
+		stop("All items in specs_list must be named.")
+	}
+	# check for cols "Spec" and "Pval" in each item in list
+	for(i in 1:length(specs_list)){
+		if(!is.data.frame(specs_list[[i]])){
+			stop(paste0("Item '", names(specs_list)[i], "' is not a data.frame."))
+		}else if(!all(c("Spec", "Pval") %in% colnames(specs_list[[i]]))){
+			stop(paste0("Item '", names(specs_list)[i], "' is missing Spec and/or Pval columns."))
+		}
 	}
 
-	# compute ratio of sig:(sig+nsig)
-	ratio_sig2nsig <- densities_sig / (densities_sig + densities_nsig)
-	ratio_sig2nsig[is.na(ratio_sig2nsig)] <- 0
+	# function to make dens and sigprop for each df in specs_list
+	makedens <- function(x, xname){
+		# check if enough points for density fit
+		if(nrow(x) < 10){stop(paste0("Insufficient observations (", 
+			nrow(x), "<", "10) in item '", xname, "'."))}
+		fit <- density(x$Spec, bw="SJ", n=res, from=minval, to=maxval)
+		dens_all <- fit$y
+		yvals <- fit$x
+		n_sig <- sum(x$Pval <= alpha)
+		n_nsig<- sum(x$Pval > alpha)
+		if(n_sig == 0){
+			sigprop <- rep(0, length(dens_all))
+		}else if(n_nsig==0){
+			sigprop <- rep(1, length(dens_all))
+		}else if(n_sig>10 & n_nsig>10){
+			# scale curves to n_sig and n_nsig
+			dens_sig <- density(x$Spec[x$Pval<=alpha], bw="SJ", n=res, from=minval, to=maxval)$y
+			dens_sig <- (dens_sig / sum(dens_sig)) * n_sig
+			dens_nsig <- density(x$Spec[x$Pval>alpha], bw="SJ", n=res, from=minval, to=maxval)$y
+			dens_nsig <- (dens_nsig / sum(dens_nsig)) * n_nsig
+			# add a tiny bit to avoid dividing by zero
+			tinybit <- max(c(dens_sig, dens_nsig)) / 1000
+			dens_sig <- dens_sig + tinybit
+			dens_nsig <- dens_nsig + tinybit
+			# proportion significant density
+			sigprop <- dens_sig / (dens_sig + dens_nsig)
+		# the following 2 conditions exist for data sets with low numbers of either sig 
+		# or nsig species, which couldn't be fit to a density curve. 
+		}else if(n_sig > n_nsig){
+			# scale curves to n_sig and n_nsig
+			dens_sig <- density(x$Spec[x$Pval<=alpha], bw="SJ", n=res, from=minval, to=maxval)$y
+			dens_sig <- (dens_sig / sum(dens_sig)) * n_sig
+			dens_all <- (dens_all / sum(dens_all)) * (n_sig + n_nsig)
+			# add a tiny bit to avoid dividing by zero
+			tinybit <- max(dens_all) / 1000
+			dens_sig <- dens_sig + tinybit
+			# proportion significant density
+			sigprop <- dens_nsig / (dens_all + tinybit)
+			# get rid of negative values
+			sigprop[sigprop < 0] <- 0
+		}else if(n_sig < n_nsig){
+			# scale curves to n_sig and n_nsig
+			dens_nsig <- density(x$Spec[x$Pval>alpha], bw="SJ", n=res, from=minval, to=maxval)$y
+			dens_nsig <- (dens_nsig / sum(dens_nsig)) * n_nsig
+			dens_all <- (dens_all / sum(dens_all)) * (n_sig + n_nsig)
+			# proportion significant density
+			sigprop <- (dens_all - dens_nsig + tinybit) / (dens_all + tinybit)
+			# get rid of negative values
+			sigprop[sigprop < 0] <- 0
+		}else{
+			stop("unknown error")
+		}
+		return(list(dens=dens_all, sigprop=sigprop, yvals=yvals, n=nrow(x)))
+	}
+	# use it to make stuff
+	densities <- mapply(makedens, specs_list, names(specs_list), SIMPLIFY=FALSE)
 
 	# handle colors
 	if(length(cols) == 1){
 		cols <- rep(cols, n)
-	}else if(length(cols) == n){
-		# do nothing...?
-	}else{
+	}else if(length(cols) != n){
 		stop("cols must be length 1, or same length as specs_list")
 	}
 	if(length(cols_bord) == 1){
 		cols_bord <- rep(cols_bord, n)
-	}else if(length(cols_bord) == n){
-		# do nothing...?
-	}else{
+	}else if(length(cols_bord) != n){
 		stop("cols_bord must be length 1, or same length as specs_list")
 	}
-	max_dens <- max(densities_all)
+
+	# get ready for plotting
+	max_dens <- max(sapply(X=densities, FUN=function(x){max(x$dens)}))
 	# calculate plot yaxis limits
 	min_spec <- min(sapply(X=specs_list, FUN=function(x){min(x$Spec)}))
 	max_spec <- min(sapply(X=specs_list, FUN=function(x){max(x$Spec)}))
@@ -239,22 +286,21 @@ plot_specs_violin <- function(specs_list, cols="black", cols_bord="white",
 		bty="n")
 	# for each variable, draw a violin
 	for(i in 1:n){
-		x_all <- (densities_all[,i] / max_dens) / 2
-		x_sig <- x_all * ratio_sig2nsig[,i]
+		x_all <- (densities[[i]]$dens / max_dens) / 2
+		x_sig <- x_all * densities[[i]]$sigprop
 
 		x_mid <- i - 0.5
 		# "all" polygon
-
 		polygon(
 			x=c(x_mid-x_all + 2*x_sig, rev(x_mid + x_all )), 
-			y=c(yvals, rev(yvals)),
+			y=c(densities[[i]]$yvals, rev(densities[[i]]$yvals)),
 			col=col2trans(cols[i], nsig_trans),
 			border=cols_bord[i], ...
 		)
 
 		polygon(
 			x=c(x_mid-x_all, rev(x_mid - x_all + 2*x_sig)), 
-			y=c(yvals, rev(yvals)),
+			y=c(densities[[i]]$yvals, rev(densities[[i]]$yvals)),
 			col=cols[i],
 			border=cols_bord[i], ...
 		)

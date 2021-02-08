@@ -44,3 +44,4 @@ importFrom("stats", "aggregate", "as.dist", "cor", "density", "dgamma",
            "dist", "dnorm", "dunif", "median", "optim", "p.adjust",
            "p.adjust.methods", "pgamma", "rmultinom", "runif", "sd",
            "var")
+importFrom("utils", "setTxtProgressBar", "txtProgressBar")

@@ -202,6 +202,21 @@ plot_specs_violin <- function(specs_list, cols="black", cols_bord="white",
 			stop(paste0("Item '", names(specs_list)[i], "' is missing Spec and/or Pval columns."))
 		}
 	}
+	# check for species with NA or NaN P-values or specs
+	# treat P=NA as P=1, remove Spec=NA
+	for(i in 1:length(specs_list)){
+		npnas <- sum(is.na(specs_list[[i]]$Pval))
+		if(npnas > 0){
+			warning(paste0("Item '", names(specs_list)[i], "' contains ", npnas, " NA P-values, they will be treated as P=1."))
+			specs_list[[i]]$Pval[is.na(specs_list[[i]]$Pval)] <- 1
+		}
+		nspecnas <- sum(is.na(specs_list[[i]]$Spec))
+		if(nspecnas > 0){
+			warning(paste0("Item '", names(specs_list)[i], "' contains ", nspecnas, " NA Spec values, they will be ignored."))
+			specs_list[[i]] <- specs_list[[i]][!is.na(specs_list[[i]]$Spec), ]
+		}
+
+	}
 
 	# function to make dens and sigprop for each df in specs_list
 	makedens <- function(x, xname){
@@ -248,6 +263,8 @@ plot_specs_violin <- function(specs_list, cols="black", cols_bord="white",
 			dens_nsig <- density(x$Spec[x$Pval>alpha], bw="SJ", n=res, from=minval, to=maxval)$y
 			dens_nsig <- (dens_nsig / sum(dens_nsig)) * n_nsig
 			dens_all <- (dens_all / sum(dens_all)) * (n_sig + n_nsig)
+			# add a tiny bit to avoid dividing by zero
+			tinybit <- max(dens_all) / 1000
 			# proportion significant density
 			sigprop <- (dens_all - dens_nsig + tinybit) / (dens_all + tinybit)
 			# get rid of negative values
@@ -273,6 +290,11 @@ plot_specs_violin <- function(specs_list, cols="black", cols_bord="white",
 	}
 
 	# get ready for plotting
+	# re-scale curves so they all add up to 1
+	for(i in 1:length(densities)){
+		densities[[i]]$dens <- densities[[i]]$dens / sum(densities[[i]]$dens)
+	}
+	# calculate max observed density
 	max_dens <- max(sapply(X=densities, FUN=function(x){max(x$dens)}))
 	# calculate plot yaxis limits
 	min_spec <- min(sapply(X=specs_list, FUN=function(x){min(x$Spec)}))
@@ -309,3 +331,4 @@ plot_specs_violin <- function(specs_list, cols="black", cols_bord="white",
 	var_names <- names(specs_list)
 	mtext(var_names, side=1, at=((1:length(var_names))-0.5), cex=label_cex )
 }
+

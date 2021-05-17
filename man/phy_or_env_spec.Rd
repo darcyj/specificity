@@ -17,9 +17,10 @@ phy_or_env_spec(
   verbose = TRUE,
   p_method = "raw",
   center = "mean",
-  denom_type = "index",
+  denom_type = "index_full",
   diagnostic = F,
-  chunksize = 1000
+  chunksize = 1000,
+  ga_params = get_ga_defaults()
 )
 }
 \arguments{
@@ -86,7 +87,7 @@ that denominator type does NOT affect P-values.
     either. Not sensitive to number of samples. Not suggested because units are
     strange, and isn't comparable between variables. 
   }
-  \item{"index":}{
+  \item{"index_full":}{
     d is the mean of simulated (permuted) RQE values for species that have stronger
     specificity than expected by chance, resulting in specificity values with range
     [-1, 0), with 0 as the null hypothesis. In this case, -1 indicates perfect
@@ -95,9 +96,23 @@ that denominator type does NOT affect P-values.
     exact same elevation or the exact same pH. For species that have weaker specificity
     than expected by chance, d is x minus the center (see above) of simulated RQE 
     values, where x is the maximum possible dissimilarity observable given species
-    weights. This d has other useful properties: scale invariance to env/hosts_phylo,
-    insensitivity to the number of samples, insensitivity to occupancy, and strong 
-    sensitivity to specificity (default).
+    weights. In "index_full", x is estimated using a genetic algorithm. This d has
+    other useful properties: scale invariance to env/hosts_phylo, insensitivity to
+    the number of samples, insensitivity to occupancy, and strong sensitivity to 
+    specificity (default).
+  }
+  \item{"index_rough":}{
+    Same as "index_full", but for species where specificity is weaker than expected by
+    chance, a rough approximation is used to vastly reduce computational load. 
+    This approximation does NOT give values where 1 is maximized generality. instead,
+    the values will tightly correlate to the correct values, but the slope of that
+    relationship will not be known a priori. In other words, if you don't care
+    about species that are more general than expected by chance, this is fine. 
+  }
+  \item{"index_fast":}{
+    Same as "index_full", but results as per "index_rough" are used together with
+    a subset of results from "index_full" to create a model relating the two. Thus,
+    speed is a compromise between the two approaches, with medium-high accuracy.
   }
 }}
 
@@ -109,6 +124,10 @@ simN where N is the number of sims (default: FALSE)}
 done using chunked evaluation, which lowers memory use considerably for larger data
 sets. Can be disabled by setting to 0. Default value is 1000 species per chunk
 (default: 1000).}
+
+\item{ga_params}{list. Parameters for genetic algorithm that maximizes RQE. Only used
+with denom_type="index". Default is the output of get_ga_defaults(). If different
+parameters are desired, start with output of get_ga_defaults and modify accordingly.}
 }
 \value{
 data.frame where each row is an input species. First column is P-value

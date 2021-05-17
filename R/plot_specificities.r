@@ -255,7 +255,7 @@ plot_specs_violin <- function(specs_list, cols="black", cols_bord="white",
 			tinybit <- max(dens_all) / 1000
 			dens_sig <- dens_sig + tinybit
 			# proportion significant density
-			sigprop <- dens_nsig / (dens_all + tinybit)
+			sigprop <- dens_sig / (dens_all + tinybit)
 			# get rid of negative values
 			sigprop[sigprop < 0] <- 0
 		}else if(n_sig < n_nsig){

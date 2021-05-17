@@ -57,19 +57,20 @@ BEGIN_RCPP
 END_RCPP
 }
 // rao_genetic_max
-List rao_genetic_max(const NumericVector p, const NumericVector D, const int term_cycles, const int maxiters, const int popsize, const int keep, const long double prc);
-RcppExport SEXP _specificity_rao_genetic_max(SEXP pSEXP, SEXP DSEXP, SEXP term_cyclesSEXP, SEXP maxitersSEXP, SEXP popsizeSEXP, SEXP keepSEXP, SEXP prcSEXP) {
+List rao_genetic_max(const NumericVector& p, const NumericVector& D, const int term_cycles, const int maxiters, const int popsize, const int keep, const long double prc, const bool permute_pop);
+RcppExport SEXP _specificity_rao_genetic_max(SEXP pSEXP, SEXP DSEXP, SEXP term_cyclesSEXP, SEXP maxitersSEXP, SEXP popsizeSEXP, SEXP keepSEXP, SEXP prcSEXP, SEXP permute_popSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const NumericVector >::type p(pSEXP);
-    Rcpp::traits::input_parameter< const NumericVector >::type D(DSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type p(pSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type D(DSEXP);
     Rcpp::traits::input_parameter< const int >::type term_cycles(term_cyclesSEXP);
     Rcpp::traits::input_parameter< const int >::type maxiters(maxitersSEXP);
     Rcpp::traits::input_parameter< const int >::type popsize(popsizeSEXP);
     Rcpp::traits::input_parameter< const int >::type keep(keepSEXP);
     Rcpp::traits::input_parameter< const long double >::type prc(prcSEXP);
-    rcpp_result_gen = Rcpp::wrap(rao_genetic_max(p, D, term_cycles, maxiters, popsize, keep, prc));
+    Rcpp::traits::input_parameter< const bool >::type permute_pop(permute_popSEXP);
+    rcpp_result_gen = Rcpp::wrap(rao_genetic_max(p, D, term_cycles, maxiters, popsize, keep, prc, permute_pop));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -79,7 +80,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_specificity_rao1sp", (DL_FUNC) &_specificity_rao1sp, 4},
     {"_specificity_raoperms", (DL_FUNC) &_specificity_raoperms, 4},
     {"_specificity_rao_sort_max", (DL_FUNC) &_specificity_rao_sort_max, 2},
-    {"_specificity_rao_genetic_max", (DL_FUNC) &_specificity_rao_genetic_max, 7},
+    {"_specificity_rao_genetic_max", (DL_FUNC) &_specificity_rao_genetic_max, 8},
     {NULL, NULL, 0}
 };
 

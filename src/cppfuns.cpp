@@ -39,14 +39,11 @@ NumericVector pairwise_product(const NumericVector& x) {
 // justin: https://stackoverflow.com/questions/50243461/stl-random-shuffle-generates-highly-correlated-sequences
 // modified by me to have default behavior of only setting seed if seed > 0, 
 // otherwise just nondeterministic random
-void shuffle_ints_so(IntegerVector &x, int seed=0)
-{
+void shuffle_ints_so(IntegerVector &x, int seed=0){
 	thread_local std::mt19937 engine;
-
 	if(seed > 0){
 		engine.seed(seed);
 	}
-
 	std::shuffle(x.begin(), x.end(), engine);
 }
 
@@ -116,7 +113,7 @@ NumericVector raoperms(const NumericVector& p, const NumericVector& D, const int
 // p is a mxn matrix where rows are samples and cols are species (or perms)
 // D is a vector of distances
 // before use, make SURE that D is length (m(m-1))/2
-NumericVector spec_core(const NumericMatrix& p, const NumericVector& D) {
+inline NumericVector spec_core(const NumericMatrix& p, const NumericVector& D) {
 	const int ncol = p.ncol();
 	NumericVector output(ncol);
 
@@ -130,6 +127,25 @@ NumericVector spec_core(const NumericMatrix& p, const NumericVector& D) {
 	}
 	return output;
 }
+
+
+// makes two different random integers in range [0, max)
+// i.e. max-1 is the largest number it can get
+// think of this as sampling two positions from an array of length max
+// max cannot be less than 2, obviously.
+inline IntegerVector twoDifferentRandomInts(int max){
+	if(max < 2){
+		stop("max must be >= 2!");
+	}
+	IntegerVector out = IntegerVector(2);
+	out[0] = rand() % max;
+	out[1] = rand() % max;
+	while(out[1] == out[0]){
+		out[1] = rand() % max;
+	}
+	return(out);
+}
+
 
 
 // rao_sort_max 
@@ -150,12 +166,23 @@ long double rao_sort_max(const NumericVector& p, const NumericVector& D) {
 
 
 // function that just swaps two items at random within a vector
-inline NumericVector swapcol (const NumericVector x){
+// there used to be another version but it wasn't used so bye-bye
+inline NumericVector swapcol2 (const NumericVector& x){
 	NumericVector xout = clone(x);
-	IntegerVector xpos = seq(0, xout.size() - 1);
-	shuffle_ints_so(xpos); // seed argument ommitted, default is just to not set a seed
-	//std::random_shuffle(xpos.begin(), xpos.end() ); // old way, R CMD check didn't like it
+	IntegerVector xpos = twoDifferentRandomInts(xout.size());
 	std::swap(xout[xpos[0]], xout[xpos[1]]);
+	return xout;
+}
+
+// function that randomly permutes a vector
+inline NumericVector permcol (const NumericVector& x){
+	int xsize = x.size();
+	NumericVector xout(xsize);
+	IntegerVector xpos = seq(0, xsize - 1);
+	shuffle_ints_so(xpos); // seed argument ommitted, default is just to not set a seed
+	for(int i=0; i<xsize; i++){
+		xout[i] = x[xpos[i]];
+	}
 	return xout;
 }
 
@@ -200,12 +227,12 @@ inline IntegerVector seqrep (const int from, const int to, const int len){
 inline bool double_equals (const long double x1, const long double x2, const long double eps=0.001){
 	return std::abs(x1 - x2) < eps;
 }
-
 // genetic optimization algorithm for finding order of p that maximizes Rao
 // [[Rcpp::export]]
-List rao_genetic_max (const NumericVector p, const NumericVector D, 
+List rao_genetic_max (const NumericVector& p, const NumericVector& D, 
 	const int term_cycles=10, const int maxiters = 400, 
-	const int popsize=300, const int keep=5, const long double prc = 0.001){
+	const int popsize=300, const int keep=5, const long double prc = 0.001,
+	const bool permute_pop=0){
 	// check to make sure p and D are correct lengths
 	int ps = p.size();
 	int p_expctd = (ps * (ps - 1)) / 2;
@@ -213,9 +240,15 @@ List rao_genetic_max (const NumericVector p, const NumericVector D,
 		throw std::invalid_argument("p and D incompatible lengths.");
 	}
 	// propagate initial matrix; each col is a p vector (a population of p vecs)
+	// if permute_pop, each is a RANDOM permutation of p
+	// else, each is just one swap away from p
 	NumericMatrix pop = NumericMatrix(ps, popsize);
 	for(int j=0; j<popsize; j++){
-		pop(_,j) = swapcol(p); 
+		if(permute_pop){
+			pop(_,j) = permcol(p); 
+		}else{
+			pop(_,j) = swapcol2(p); 
+		}
 	}
 
 	// set up counters and outputs for generations
@@ -258,7 +291,7 @@ List rao_genetic_max (const NumericVector p, const NumericVector D,
 		IntegerVector col2do = seqrep(0, keep - 1, popsize);
 		NumericVector tempcol(ps);
 		for(int j=keep; j<popsize; j++){
-			pop(_,j) = swapcol(keepmat(_,col2do[j]));
+			pop(_,j) = swapcol2(keepmat(_,col2do[j]));
 		}
 
 		// check stop conditions and modify stopper
@@ -281,6 +314,12 @@ List rao_genetic_max (const NumericVector p, const NumericVector D,
 		iter ++;
 
 	}
+
+	// warning if stopped because of maxiters
+	if(iter >= maxiters){
+		warning("Reached maxiters");
+	}
+
 
 	// make output list object
 	IntegerVector iterations = seq(0, maxiters - 1);

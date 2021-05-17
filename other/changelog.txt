@@ -11,13 +11,22 @@
   * changed srand and std::random_shuffle in C++ code to a new implementation that doesn't make R CMD check angry
   * updated documentation, made examples nicer and made examples actually run on check
   * re-organized extra stuff in package directory into folder "other"
-0.1.2.9000 // 2020 JAN 20
+0.1.2.9000 // 2021 JAN 20
   * added Rcpp heder line so that C++11 will be used during compilation by default
   * added log for what package versions were used during a build in other/  
-0.1.3.9000 // 2020 JAN 21
+0.1.3.9000 // 2021 JAN 21
   * reverted C++11 header because it isn't necessary and actually slowed stuff down
   * added chunking for sim RAO computation
   * parallelized
-0.1.3.9000 // 2020 FEB 08
+0.1.3.9000 // 2021 FEB 08
   * fixed bug in plot_specs_violin() where it wouldn't work unless >3 significant features
   * added note in update script to update this changelot
+0.1.5.9000 // 2021 MAY 10
+  * changed phy_or_env_spec and calculate_spec_and_pval "index" mode. Now, GA is used to
+    calcualte max rqe value. old index mode is now "index_rough". 
+  * added function get_ga_defaults()
+0.1.6.9000 // 2021 MAY 10
+  * added "index_fast" option to phy_or_env_spec's denom argument. This is a compromise
+    between "index_full" (use GA on everything) and "rough" (above). 
+  * uppdates to C++ functions to improve efficiency
+  * bug fix in plot_specs_violin

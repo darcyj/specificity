@@ -2,7 +2,7 @@ Pagage versions used in this build and tests:
 devtools=2.3.0
 roxygen2=7.1.1
 Rcpp=1.0.6
-testthat=2.3.2
+testthat=3.0.2
 ape=5.5
 parallel=3.6.3
 fields=12.3

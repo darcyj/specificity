@@ -3,7 +3,15 @@
 \alias{rao_genetic_max}
 \title{rao_genetic_max}
 \usage{
-rao_genetic_max(p, D, term_cycles, maxiters, popsize, keep, prc)
+rao_genetic_max(
+  p, 
+  D, 
+  term_cycles=10, 
+  maxiters=400,
+  popsize=300,
+  keep=5, 
+  prc=0.001,
+  permute_pop=0)
 }
 \arguments{
 \item{p}{numeric vector of length n - a species weights vector.}

@@ -3,7 +3,11 @@
 \alias{rao1sp}
 \title{rao1sp}
 \usage{
-rao1sp(p, D, perm, seed)
+rao1sp(
+	p, 
+	D, 
+	perm=FALSE, 
+	seed=0)
 }
 \arguments{
 \item{p}{numeric vector of length n. a species weights vector.}

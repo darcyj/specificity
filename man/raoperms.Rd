@@ -3,7 +3,11 @@
 \alias{raoperms}
 \title{raoperms}
 \usage{
-raoperms(p,D,n_sim,seed)
+raoperms(
+	p,
+	D,
+	n_sim=1000,
+	seed=12345)
 }
 \arguments{
 \item{p}{numeric vector of species weights.}

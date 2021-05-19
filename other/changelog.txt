@@ -25,8 +25,11 @@
   * changed phy_or_env_spec and calculate_spec_and_pval "index" mode. Now, GA is used to
     calcualte max rqe value. old index mode is now "index_rough". 
   * added function get_ga_defaults()
-0.1.6.9000 // 2021 MAY 10
+0.1.6.9000 // 2021 MAY 17
   * added "index_fast" option to phy_or_env_spec's denom argument. This is a compromise
     between "index_full" (use GA on everything) and "rough" (above). 
   * uppdates to C++ functions to improve efficiency
   * bug fix in plot_specs_violin
+0.1.7.9000 // 2021 MAY 19
+  * update vignette
+  * remove old "sim" functions that are no longer used

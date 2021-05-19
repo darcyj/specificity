@@ -1,10 +1,7 @@
 ---
 title: "Tutorial vignette for package 'specificity'"
 author: "John L Darcy"
-date: "`r format(Sys.Date(), "%B %d, %Y")`"
-output:
-  html_document:
-    df_print: paged
+output: pdf_document
 ---
 
 ## Introduction
@@ -38,11 +35,11 @@ The endophyte dataset consists of foliar endophytic fungi sampled from leaves of
 ```{r echo = T}
 # load specificity R package
 suppressMessages(library(specificity))
-# load endophyte data set from specificity
-data(endophyte)
+# the version of specificity with which this vignette was built:
+packageVersion("specificity")
 # check what objects are within endophyte
 names(endophyte)
-# add those objects to R namespace so we aren't typing "endophyte$" every time
+# attach "endophyte" data set from specificity
 attach(endophyte)
 ```
 As you can see, there are 3 objects inside 'endophyte'. 
@@ -74,9 +71,13 @@ all(rownames(otutable_ovr10) == rownames(metadata))
 ```
 
 ## Specificity analysis
-Calculating specificity for various data types is fairly easy with this package. In this example, we will analyze specificity to elevation, rainfall, host plant phylogeny, and geographic distance. In the function `phy_or_env_spec()`, the `n_sim` argument determines the number of simulations (i.e. permutations) to do. Each analysis below should take a few seconds to complete (maybe several minutes on laptop hardware). When you run them, you will see status updates that are omitted in this vignette for the sake of brevity. To make all of this run faster, we are only using 100 simulations, but recommend 1000 sims for a real analysis (default). `p_method = "gamma_fit"` means we fit a gamma distribution to permuted specificity values in order to calculate P-values for each species. The default is `p_method = "raw"`, which requires a much higher `n_sim` to get reasonable P-values. Funky variable distributions may break `gamma_fit` (you'll get an error message to that effect), but using `raw` with lots of permutations will always work.
+Calculating specificity for various data types is fairly easy with this package. In this example, we will analyze specificity to elevation, rainfall, host plant phylogeny, and geographic distance. In the function `phy_or_env_spec()`, the `n_sim` argument determines the number of simulations (i.e. permutations) to do. When you run them, you will see status updates that are omitted in this vignette for the sake of brevity. 
 
-`phy_or_env_spec()` is parallelized, and speeds up very nicely using multiple CPU cores. For typical hardware, use 4 or so. If you're using a cluster, know that more cores = more faster.
+To make all of this run faster, we are only using 100 simulations, but recommend 1000 sims for a real analysis (default). To get more accurate P-values with few simulations, we use `p_method = "gamma_fit"`. This means we fit a gamma distribution to permuted specificity values in order to calculate P-values for each species. The default is `p_method = "raw"`, which requires a much higher `n_sim` to get reasonable P-values. Funky variable distributions may break `gamma_fit` (you'll get an error message to that effect), but using `raw` with lots of permutations will always work.
+
+`phy_or_env_spec()` is parallelized, and speeds up very nicely using multiple CPU cores. For typical hardware, use 4 or so. If you're using a cluster, know that more cores = more faster. On typical hardware, each of the below analyses should take a minute or two.
+
+The argument `denom_type="index_fast"` is used to specify a fast calculation for species that are less specific than expected by chance. For a data set like this one, with 760 samples, the fast approximation is necessary so calculation doesn't take forever. A thorough explanation of available options can be found with `?phy_or_env_spec`.
 
 One more thing to note is that here, we're placing each specificity result into a list object. That's because `plot_specs_violin` (used below) expects them to all be in a list. It's also a convenient way to organize our results.
 
@@ -85,18 +86,23 @@ One more thing to note is that here, we're placing each specificity result into 
 spec_ncores <- 4
 # make empty list for specificity values
 specs_list <- list()
+
 # specificity for elevation:
-specs_list$"Elevation" <- phy_or_env_spec(otutable_ovr10, env=metadata$Elevation, 
-  n_sim=100, n_cores=spec_ncores, p_method = "gamma_fit")
+specs_list$"Elevation" <- phy_or_env_spec(otutable_ovr10, env=metadata$Elevation,
+  n_sim=100, n_cores=spec_ncores, p_method="gamma_fit", denom_type="index_fast")
+
 # specificity for rainfall
 specs_list$"Rainfall" <- phy_or_env_spec(otutable_ovr10, env=metadata$Rainfall, 
-  n_sim=100, n_cores=spec_ncores, p_method = "gamma_fit")
+  n_sim=100, n_cores=spec_ncores, p_method="gamma_fit", denom_type="index_fast")
 # specificity for evapotranspiration
-specs_list$"Evapotranspiration" <- phy_or_env_spec(otutable_ovr10, env=metadata$Evapotranspiration, 
-  n_sim=100, n_cores=spec_ncores, p_method = "gamma_fit")
+specs_list$"Evapotranspiration" <- phy_or_env_spec(otutable_ovr10,
+  env=metadata$Evapotranspiration, n_sim=100, n_cores=spec_ncores,
+  p_method="gamma_fit", denom_type="index_fast")
+
 # specificity for host phylogeny - converting tree to dist will take a while!
-specs_list$"Host Phylogeny" <- phy_or_env_spec(otutable_ovr10, hosts=metadata$PlantGenus, 
-	hosts_phylo=supertree, n_sim=100, n_cores=spec_ncores, p_method = "gamma_fit")
+specs_list$"Host Phylogeny" <- phy_or_env_spec(otutable_ovr10,
+  hosts=metadata$PlantGenus, hosts_phylo=supertree, n_sim=100, n_cores=spec_ncores,
+  p_method="gamma_fit", denom_type="index_fast")
 ```
 
 For geographic distance, we'll use specificity's `distcalc` function to calculate pairwise geographic distances between samples, using latitude and longitude data.  
@@ -104,8 +110,9 @@ For geographic distance, we'll use specificity's `distcalc` function to calculat
 # calculate geographic distances
 geo_distmat <- distcalc(lat=metadata$Lat, lng=metadata$Lon, sampIDs=metadata$SampleID)
 # specificity for geographic distance
-specs_list$"Geographic Distance" <- phy_or_env_spec(otutable_ovr10, env=geo_distmat, n_sim=100, 
-	n_cores=spec_ncores, p_method = "gamma_fit")
+specs_list$"Geographic Distance" <- phy_or_env_spec(otutable_ovr10, env=geo_distmat,
+  n_sim=100, 
+  n_cores=spec_ncores, p_method="gamma_fit", denom_type="index_fast")
 ```
 
 ## Visualization

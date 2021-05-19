@@ -13,6 +13,7 @@ rao_genetic_max(p, D, term_cycles, maxiters, popsize, keep, prc)
 \item{popsize}{integer, population size for genetic algorithm (default: 300).}
 \item{keep}{integer, number of individuals to keep during each iteration (default: 5).}
 \item{prc}{double, precision for calculating termination with term_cycles (default: 0.001).}
+\item{permute_pop}{bool, whether to randomly permute p when initializing population (default: 0).}
 }
 \value{
 List object containing results of genetic algorithm:

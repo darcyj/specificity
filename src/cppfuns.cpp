@@ -133,15 +133,20 @@ inline NumericVector spec_core(const NumericMatrix& p, const NumericVector& D) {
 // i.e. max-1 is the largest number it can get
 // think of this as sampling two positions from an array of length max
 // max cannot be less than 2, obviously.
+// R package checks don't like rand(), so using R::runif() instead
 inline IntegerVector twoDifferentRandomInts(int max){
 	if(max < 2){
 		stop("max must be >= 2!");
 	}
 	IntegerVector out = IntegerVector(2);
-	out[0] = rand() % max;
-	out[1] = rand() % max;
+	out[0] = floor(R::runif(0,1) * max);
+	out[1] = floor(R::runif(0,1) * max);
+	// commented out because R checks don't like rand()
+	// out[0] = rand() % max;
+	// out[1] = rand() % max;
 	while(out[1] == out[0]){
-		out[1] = rand() % max;
+		// out[1] = rand() % max;
+		out[1] = floor(R::runif(0,1) * max);
 	}
 	return(out);
 }

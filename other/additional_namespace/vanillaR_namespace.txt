@@ -13,5 +13,5 @@ importFrom("graphics", "abline", "axis", "box", "mtext", "par", "plot",
 importFrom("stats", "aggregate", "as.dist", "cor", "density", "dgamma",
            "dist", "dnorm", "dunif", "median", "optim", "p.adjust",
            "p.adjust.methods", "pgamma", "rmultinom", "runif", "sd",
-           "var")
+           "var", "coef", "lm", "summary.lm")
 importFrom("utils", "setTxtProgressBar", "txtProgressBar")

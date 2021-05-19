@@ -15,13 +15,13 @@
 #' @return string. either "mat", "dist", "vec", "phy", or "error".
 #' 
 #' @examples
-#' library(specificity)
-#' attach(endophyte)
-#' m <- occ_threshold(prop_abund(otutable), threshold=10)
-#' check_pes_inputs(m, env=metadata$Elevation, hosts=NULL, hosts_phylo=NULL)
-#' check_pes_inputs(m, env=NULL, hosts=metadata$PlantGenus, hosts_phylo=supertree)
-#' aspect_dis <- circularize2dist(metadata$Aspect, 360)
-#' check_pes_inputs(m, env=aspect_dis, hosts=NULL, hosts_phylo=NULL)
+#' # library(specificity)
+#' # attach(endophyte)
+#' # m <- occ_threshold(prop_abund(otutable), threshold=10)
+#' # check_pes_inputs(m, env=metadata$Elevation, hosts=NULL, hosts_phylo=NULL)
+#' # check_pes_inputs(m, env=NULL, hosts=metadata$PlantGenus, hosts_phylo=supertree)
+#' # aspect_dis <- circularize2dist(metadata$Aspect, 360)
+#' # check_pes_inputs(m, env=aspect_dis, hosts=NULL, hosts_phylo=NULL)
 #' 
 #' @export
 check_pes_inputs <- function(abunds_mat, env, hosts, hosts_phylo, verbose=TRUE){

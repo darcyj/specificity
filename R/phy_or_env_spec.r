@@ -113,39 +113,39 @@
 #'   ($Pval), second column is specificity ($Spec).
 #'
 #' @examples
-#' library(specificity)
-#' attach(endophyte)
-#' # only analyze species with occupancy >= 20
-#' m <- occ_threshold(prop_abund(otutable), 20)
-#' # create list to hold phy_or_env_spec outputs
-#' specs_list <- list()
-#' 
-#' # phylogenetic specificity using endophyte data set
-#' specs_list$host <- phy_or_env_spec(
-#'     abunds_mat=m,
-#'     hosts=metadata$PlantGenus, 
-#'     hosts_phylo=supertree,
-#'     n_sim=100, p_method="gamma_fit",
-#'     n_cores=4
-#' )
-#' 
-#' # environmental specificity using elevation from endophyte data set:
-#' specs_list$elev <- phy_or_env_spec(
-#'     abunds_mat=m,
-#'     env=metadata$Elevation,
-#'     n_sim=100, p_method="gamma_fit",
-#'     n_cores=4
-#' )
-#' 
-#' # geographic specificity using spatial data from endophyte data set:
-#' specs_list$geo <- phy_or_env_spec(
-#'     abunds_mat=m,
-#'     env=distcalc(metadata$Lat, metadata$Lon),
-#'     n_sim=100, p_method="gamma_fit",
-#'     n_cores=4
-#' )
-#' 
-#' plot_specs_violin(specs_list, cols=c("forestgreen", "red", "black"))
+#' # library(specificity)
+#' # attach(endophyte)
+#' # # only analyze species with occupancy >= 20
+#' # m <- occ_threshold(prop_abund(otutable), 20)
+#' # # create list to hold phy_or_env_spec outputs
+#' # specs_list <- list()
+#' # 
+#' # # phylogenetic specificity using endophyte data set
+#' # specs_list$host <- phy_or_env_spec(
+#' #     abunds_mat=m,
+#' #     hosts=metadata$PlantGenus, 
+#' #     hosts_phylo=supertree,
+#' #     n_sim=100, p_method="gamma_fit",
+#' #     n_cores=4, denom="index_fast"
+#' # )
+#' # 
+#' # # environmental specificity using elevation from endophyte data set:
+#' # specs_list$elev <- phy_or_env_spec(
+#' #     abunds_mat=m,
+#' #     env=metadata$Elevation,
+#' #     n_sim=100, p_method="gamma_fit",
+#' #     n_cores=4, denom="index_fast"
+#' # )
+#' # 
+#' # # geographic specificity using spatial data from endophyte data set:
+#' # specs_list$geo <- phy_or_env_spec(
+#' #     abunds_mat=m,
+#' #     env=distcalc(metadata$Lat, metadata$Lon),
+#' #     n_sim=100, p_method="gamma_fit",
+#' #     n_cores=4, denom="index_fast"
+#' # )
+#' # 
+#' # plot_specs_violin(specs_list, cols=c("forestgreen", "red", "black"))
 #'
 #' @export
 phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL, 

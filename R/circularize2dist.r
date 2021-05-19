@@ -17,15 +17,15 @@
 #' @return a vector of differences, ordered identically to a "dist" object.
 #'
 #' @examples
-#' library(specificity)
-#' # make some fake data to represent months of the year
-#' months <- c(1, 4, 11)
-#' # run circularize2dist() on the months. Must specify that
-#' # maxx = 12, since december is both 12 and 0 for these data.
-#' circularize2dist(months, 12)
-#' # output is a distance matrix. 
-#' # rows and cols of months_circdm are months - it's ordered.
-#' # notice the distance between 11 and 1 is 2, not 10!
+#' # library(specificity)
+#' # # make some fake data to represent months of the year
+#' # months <- c(1, 4, 11)
+#' # # run circularize2dist() on the months. Must specify that
+#' # # maxx = 12, since december is both 12 and 0 for these data.
+#' # circularize2dist(months, 12)
+#' # # output is a distance matrix. 
+#' # # rows and cols of months_circdm are months - it's ordered.
+#' # # notice the distance between 11 and 1 is 2, not 10!
 #'
 #' @export
 circularize2dist <- function(x, maxx){

@@ -25,20 +25,20 @@
 #'   values are the lower triangle of a patristic distance matrix with rows=x and cols=x. 
 #'
 #' @examples
-#'   library(specificity)
-#'   library(ape)
-#'   example_tree <- ape::read.tree(text=" ((((a:1,b:1):1,c:2):1,d:3):1,(e:1,f:1):3);")
-#'   example_x <- c("a", "a", "a", "b", "c", "d", "c", "a", "f")
-#'   # unique patristic distance matrix:
-#'   ape::cophenetic.phylo(example_tree)
-#'   # dist object for example_x:
-#'   tree2mat(tree=example_tree, x=example_x)
-#' 
-#'   # examples with other delimiters
-#'   tree2mat(tree=example_tree, x=example_x, delim="@")
-#'   tree2mat(tree=example_tree, x=example_x, delim="i love cats")
-#'   # should fail since "a" is in a tip name:
-#'   # tree2mat(tree=example_tree, x=example_x, delim="a")
+#' # library(specificity)
+#' # library(ape)
+#' # example_tree <- ape::read.tree(text=" ((((a:1,b:1):1,c:2):1,d:3):1,(e:1,f:1):3);")
+#' # example_x <- c("a", "a", "a", "b", "c", "d", "c", "a", "f")
+#' # # unique patristic distance matrix:
+#' # ape::cophenetic.phylo(example_tree)
+#' # # dist object for example_x:
+#' # tree2mat(tree=example_tree, x=example_x)
+#' # 
+#' # # examples with other delimiters
+#' # tree2mat(tree=example_tree, x=example_x, delim="@")
+#' # tree2mat(tree=example_tree, x=example_x, delim="i love cats")
+#' # # should fail since "a" is in a tip name:
+#' # # tree2mat(tree=example_tree, x=example_x, delim="a")
 #' 
 #' @export
 tree2mat <- function(tree, x, n_cores=1, delim=";"){

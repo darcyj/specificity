@@ -24,15 +24,15 @@ distance between 350 and 365. Another example may be direction, where 0.1 and
 2pi radians are close together.
 }
 \examples{
-library(specificity)
-# make some fake data to represent months of the year
-months <- c(1, 4, 11)
-# run circularize2dist() on the months. Must specify that
-# maxx = 12, since december is both 12 and 0 for these data.
-circularize2dist(months, 12)
-# output is a distance matrix. 
-# rows and cols of months_circdm are months - it's ordered.
-# notice the distance between 11 and 1 is 2, not 10!
+# library(specificity)
+# # make some fake data to represent months of the year
+# months <- c(1, 4, 11)
+# # run circularize2dist() on the months. Must specify that
+# # maxx = 12, since december is both 12 and 0 for these data.
+# circularize2dist(months, 12)
+# # output is a distance matrix. 
+# # rows and cols of months_circdm are months - it's ordered.
+# # notice the distance between 11 and 1 is 2, not 10!
 
 }
 \author{

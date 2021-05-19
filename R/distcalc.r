@@ -13,10 +13,10 @@
 #' @return matrix containing all pairwise geographic distances in km. 
 #' 
 #' @examples
-#' library(specificity)
-#' attach(endophyte)
-#' geo_dists <- distcalc(metadata$Lat, metadata$Lon, metadata$SampleID)
-#' all(rownames(geo_dists) == metadata$SampleID)
+#' # library(specificity)
+#' # attach(endophyte)
+#' # geo_dists <- distcalc(metadata$Lat, metadata$Lon, metadata$SampleID)
+#' # all(rownames(geo_dists) == metadata$SampleID)
 #' 
 #' @export
 distcalc <- function(lat, lng, sampIDs=NULL){

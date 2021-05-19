@@ -17,15 +17,15 @@ vector x. The output vector is the same length and same order as a
 lower triangle of matrix with rows and columns x.
 }
 \examples{
-  x <- 1:6
-  y_cpp <- pairwise_product(x)
-  y_r <- as.dist(outer(x, x, function(x,y){x*y}))
-  print("Calculated with R's outer() function:")
-  y_r
-  print("As a vector:")
-  as.vector(y_r)
-  print("Calculated with pairwise_product (C++):")
-  y_cpp
+  # x <- 1:6
+  # y_cpp <- pairwise_product(x)
+  # y_r <- as.dist(outer(x, x, function(x,y){x*y}))
+  # print("Calculated with R's outer() function:")
+  # y_r
+  # print("As a vector:")
+  # as.vector(y_r)
+  # print("Calculated with pairwise_product (C++):")
+  # y_cpp
 }
 \author{
 John L. Darcy

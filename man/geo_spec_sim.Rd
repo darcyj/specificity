@@ -83,21 +83,21 @@ species specific to geographic space. A high SD means less specificity, and a
 low SD means more specificity.
 }
 \examples{
-library(specificity)
-g1 <- randomgrid()
-plot(g1)
-a1 <- geo_spec_sim(sdev=c(30, 30, 30, 30), n_obs=1000, grid=g1, up=c(0, 0.20, 0.40, 0.60))
-par(mfrow=c(2,2))
-plot_grid_abunds(g1, a1$matrix[,1])
-plot_grid_abunds(g1, a1$matrix[,2])
-plot_grid_abunds(g1, a1$matrix[,3])
-plot_grid_abunds(g1, a1$matrix[,4])
-a2 <- geo_spec_sim(sdev=c(10, 20, 30, 40), n_obs=1000, grid=g1, ideal_x=-50, ideal_x2=50, n_ideal=2)
-par(mfrow=c(2,2))
-plot_grid_abunds(g1, a2$matrix[,1], main="sd=10")
-plot_grid_abunds(g1, a2$matrix[,2], main="sd=20")
-plot_grid_abunds(g1, a2$matrix[,3], main="sd=30")
-plot_grid_abunds(g1, a2$matrix[,4], main="sd=40")
+# library(specificity)
+# g1 <- randomgrid()
+# plot(g1)
+# a1 <- geo_spec_sim(sdev=c(30, 30, 30, 30), n_obs=1000, grid=g1, up=c(0, 0.20, 0.40, 0.60))
+# par(mfrow=c(2,2))
+# plot_grid_abunds(g1, a1$matrix[,1])
+# plot_grid_abunds(g1, a1$matrix[,2])
+# plot_grid_abunds(g1, a1$matrix[,3])
+# plot_grid_abunds(g1, a1$matrix[,4])
+# a2 <- geo_spec_sim(sdev=c(10, 20, 30, 40), n_obs=1000, grid=g1, ideal_x=-50, ideal_x2=50, n_ideal=2)
+# par(mfrow=c(2,2))
+# plot_grid_abunds(g1, a2$matrix[,1], main="sd=10")
+# plot_grid_abunds(g1, a2$matrix[,2], main="sd=20")
+# plot_grid_abunds(g1, a2$matrix[,3], main="sd=30")
+# plot_grid_abunds(g1, a2$matrix[,4], main="sd=40")
 
 }
 \author{

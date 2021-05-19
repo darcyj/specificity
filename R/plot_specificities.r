@@ -21,20 +21,20 @@
 #' @aliases plot_specificities
 #'
 #' @examples
-#' library(specificity)
-#' attach(endophyte)
-#' # only analyze species with occupancy >= 20
-#' m <- occ_threshold(prop_abund(otutable), 20)
-#' # create list to hold phy_or_env_spec outputs
-#' specs_list <- list()
-#' specs_list$NDVI <- phy_or_env_spec(m, env=metadata$NDVI, 
-#'   n_cores=10, n_sim=50, p_method="gamma_fit")
-#' specs_list$Evapotranspiration <- phy_or_env_spec(m,
-#'   env=metadata$Evapotranspiration, n_cores=10, 
-#'   n_sim=100, p_method="gamma_fit")
-#' specs_list$Rainfall <- phy_or_env_spec(m, env=metadata$Rainfall,
-#'   n_cores=10, n_sim=50, p_method="gamma_fit")
-#' plot_specs_stacks(specs_list)
+#' # library(specificity)
+#' # attach(endophyte)
+#' # # only analyze species with occupancy >= 20
+#' # m <- occ_threshold(prop_abund(otutable), 20)
+#' # # create list to hold phy_or_env_spec outputs
+#' # specs_list <- list()
+#' # specs_list$NDVI <- phy_or_env_spec(m, env=metadata$NDVI, 
+#' #   n_cores=10, n_sim=50, p_method="gamma_fit")
+#' # specs_list$Evapotranspiration <- phy_or_env_spec(m,
+#' #   env=metadata$Evapotranspiration, n_cores=10, 
+#' #   n_sim=100, p_method="gamma_fit")
+#' # specs_list$Rainfall <- phy_or_env_spec(m, env=metadata$Rainfall,
+#' #   n_cores=10, n_sim=50, p_method="gamma_fit")
+#' # plot_specs_stacks(specs_list)
 #'
 #' @export
 plot_specs_stacks <- plot_specificities <- function(specs_list, n_bins=20, 

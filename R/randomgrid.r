@@ -14,11 +14,11 @@
 #' @return data.frame object with x and y columns, with n_samp rows.
 #'
 #' @examples
-#' library(specificity)
-#' g <- randomgrid()
-#' plot(g)
-#' g2 <- randomgrid(n_samp=50, xmin=0, ymin=0)
-#' plot(g2)
+#' # library(specificity)
+#' # g <- randomgrid()
+#' # plot(g)
+#' # g2 <- randomgrid(n_samp=50, xmin=0, ymin=0)
+#' # plot(g2)
 #'
 #' @export
 randomgrid <- function(n_samp=1000, xmin=-100, xmax=100, ymin=-100, ymax=100, seed=123456){

@@ -15,10 +15,10 @@ A single value, approximating maximum rao under permutations of p.
 Sorts pairwise_product(p) and D to approximate the maximum of Rao(p,D) under permutations of p.
 }
 \examples{
-  data(endophyte)
-  p <- prop_abund(endophyte$otutable)[,1]
-  D <- dist(endophyte$metadata$Elevation)
-  rsm <- rao_sort_max(p,D)
+  # data(endophyte)
+  # p <- prop_abund(endophyte$otutable)[,1]
+  # D <- dist(endophyte$metadata$Elevation)
+  # rsm <- rao_sort_max(p,D)
 }
 \author{
 John L. Darcy

@@ -21,10 +21,10 @@ A single Rao value.
 Calculate's Rao's quadratic entropy for one species (rao1sp = "rao one species"). 
 }
 \examples{
-  library(specificity)
-  p <- 1:5/sum(1:5)
-  D <- dist(6:10)
-  rao1sp(p, D)
+  # library(specificity)
+  # p <- 1:5/sum(1:5)
+  # D <- dist(6:10)
+  # rao1sp(p, D)
 }
 \author{
 John L. Darcy

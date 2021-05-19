@@ -26,19 +26,19 @@ Data should come from a rooted phylogeny, but this function doesn't check that s
 be careful.
 }
 \examples{
-  library(specificity)
-  library(ape)
-  phy <- get(data(endophyte))$supertree
-  # check if tree is rooted:
-  ape::is.rooted(phy)
-  # which tips are in the Cucurbitales?
-  plot(phy) # need to stretch out the plot to see...
-  nodelabels(adj=c(0,-1), bg="yellow") # node numbers
-  nodelabels(phy$node.label, adj=c(0,1), bg="lightblue") # node names
-  # we can see that Cucurbitales is node 107  
-  cuc_tips <- tips_from_node( nodes=107, anc=phy$edge[,1], des=phy$edge[,2] )
-  cuc_tips
-  phy$tip.label[cuc_tips]
+# library(specificity)
+# library(ape)
+# phy <- get(data(endophyte))$supertree
+# # check if tree is rooted:
+# ape::is.rooted(phy)
+# # which tips are in the Cucurbitales?
+# plot(phy) # need to stretch out the plot to see...
+# nodelabels(adj=c(0,-1), bg="yellow") # node numbers
+# nodelabels(phy$node.label, adj=c(0,1), bg="lightblue") # node names
+# # we can see that Cucurbitales is node 107  
+# cuc_tips <- tips_from_node( nodes=107, anc=phy$edge[,1], des=phy$edge[,2] )
+# cuc_tips
+# phy$tip.label[cuc_tips]
 
 }
 \seealso{

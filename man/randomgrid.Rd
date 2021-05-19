@@ -33,11 +33,11 @@ data.frame object with x and y columns, with n_samp rows.
 Generates a random spatial sampling using a bivariate random uniform distribution.
 }
 \examples{
-library(specificity)
-g <- randomgrid()
-plot(g)
-g2 <- randomgrid(n_samp=50, xmin=0, ymin=0)
-plot(g2)
+# library(specificity)
+# g <- randomgrid()
+# plot(g)
+# g2 <- randomgrid(n_samp=50, xmin=0, ymin=0)
+# plot(g2)
 
 }
 \author{

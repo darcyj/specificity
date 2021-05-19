@@ -14,14 +14,14 @@
 #' @return Distance between tipa and tipb.
 #'
 #' @examples
-#'   library(specificity)
-#'   library(ape)
-#'   example_tree <- ape::read.tree(text=" ((((a:1,b:1):1,c:2):1,d:3):1,(e:1,f:1):3);")
-#'   plot(example_tree); axis(side=1)
-#'   example_ns <- make_nested_set(example_tree)
-#'   bl_distance_ns("a", "c", example_tree, example_ns) # should be 4
-#'   bl_distance_ns("a", "f", example_tree, example_ns) # should be 8
-#'   bl_distance_ns("d", "c", example_tree, example_ns) # should be 6
+#' #  library(specificity)
+#' #  library(ape)
+#' #  example_tree <- ape::read.tree(text=" ((((a:1,b:1):1,c:2):1,d:3):1,(e:1,f:1):3);")
+#' #  plot(example_tree); axis(side=1)
+#' #  example_ns <- make_nested_set(example_tree)
+#' #  bl_distance_ns("a", "c", example_tree, example_ns) # should be 4
+#' #  bl_distance_ns("a", "f", example_tree, example_ns) # should be 8
+#' #  bl_distance_ns("d", "c", example_tree, example_ns) # should be 6
 #'   
 #' 
 #' @export

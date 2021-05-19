@@ -43,12 +43,12 @@ List object containing results of genetic algorithm:
 Uses a genetic algorithm to find the optimum permutation of p to maximize Rao(p,D). 
 }
 \examples{
-  library(specificity)
-  set.seed(12345)
-  p <- runif(100)
-  D <- dist(sample(p))
-  a <- rao_genetic_max(p,D)
-  plot(a$iter_raos ~ a$iterations)
+  # library(specificity)
+  # set.seed(12345)
+  # p <- runif(100)
+  # D <- dist(sample(p))
+  # a <- rao_genetic_max(p,D)
+  # plot(a$iter_raos ~ a$iterations)
 }
 \author{
 John L. Darcy

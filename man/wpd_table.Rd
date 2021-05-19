@@ -55,18 +55,18 @@ observations within matrix m, weighted by the frequency of each species within
 s. Can also calculate Faith's PD.
 }
 \examples{
-  library(specificity)
-  set.seed(12345)
-  s_phylo <- get(data(endophyte))$supertree
-  w <- sample(c(0, 1), replace=TRUE, size=10)
-  nspec <- 12
-  m <- t(as.matrix(data.frame(
-    a=runif(nspec, 0, 100),
-    b=runif(nspec, 0, 100),
-    c=runif(nspec, 0, 100)
-  )))
-  colnames(m) <- sample(s_phylo$tip.label, ncol(m))
-  wpd_table(m, s_phylo)
+# library(specificity)
+# set.seed(12345)
+# s_phylo <- get(data(endophyte))$supertree
+# w <- sample(c(0, 1), replace=TRUE, size=10)
+# nspec <- 12
+# m <- t(as.matrix(data.frame(
+#   a=runif(nspec, 0, 100),
+#   b=runif(nspec, 0, 100),
+#   c=runif(nspec, 0, 100)
+# )))
+# colnames(m) <- sample(s_phylo$tip.label, ncol(m))
+# wpd_table(m, s_phylo)
 
 }
 \references{

@@ -22,11 +22,11 @@ Vector of Rao values, length = n_sim.
 C++ function used by phy_or_env_spec(). Not meant for use otherwise.
 }
 \examples{
-  library(specificity)
-  p <- runif(100) 
-  D <- dist(runif(100))
-  a <- raoperms(p,D,100,12345)
-  hist(a)
+  # library(specificity)
+  # p <- runif(100) 
+  # D <- dist(runif(100))
+  # a <- raoperms(p,D,100,12345)
+  # hist(a)
 }
 
 \author{

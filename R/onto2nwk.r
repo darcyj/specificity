@@ -15,16 +15,16 @@
 #' @return A newick (nwk) format string.
 #'
 #' @examples
-#' library(specificity)
-#' library(ape)
-#' df <- data.frame(
-#'	l1 = c( "a", "a", "a", "a", "a", "a", "a", "b", "b", "b", "b", "b", "b", "c", "d"),
-#'	l2 = c( "e", "e", "e", "e", "f", "f", "g", "h", "h", "h", "i", "j", "j", "k", "l"),
-#'	l3 = c( "m", "n", "o", "o", "p", "p", "q", "r", "r", "s", "t", "u", "v", "w", "x")
-#' )
-#' nwk_str <- onto2nwk(df)
-#' a <- ape::read.tree(text=nwk_str)
-#' plot(a, show.node.label=TRUE)
+#' # library(specificity)
+#' # library(ape)
+#' # df <- data.frame(
+#' #   l1 = c( "a", "a", "a", "a", "a", "a", "a", "b", "b", "b", "b", "b", "b", "c", "d"),
+#' #   l2 = c( "e", "e", "e", "e", "f", "f", "g", "h", "h", "h", "i", "j", "j", "k", "l"),
+#' #   l3 = c( "m", "n", "o", "o", "p", "p", "q", "r", "r", "s", "t", "u", "v", "w", "x")
+#' # )
+#' # nwk_str <- onto2nwk(df)
+#' # a <- ape::read.tree(text=nwk_str)
+#' # plot(a, show.node.label=TRUE)
 #'
 #' @export
 onto2nwk <- function(df){

@@ -33,15 +33,15 @@
 #'   }
 #'
 #' @examples
-#'   library(specificity)
-#'   library(ape)
-#'   phy <- get(data(endophyte))$supertree
-#'   # check if tree is rooted:
-#'   ape::is.rooted(phy)
-#'   # make nested set table:
-#'   phy_ns <- make_nested_set(phy)
-#'   # show that nested set table matches up with edges table in phy:
-#'   all(phy$edge[,2] == phy_ns[,1])
+#'   # library(specificity)
+#'   # library(ape)
+#'   # phy <- get(data(endophyte))$supertree
+#'   # # check if tree is rooted:
+#'   # ape::is.rooted(phy)
+#'   # # make nested set table:
+#'   # phy_ns <- make_nested_set(phy)
+#'   # # show that nested set table matches up with edges table in phy:
+#'   # all(phy$edge[,2] == phy_ns[,1])
 #'
 #' @export
 make_nested_set <- function(phy, n_cores=2){

@@ -33,3 +33,6 @@
 0.1.7.9000 // 2021 MAY 19
   * update vignette
   * remove old "sim" functions that are no longer used
+0.1.8.9000 // 2021 MAY 24
+  * phy_or_env_spec: remove maxint check, instead check for ints in abunds_mat and
+    change to doubles if present

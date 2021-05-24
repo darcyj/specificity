@@ -227,14 +227,31 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 		stop("unknown error")
 	}
 
-	# check if max rao is an int an if it's too large
-	col2check <- which.max(colSums(abunds_mat))
-	max2check <- rao_sort_max(abunds_mat[,col2check], D=env)
-	if(max2check > .Machine$integer.max){
-		stop("Maximum possible RAO value is greater than max integer value.
-			Use prop_abund() on abunds_mat, and/or divide env by a scalar 
-			to remedy this.")
+	# check for integers in abunds_mat. integers can cause issues because
+	# .Machine$integer.max is pretty small, and is easily outpaced by rao computation.
+	# no, apply(abunds_mat, FUN=is.integer, MARGIN=2) does NOT work on dfs, don't know why.
+	# test <- data.frame(a=1:2, b=c(0.1, 0.2))
+	# apply(test, FUN=is.integer, MARGIN=2)                         # WRONG
+	# lapply(test, FUN=is.integer )                                 # CORRECT (will work on df but not matrix)
+	# sapply(X=1:ncol(test), FUN=function(j){is.integer(test[,j])}) # CORRECT (works on both)
+	abunds_mat_intcols <- sapply(X=1:ncol(abunds_mat), FUN=function(j){is.integer(abunds_mat[j])})
+	if(any(abunds_mat_intcols)){
+		msg("...Changing abunds_mat ints to doubles...")
+		abunds_mat <- apply(X=abunds_mat, MAR=2, FUN=as.double)
 	}
+	# not necessary to do the same for env since double * int = double.
+	
+	# below is old code used to check if this function could produce
+	# integers that were too large. new code (above) converts integer
+	# values to doubles, so it should be fine. 
+		# check if max rao is an int an if it's too large
+		# col2check <- which.max(colSums(abunds_mat))
+		# max2check <- rao_sort_max(abunds_mat[,col2check], D=env)
+		# if(max2check > .Machine$integer.max){
+		# 	stop("Maximum possible RAO value is greater than max integer value.
+		# 		Use prop_abund() on abunds_mat, and/or divide env by a scalar 
+		# 		to remedy this.")
+		# }
 	msg(paste0("...done (took ", fms(proc.time()-tt), ")"))
 
 

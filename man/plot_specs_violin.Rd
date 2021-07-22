@@ -61,12 +61,15 @@ and darker colors represent statistically significant features.
 # # create list to hold phy_or_env_spec outputs
 # specs_list <- list()
 # specs_list$NDVI <- phy_or_env_spec(m, env=metadata$NDVI, 
-#   n_cores=10, n_sim=50, p_method="gamma_fit", denom="index_fast")
+#   n_cores=10, n_sim=50, p_method="gamma_fit", 
+#   denom_type="sim_center")
 # specs_list$Evapotranspiration <- phy_or_env_spec(m,
 #   env=metadata$Evapotranspiration, n_cores=10, 
-#   n_sim=100, p_method="gamma_fit", denom="index_fast")
+#   n_sim=100, p_method="gamma_fit",
+#   denom_type="sim_center")
 # specs_list$Rainfall <- phy_or_env_spec(m, env=metadata$Rainfall,
-#   n_cores=10, n_sim=50, p_method="gamma_fit", denom="index_fast")
+#   n_cores=10, n_sim=50, p_method="gamma_fit", 
+#   denom_type="sim_center")
 # # default black
 # plot_specs_violin(specs_list)
 # # with colors

@@ -15,7 +15,7 @@ calculate_spec_and_pval(
   verbose = TRUE,
   p_method = "raw",
   center = "mean",
-  denom_type = "index_full",
+  denom_type = "index",
   diagnostic = FALSE,
   ga_params = get_ga_defaults()
 )
@@ -70,8 +70,8 @@ that denominator type does NOT affect P-values.
     either. Not sensitive to number of samples. Not suggested because units are
     strange, and isn't comparable between variables. 
   }
-  \item{"index_full":}{
-    d is the mean of simulated (permuted) RQE values for species that have stronger
+  \item{"index":}{
+    d is the center of simulated (permuted) RQE values for species that have stronger
     specificity than expected by chance, resulting in specificity values with range
     [-1, 0), with 0 as the null hypothesis. In this case, -1 indicates perfect
     specificity, where a species is associated with zero environmental variability.
@@ -79,23 +79,19 @@ that denominator type does NOT affect P-values.
     exact same elevation or the exact same pH. For species that have weaker specificity
     than expected by chance, d is x minus the center (see above) of simulated RQE 
     values, where x is the maximum possible dissimilarity observable given species
-    weights. In "index_full", x is estimated using a genetic algorithm. This d has
+    weights. x is estimated using a genetic algorithm. This d has
     other useful properties: scale invariance to env/hosts_phylo, insensitivity to
     the number of samples, insensitivity to occupancy, and strong sensitivity to 
     specificity (default).
   }
-  \item{"index_rough":}{
-    Same as "index_full", but for species where specificity is weaker than expected by
-    chance, a rough approximation is used to vastly reduce computational load. 
-    This approximation does NOT give values where 1 is maximized generality. instead,
-    the values will tightly correlate to the correct values, but the slope of that
-    relationship will not be known a priori. In other words, if you don't care
-    about species that are more general than expected by chance, this is fine. 
-  }
-  \item{"index_fast":}{
-    Same as "index_full", but results as per "index_rough" are used together with
-    a subset of results from "index_full" to create a model relating the two. Thus,
-    speed is a compromise between the two approaches, with medium-high accuracy.
+  \item{"sim_center":}{
+    d is always the center of simulated (permuted) RQE values. For species that have
+    stronger specificity than expected by chance, this will return the same Spec 
+    values as "index". For species with weaker specificity than expected by chance,
+    instead of values that range between 0 and 1, they will range between 0 and Inf.
+    This is much faster than "index" because the genetic algorithm is not used. So 
+    if species with weaker specificity than expected by chance are not interesting
+    to you, this may be a good option.
   }
 }}
 
@@ -104,8 +100,9 @@ This includes Pval, SES, raw, denom, emp, and all sim values with column labels 
 simN where N is the number of sims (default: FALSE)}
 
 \item{ga_params}{list. Parameters for genetic algorithm that maximizes RQE. Only used
-with denom_type="index_full/rough/fast". Default is the output of get_ga_defaults(). If different
-parameters are desired, start with output of get_ga_defaults and modify accordingly.}
+with denom_type="index". Default is the output of get_ga_defaults(). 
+If different parameters are desired, start with output of get_ga_defaults and modify
+accordingly.}
 }
 \value{
 data.frame where each row is an input species. First column is P-value
@@ -124,9 +121,18 @@ of this function as the final component of "build your own phy_or_env_spec()".
 Note that for this custom approach, the environmental variable must be a dist.
 }
 \examples{
-# None yet. Forthcoming examples:
-# 1. calculating regular old elevational specificity the hard way
-# 2. same thing, but using vazquez null model from bipartite package
+# # calculating regular old elevational specificity the hard way
+# attach(endophyte)
+# library(parallel)
+# otutable <- occ_threshold(prop_abund(otutable), 10)
+# env <- dist(metadata$Elevation)
+# emp_raos <- apply(X=otutable, MARGIN=2, FUN=rao1sp, 
+#   D=env, perm=F, seed=12345)
+# sim_raos <- mclapply(X=as.data.frame(otutable), FUN=function(p){
+#   replicate(200, rao1sp(p, D=env, perm=TRUE, seed=0))}, mc.cores=20)
+# calculate_spec_and_pval(emp_raos, sim_raos, otutable, env, 
+#   n_cores=20, denom_type="index_full")
+
 
 }
 \author{

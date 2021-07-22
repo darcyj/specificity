@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // pairwise_product
 NumericVector pairwise_product(const NumericVector& x);
 RcppExport SEXP _specificity_pairwise_product(SEXP xSEXP) {
@@ -44,33 +49,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// rao_sort_max
-long double rao_sort_max(const NumericVector& p, const NumericVector& D);
-RcppExport SEXP _specificity_rao_sort_max(SEXP pSEXP, SEXP DSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const NumericVector& >::type p(pSEXP);
-    Rcpp::traits::input_parameter< const NumericVector& >::type D(DSEXP);
-    rcpp_result_gen = Rcpp::wrap(rao_sort_max(p, D));
-    return rcpp_result_gen;
-END_RCPP
-}
 // rao_genetic_max
-List rao_genetic_max(const NumericVector& p, const NumericVector& D, const int term_cycles, const int maxiters, const int popsize, const int keep, const long double prc, const bool permute_pop);
-RcppExport SEXP _specificity_rao_genetic_max(SEXP pSEXP, SEXP DSEXP, SEXP term_cyclesSEXP, SEXP maxitersSEXP, SEXP popsizeSEXP, SEXP keepSEXP, SEXP prcSEXP, SEXP permute_popSEXP) {
+List rao_genetic_max(const NumericVector& p, const NumericVector& D, const IntegerVector swap_freq, int term_cycles, int maxiters, int popsize_perm, int popsize_swap, int keep, double prc);
+RcppExport SEXP _specificity_rao_genetic_max(SEXP pSEXP, SEXP DSEXP, SEXP swap_freqSEXP, SEXP term_cyclesSEXP, SEXP maxitersSEXP, SEXP popsize_permSEXP, SEXP popsize_swapSEXP, SEXP keepSEXP, SEXP prcSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const NumericVector& >::type p(pSEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type D(DSEXP);
-    Rcpp::traits::input_parameter< const int >::type term_cycles(term_cyclesSEXP);
-    Rcpp::traits::input_parameter< const int >::type maxiters(maxitersSEXP);
-    Rcpp::traits::input_parameter< const int >::type popsize(popsizeSEXP);
-    Rcpp::traits::input_parameter< const int >::type keep(keepSEXP);
-    Rcpp::traits::input_parameter< const long double >::type prc(prcSEXP);
-    Rcpp::traits::input_parameter< const bool >::type permute_pop(permute_popSEXP);
-    rcpp_result_gen = Rcpp::wrap(rao_genetic_max(p, D, term_cycles, maxiters, popsize, keep, prc, permute_pop));
+    Rcpp::traits::input_parameter< const IntegerVector >::type swap_freq(swap_freqSEXP);
+    Rcpp::traits::input_parameter< int >::type term_cycles(term_cyclesSEXP);
+    Rcpp::traits::input_parameter< int >::type maxiters(maxitersSEXP);
+    Rcpp::traits::input_parameter< int >::type popsize_perm(popsize_permSEXP);
+    Rcpp::traits::input_parameter< int >::type popsize_swap(popsize_swapSEXP);
+    Rcpp::traits::input_parameter< int >::type keep(keepSEXP);
+    Rcpp::traits::input_parameter< double >::type prc(prcSEXP);
+    rcpp_result_gen = Rcpp::wrap(rao_genetic_max(p, D, swap_freq, term_cycles, maxiters, popsize_perm, popsize_swap, keep, prc));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -79,8 +73,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_specificity_pairwise_product", (DL_FUNC) &_specificity_pairwise_product, 1},
     {"_specificity_rao1sp", (DL_FUNC) &_specificity_rao1sp, 4},
     {"_specificity_raoperms", (DL_FUNC) &_specificity_raoperms, 4},
-    {"_specificity_rao_sort_max", (DL_FUNC) &_specificity_rao_sort_max, 2},
-    {"_specificity_rao_genetic_max", (DL_FUNC) &_specificity_rao_genetic_max, 8},
+    {"_specificity_rao_genetic_max", (DL_FUNC) &_specificity_rao_genetic_max, 9},
     {NULL, NULL, 0}
 };
 

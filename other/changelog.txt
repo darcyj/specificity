@@ -17,10 +17,9 @@
 0.1.3.9000 // 2021 JAN 21
   * reverted C++11 header because it isn't necessary and actually slowed stuff down
   * added chunking for sim RAO computation
-  * parallelized
 0.1.3.9000 // 2021 FEB 08
   * fixed bug in plot_specs_violin() where it wouldn't work unless >3 significant features
-  * added note in update script to update this changelot
+  * added note in update script to update this changelog
 0.1.5.9000 // 2021 MAY 10
   * changed phy_or_env_spec and calculate_spec_and_pval "index" mode. Now, GA is used to
     calcualte max rqe value. old index mode is now "index_rough". 
@@ -36,3 +35,19 @@
 0.1.8.9000 // 2021 MAY 24
   * phy_or_env_spec: remove maxint check, instead check for ints in abunds_mat and
     change to doubles if present
+0.1.9.9000 // 2021 JUL 22
+  * new function - aggregate_specs_list turns data from specs list and metadata into "long" or
+    "wide" format data, for ggplot etc
+  * added taxonomy to endophyte example data set for use with aggregate_specs_list()
+  * removed "index_fast" and "index_rough" from denom_type options of phy_or_env_spec(). It
+    turned out that the approximation upon which those options were based was critically
+    flawed. 
+  * added documentation for previously undocumented "sim_center" denom_type option for 
+    phy_or_env_spec(). it serves as a new "quick and dirty" option for examples and for users
+    who don't care about species with weaker specificity than expected by chance. 
+  * removed popsize argument from rao_genetic_max; population initialization is now specified
+    using popsize_swap and popsize_perm, each with default 150. 
+  * added option to make rao_genetic_max have stochastic swap rate using the new swap_freq
+    argument. This is a required argument and may break previous code using rao_genetic_max.
+  * general improvements to documentation
+  * updated vignette with a ggplot example

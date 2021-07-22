@@ -13,11 +13,7 @@ raoperms <- function(p, D, n_sim = 1000L, seed = 12345L) {
     .Call(`_specificity_raoperms`, p, D, n_sim, seed)
 }
 
-rao_sort_max <- function(p, D) {
-    .Call(`_specificity_rao_sort_max`, p, D)
-}
-
-rao_genetic_max <- function(p, D, term_cycles = 10L, maxiters = 400L, popsize = 300L, keep = 5L, prc = 0.001, permute_pop = 0L) {
-    .Call(`_specificity_rao_genetic_max`, p, D, term_cycles, maxiters, popsize, keep, prc, permute_pop)
+rao_genetic_max <- function(p, D, swap_freq, term_cycles = 10L, maxiters = 400L, popsize_perm = 150L, popsize_swap = 150L, keep = 5L, prc = 0.001) {
+    .Call(`_specificity_rao_genetic_max`, p, D, swap_freq, term_cycles, maxiters, popsize_perm, popsize_swap, keep, prc)
 }
 

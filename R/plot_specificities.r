@@ -161,12 +161,15 @@ plot_specs_stacks <- plot_specificities <- function(specs_list, n_bins=20,
 #' # # create list to hold phy_or_env_spec outputs
 #' # specs_list <- list()
 #' # specs_list$NDVI <- phy_or_env_spec(m, env=metadata$NDVI, 
-#' #   n_cores=10, n_sim=50, p_method="gamma_fit", denom="index_fast")
+#' #   n_cores=10, n_sim=50, p_method="gamma_fit", 
+#' #   denom_type="sim_center")
 #' # specs_list$Evapotranspiration <- phy_or_env_spec(m,
 #' #   env=metadata$Evapotranspiration, n_cores=10, 
-#' #   n_sim=100, p_method="gamma_fit", denom="index_fast")
+#' #   n_sim=100, p_method="gamma_fit",
+#' #   denom_type="sim_center")
 #' # specs_list$Rainfall <- phy_or_env_spec(m, env=metadata$Rainfall,
-#' #   n_cores=10, n_sim=50, p_method="gamma_fit", denom="index_fast")
+#' #   n_cores=10, n_sim=50, p_method="gamma_fit", 
+#' #   denom_type="sim_center")
 #' # # default black
 #' # plot_specs_violin(specs_list)
 #' # # with colors
@@ -304,7 +307,7 @@ plot_specs_violin <- function(specs_list, cols="black", cols_bord="white",
 		rgb( col2rgb(col)[1,1]/255, col2rgb(col)[2,1]/255, col2rgb(col)[3,1]/255, trans)
 	}
 	# each subplot is 1 unit wide, centered on n-0.5. 
-	plot(0, type="n", xlim=c(0, n), ylim=c(min_spec, max_spec), xaxt="n", xlab="", ylab=ylab,
+	plot(0, type="n", xlim=c(0, n), ylim=c(minval, maxval), xaxt="n", xlab="", ylab=ylab,
 		bty="n")
 	# for each variable, draw a violin
 	for(i in 1:n){

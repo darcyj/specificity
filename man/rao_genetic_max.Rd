@@ -5,10 +5,12 @@
 \usage{
 rao_genetic_max(
   p, 
-  D, 
+  D,
+  swap_freq,
   term_cycles=10, 
   maxiters=400,
-  popsize=300,
+  popsize_perm=150,
+  popsize_swap=150,
   keep=5, 
   prc=0.001,
   permute_pop=0)
@@ -16,9 +18,17 @@ rao_genetic_max(
 \arguments{
 \item{p}{numeric vector of length n - a species weights vector.}
 \item{D}{numeric vector of length n(n-1)/2 - i.e. a dist object whose full matrix is nxn.}
+\item{swap_freq}{integer vector - distribution of swaps per generation. For a constant
+  swap rate, set to a constant value (recommend 1). If set to c(1,1,2,3), for example, 
+  one swap per generation will occur about half the time, and two swaps per generation will
+  occur one quarter of the time, etc.}
 \item{term_cycles}{integer, number of cycles with no improvement to trigger termination (default: 10).}
 \item{maxiters}{integer, maximum number of iterations to run algorithm (default: 400).}
-\item{popsize}{integer, population size for genetic algorithm (default: 300).}
+\item{popsize_perm}{integer, population size for genetic algorithm that is initialized using
+  random permutations of p. Total population size is equal to popsize_perm+popsize_swap+1, and
+  all mutation post initialization is performed using swaps (default: 150).}
+\item{popsize_swap}{integer, population size for genetic algorithm that is initialized using
+  random swaps of p. The numbers of swaps are drawn from swap_freq (default: 150).}
 \item{keep}{integer, number of individuals to keep during each iteration (default: 5).}
 \item{prc}{double, precision for calculating termination with term_cycles (default: 0.001).}
 \item{permute_pop}{bool, whether to randomly permute p when initializing population (default: 0).}
@@ -47,7 +57,7 @@ Uses a genetic algorithm to find the optimum permutation of p to maximize Rao(p,
   # set.seed(12345)
   # p <- runif(100)
   # D <- dist(sample(p))
-  # a <- rao_genetic_max(p,D)
+  # a <- rao_genetic_max(p,D,c(1,1,2,3))
   # plot(a$iter_raos ~ a$iterations)
 }
 \author{

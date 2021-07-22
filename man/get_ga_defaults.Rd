@@ -11,7 +11,7 @@ named list of parameters.
 }
 \description{
 Simply returns default parameters for the genetic algorithm in rao_genetic_max().
-This function has no parameters.
+This function has no arguments.
 }
 \examples{
 # get_ga_defaults()

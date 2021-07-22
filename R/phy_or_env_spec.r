@@ -70,8 +70,8 @@
 #'       either. Not sensitive to number of samples. Not suggested because units are
 #'       strange, and isn't comparable between variables. 
 #'     }
-#'     \item{"index_full":}{
-#'       d is the mean of simulated (permuted) RQE values for species that have stronger
+#'     \item{"index":}{
+#'       d is the center of simulated (permuted) RQE values for species that have stronger
 #'       specificity than expected by chance, resulting in specificity values with range
 #'       [-1, 0), with 0 as the null hypothesis. In this case, -1 indicates perfect
 #'       specificity, where a species is associated with zero environmental variability.
@@ -79,23 +79,19 @@
 #'       exact same elevation or the exact same pH. For species that have weaker specificity
 #'       than expected by chance, d is x minus the center (see above) of simulated RQE 
 #'       values, where x is the maximum possible dissimilarity observable given species
-#'       weights. In "index_full", x is estimated using a genetic algorithm. This d has
+#'       weights. x is estimated using a genetic algorithm. This d has
 #'       other useful properties: scale invariance to env/hosts_phylo, insensitivity to
 #'       the number of samples, insensitivity to occupancy, and strong sensitivity to 
 #'       specificity (default).
 #'     }
-#'     \item{"index_rough":}{
-#'       Same as "index_full", but for species where specificity is weaker than expected by
-#'       chance, a rough approximation is used to vastly reduce computational load. 
-#'       This approximation does NOT give values where 1 is maximized generality. instead,
-#'       the values will tightly correlate to the correct values, but the slope of that
-#'       relationship will not be known a priori. In other words, if you don't care
-#'       about species that are more general than expected by chance, this is fine. 
-#'     }
-#'     \item{"index_fast":}{
-#'       Same as "index_full", but results as per "index_rough" are used together with
-#'       a subset of results from "index_full" to create a model relating the two. Thus,
-#'       speed is a compromise between the two approaches, with medium-high accuracy.
+#'     \item{"sim_center":}{
+#'       d is always the center of simulated (permuted) RQE values. For species that have
+#'       stronger specificity than expected by chance, this will return the same Spec 
+#'       values as "index". For species with weaker specificity than expected by chance,
+#'       instead of values that range between 0 and 1, they will range between 0 and Inf.
+#'       This is much faster than "index" because the genetic algorithm is not used. So 
+#'       if species with weaker specificity than expected by chance are not interesting
+#'       to you, this may be a good option.
 #'     }
 #'   }
 #' @param diagnostic logical. If true, changes output to include different parts of Spec. 
@@ -126,7 +122,7 @@
 #' #     hosts=metadata$PlantGenus, 
 #' #     hosts_phylo=supertree,
 #' #     n_sim=100, p_method="gamma_fit",
-#' #     n_cores=4, denom="index_fast"
+#' #     n_cores=4
 #' # )
 #' # 
 #' # # environmental specificity using elevation from endophyte data set:
@@ -134,7 +130,7 @@
 #' #     abunds_mat=m,
 #' #     env=metadata$Elevation,
 #' #     n_sim=100, p_method="gamma_fit",
-#' #     n_cores=4, denom="index_fast"
+#' #     n_cores=4
 #' # )
 #' # 
 #' # # geographic specificity using spatial data from endophyte data set:
@@ -142,7 +138,7 @@
 #' #     abunds_mat=m,
 #' #     env=distcalc(metadata$Lat, metadata$Lon),
 #' #     n_sim=100, p_method="gamma_fit",
-#' #     n_cores=4, denom="index_fast"
+#' #     n_cores=4
 #' # )
 #' # 
 #' # plot_specs_violin(specs_list, cols=c("forestgreen", "red", "black"))

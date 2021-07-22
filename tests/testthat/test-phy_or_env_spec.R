@@ -41,7 +41,8 @@ spec_results <- phy_or_env_spec(
 	n_sim = 100,
 	n_cores = 10,
 	verbose=FALSE,
-	p_method="raw" , diagnostic = T
+	p_method="raw",
+	diagnostic = T
 )
 
 test_that("flat otu Specificity is zero", {
@@ -214,3 +215,61 @@ test_that("semicolons in hosts gives error", {expect_error(
 	)
 )})
 
+
+
+
+# test denom types (may take a while!)
+
+m <- prop_abund(otutable)
+# downsampled so it can run on Travis
+set.seed(12345)
+samps2keep <- sample(1:nrow(m), 200)
+m <- m[samps2keep, ]
+e <- metadata$Elevation[samps2keep]
+# only analyze species with occupancy >= 10
+m <- occ_threshold(m, 10)
+
+# NOTE that in tests below, "regexp=NA" means to NOT EXPECT AN ERROR
+# test will fail if there is an error
+test_that("downsampled endophyte data and denom=index gives no errors", {expect_error(regexp=NA,
+	crap <- phy_or_env_spec(
+	    abunds_mat=m,
+	    env=e,
+	    n_sim=100,
+	    denom_type="index",
+	    n_cores=4
+	)
+)})
+
+
+test_that("downsampled endophyte data and denom=ses gives no errors", {expect_error(regexp=NA,
+	crap <- phy_or_env_spec(
+	    abunds_mat=m,
+	    env=e,
+	    n_sim=100,
+	    denom_type="ses",
+	    n_cores=4
+	)
+)})
+
+
+test_that("downsampled endophyte data and denom=raw gives no errors", {expect_error(regexp=NA,
+	crap <- phy_or_env_spec(
+	    abunds_mat=m,
+	    env=e,
+	    n_sim=100,
+	    denom_type="raw",
+	    n_cores=4
+	)
+)})
+
+
+test_that("downsampled endophyte data and denom=sim_center gives no errors", {expect_error(regexp=NA,
+	crap <- phy_or_env_spec(
+	    abunds_mat=m,
+	    env=e,
+	    n_sim=100,
+	    denom_type="sim_center",
+	    n_cores=4
+	)
+)})

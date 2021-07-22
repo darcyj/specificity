@@ -5,7 +5,7 @@
 \alias{endophyte}
 \title{Foliar endophytic fungi across the Hawaiian Archipelago}
 \format{
-A list containing 3 objects:
+A list containing 4 objects:
 \describe{
   \item{otutable:}{
     data.frame object where each row is a sample and each column is a
@@ -18,6 +18,9 @@ A list containing 3 objects:
   \item{supertree:}{
     Phylogenetic tree containing all host plant genera in PlantGenus
     column of metadata.
+  }
+  \item{taxonomy:}{
+    UNITE (v8) taxonomy for OTUs in otutable. Assigned using BLAST, e-value (eval) and UNITE best hit (hit) are given as well. 
   }
 }
 }

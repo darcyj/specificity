@@ -52,8 +52,8 @@
 #'       either. Not sensitive to number of samples. Not suggested because units are
 #'       strange, and isn't comparable between variables. 
 #'     }
-#'     \item{"index_full":}{
-#'       d is the mean of simulated (permuted) RQE values for species that have stronger
+#'     \item{"index":}{
+#'       d is the center of simulated (permuted) RQE values for species that have stronger
 #'       specificity than expected by chance, resulting in specificity values with range
 #'       [-1, 0), with 0 as the null hypothesis. In this case, -1 indicates perfect
 #'       specificity, where a species is associated with zero environmental variability.
@@ -61,45 +61,56 @@
 #'       exact same elevation or the exact same pH. For species that have weaker specificity
 #'       than expected by chance, d is x minus the center (see above) of simulated RQE 
 #'       values, where x is the maximum possible dissimilarity observable given species
-#'       weights. In "index_full", x is estimated using a genetic algorithm. This d has
+#'       weights. x is estimated using a genetic algorithm. This d has
 #'       other useful properties: scale invariance to env/hosts_phylo, insensitivity to
 #'       the number of samples, insensitivity to occupancy, and strong sensitivity to 
 #'       specificity (default).
 #'     }
-#'     \item{"index_rough":}{
-#'       Same as "index_full", but for species where specificity is weaker than expected by
-#'       chance, a rough approximation is used to vastly reduce computational load. 
-#'       This approximation does NOT give values where 1 is maximized generality. instead,
-#'       the values will tightly correlate to the correct values, but the slope of that
-#'       relationship will not be known a priori. In other words, if you don't care
-#'       about species that are more general than expected by chance, this is fine. 
-#'     }
-#'     \item{"index_fast":}{
-#'       Same as "index_full", but results as per "index_rough" are used together with
-#'       a subset of results from "index_full" to create a model relating the two. Thus,
-#'       speed is a compromise between the two approaches, with medium-high accuracy.
+#'     \item{"sim_center":}{
+#'       d is always the center of simulated (permuted) RQE values. For species that have
+#'       stronger specificity than expected by chance, this will return the same Spec 
+#'       values as "index". For species with weaker specificity than expected by chance,
+#'       instead of values that range between 0 and 1, they will range between 0 and Inf.
+#'       This is much faster than "index" because the genetic algorithm is not used. So 
+#'       if species with weaker specificity than expected by chance are not interesting
+#'       to you, this may be a good option.
 #'     }
 #'   }
 #' @param diagnostic logical. If true, changes output to include different parts of SES. 
 #'   This includes Pval, SES, raw, denom, emp, and all sim values with column labels as
 #'   simN where N is the number of sims (default: FALSE)
 #' @param ga_params list. Parameters for genetic algorithm that maximizes RQE. Only used
-#'   with denom_type="index_full/rough/fast". Default is the output of get_ga_defaults(). If different
-#'   parameters are desired, start with output of get_ga_defaults and modify accordingly.
+#'   with denom_type="index". Default is the output of get_ga_defaults(). 
+#'   If different parameters are desired, start with output of get_ga_defaults and modify
+#'   accordingly.
 #'
 #'
 #' @return data.frame where each row is an input species. First column is P-value
 #'   ($Pval), second column is specificity ($Spec).
 #'
 #' @examples
-#' # None yet. Forthcoming examples:
-#' # 1. calculating regular old elevational specificity the hard way
-#' # 2. same thing, but using vazquez null model from bipartite package
-#'
+#' # # calculating regular old elevational specificity the hard way
+#' # attach(endophyte)
+#' # library(parallel)
+#' # otutable <- occ_threshold(prop_abund(otutable), 10)
+#' # env <- dist(metadata$Elevation)
+#' # emp_raos <- apply(X=otutable, MARGIN=2, FUN=rao1sp, 
+#' #   D=env, perm=F, seed=12345)
+#' # sim_raos <- mclapply(X=as.data.frame(otutable), FUN=function(p){
+#' #   replicate(200, rao1sp(p, D=env, perm=TRUE, seed=0))}, mc.cores=20)
+#' # calculate_spec_and_pval(emp_raos, sim_raos, otutable, env, 
+#' #   n_cores=20, denom_type="index_full")
+#' 
+#' 
 #' @export
 calculate_spec_and_pval <- function(emp_raos, sim_raos, abunds_mat, env,
 	p_adj="fdr", tails=1, n_cores=2, verbose=TRUE, p_method="raw", center="mean", 
-	denom_type="index_full", diagnostic=FALSE, ga_params=get_ga_defaults()){
+	denom_type="index", diagnostic=FALSE, ga_params=get_ga_defaults()){
+
+	# check if env is a dist
+	if(class(env) != "dist"){
+		stop("env must be of class dist")
+	}
 
 	# little message function, to clean up code a bit
 	msg <- function(x){if(verbose){message(x)}}
@@ -161,7 +172,7 @@ calculate_spec_and_pval <- function(emp_raos, sim_raos, abunds_mat, env,
 	Pval <- p.adjust(Pval, method=p_adj)
 	msg(paste0("...done (took ", fms(proc.time()-tt), ")"))
 
-	# calculate means as fallback for mode
+	# calculate centers
 	msg("...Calculating sim RAO centers")
 	spec_sim_means <- sapply(X=sim_raos, FUN=mean)
 	if(center == "mean"){
@@ -177,21 +188,6 @@ calculate_spec_and_pval <- function(emp_raos, sim_raos, abunds_mat, env,
 		denom <- sapply(X=sim_raos, FUN=sd)
 	}else if(denom_type == "raw"){
 		denom <- rep(1, length(sim_raos))
-	}else if(denom_type == "index_rough"){
-		# initialize denominator to sim_rao_centers, which is correct denominator for spec <= 0 otus
-		denom <- sim_rao_centers
-		msg("...Approximating max RAO values (rough)")
-		# which species are overdispersed and need maxs calculated? This gives their indices
-		species_inds_4_max <- which(emp_raos > sim_rao_centers)
-
-		# approximate max rao for each species indexed by species_inds_4_max
-		# max_raos <- apply(X=abunds_mat[,species_inds_4_max, drop=F], MARGIN=2, 
-		# 	FUN=rao_sort_max, D=env)
-		max_raos <- unlist(lapply_fun(X=species_inds_4_max, FUN=function(j){
-			rao_sort_max(abunds_mat[,j], D=env)}))
-
-		# put newly calculated maxs where they belong (for spec > 0 otus)
-		denom[species_inds_4_max] <- max_raos - sim_rao_centers[species_inds_4_max]
 	}else if(denom_type %in% c("index", "index_full")){
 		msg("...Approximating max RAO values (full)")
 		# initialize denominator to sim_rao_centers, which is correct denominator for spec <= 0 otus
@@ -206,96 +202,39 @@ calculate_spec_and_pval <- function(emp_raos, sim_raos, abunds_mat, env,
 			max_raos <- NULL
 		}else if(length(species_inds_4_max) == 1){
 			# use GA to get maxrao for that one species
-			max_raos <- rao_genetic_max(p=abunds_mat[species_inds_4_max[1]],
-				D=env, term_cycles=ga_params$term_cycles, popsize=ga_params$popsize,
-				keep=ga_params$keep, prc=ga_params$prc, maxiters=ga_params$maxiters)$best_rao
-		}else if(length(species_inds_4_max) < (2 * n_cores)){
+			max_raos <- rao_genetic_max(
+				p=abunds_mat[species_inds_4_max[1]],
+				D=env,
+				swap_freq=ga_params$swap_freq,
+				term_cycles=ga_params$term_cycles, 
+				popsize_swap=ga_params$popsize_swap,
+				popsize_perm=ga_params$popsize_perm,
+				keep=ga_params$keep, 
+				prc=ga_params$prc, 
+				maxiters=ga_params$maxiters
+			)$best_rao
+		}else{
 			max_raos <- unlist(lapply_fun(
 				X=species_inds_4_max,
 				FUN=function(j, par){
-					rao_genetic_max(p=abunds_mat[,j], D=env, 
-						term_cycles=par$term_cycles, popsize=par$popsize,
-						keep=par$keep, prc=par$prc, maxiters=par$maxiters)$best_rao
+					rao_genetic_max(
+						p=abunds_mat[,j],
+						D=env,
+						swap_freq=par$swap_freq,
+						term_cycles=par$term_cycles, 
+						popsize_swap=par$popsize_swap,
+						popsize_perm=par$popsize_perm,
+						keep=par$keep, 
+						prc=par$prc, 
+						maxiters=par$maxiters
+					)$best_rao
 				}, 
 				par=ga_params
 			))
-		}else{
-			seed_order <- rao_genetic_max(p=1:nrow(abunds_mat), D=env, 
-				term_cycles=ga_params$term_cycles, popsize=ga_params$popsize,
-				keep=ga_params$keep, prc=ga_params$prc, maxiters=ga_params$maxiters)$best_p
-		
-			max_raos <- unlist(lapply_fun(
-				X=species_inds_4_max,
-				FUN=function(j, par, ord){
-					rao_genetic_max(p=sort(abunds_mat[,j])[ord], D=env, 
-						term_cycles=par$term_cycles, popsize=par$popsize,
-						keep=par$keep, prc=par$prc)$best_rao
-				}, 
-				par=ga_params, ord=seed_order
-			))
 		}
-
 		# put newly calculated maxs where they belong (for spec > 0 otus)
 		denom[species_inds_4_max] <- max_raos - sim_rao_centers[species_inds_4_max]
-	}else if(denom_type == "index_fast"){
-		msg("...Approximating max RAO values (fast)")
-		# initialize denominator to sim_rao_centers, which is correct denominator for spec <= 0 otus
-		denom <- sim_rao_centers
-		# which species are overdispersed and need maxs calculated? This gives their indices
-		species_inds_4_max <- which(emp_raos > sim_rao_centers)
-
-		# determine how many values (=NR =number of representatives) to use for modeling
-		NR <- 5
-		if(NR < n_cores){NR <- n_cores}
-		if(length(species_inds_4_max) <= NR){
-			msg("......Approximation not neccesary (full instead)")
-
-			# just use GA on each species instead
-			# this also catches the case where NR > length(species_inds_4_max)
-			max_raos <- unlist(lapply_fun(
-				X=species_inds_4_max,
-				FUN=function(j, par){
-					rao_genetic_max(p=sort(abunds_mat[,j]), D=env, 
-						term_cycles=par$term_cycles, popsize=par$popsize,
-						keep=par$keep, prc=par$prc)$best_rao
-				}, 
-				par=ga_params
-			))
-			# put new values in
-			denom[species_inds_4_max] <- max_raos - sim_rao_centers[species_inds_4_max]
-		}else{
-			msg("......1/3: Naive approximation")
-			# calculate "naive" max value for all species in abunds_mat
-			max_raos_n_log <- log(unlist(lapply_fun(X=1:ncol(abunds_mat), FUN=function(j){
-				rao_sort_max(abunds_mat[,j], D=env)})))
-			# choose NR representatives as even as possible
-			ideals <- seq(from=min(max_raos_n_log), to=max(max_raos_n_log), length.out=NR)
-			inds2get <- unique(sapply(X=ideals, FUN=function(i){which.min(abs(i-max_raos_n_log))}))
-			if(length(inds2get) < NR){
-				unusedinds <- (1:length(max_raos_n_log))[!(1:length(max_raos_n_log)) %in% inds2get]
-				inds2get <- c(inds2get, sample(unusedinds, NR - length(inds2get)))
-			}
-			msg("......2/3: Gen. alg. subset")
-			# use genetic algo on species whose indices are in inds2get
-			ga_raos <- unlist(lapply_fun(
-				X=inds2get,
-				FUN=function(j, par){
-					rao_genetic_max(p=sort(abunds_mat[,j]), D=env, 
-						term_cycles=par$term_cycles, popsize=par$popsize,
-						keep=par$keep, prc=par$prc)$best_rao
-				}, 
-				par=ga_params
-			))
-			msg("......3/3: Linear model and predict")
-			# make linear model ga_raos ~ max_raos_all[inds2get]
-			ga_mod <- lm(log(ga_raos) ~ max_raos_n_log[inds2get])
-			msg(paste0(".........Rsquared=", summary.lm(ga_mod)$r.squared))
-			preds <- exp( coef(ga_mod)[1] + (coef(ga_mod)[2] * max_raos_n_log) )
-
-			# put new values in
-			denom[species_inds_4_max] <- preds[species_inds_4_max] - sim_rao_centers[species_inds_4_max]
-		}
-	}else if(denom_type == "sim_mode"){
+	}else if(denom_type %in% c("sim_center", "sim_mode")){
 		denom <- sim_rao_centers
 	}else{
 		stop("Invalid denom_type.")

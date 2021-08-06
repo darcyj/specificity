@@ -2,6 +2,7 @@
 title: "Tutorial vignette for package 'specificity'"
 author: "John L Darcy"
 output: pdf_document
+urlcolor: blue
 ---
 
 ## Introduction
@@ -54,10 +55,7 @@ The species 'abundance' values we feed to `specificity` are really just proxies 
   otutable <- prop_abund(otutable)
 ```
 
-The HPC used to process these data originally had 24 threads and 128
-gigabytes of RAM. Your machine may not be so impressive. This is just
-a random downsampling of the data, done only for demonstration purposes.
-Real data in a real analysis should not be downsampled.
+The HPC used to process these data originally had 24 threads available. Your machine may not be so impressive. This is just a random downsampling of the data, done only for demonstration purposes. Real data in a real analysis should not be downsampled. With only 300 samples, each analysis below should only take a minute or two on modern hardware.
 ```{r echo=T}
   set.seed(12345)
   keep <- sample(c(rep(TRUE, 300), rep(FALSE, nrow(otutable) - 300)))
@@ -65,7 +63,7 @@ Real data in a real analysis should not be downsampled.
   metadata <- metadata[keep,]
 ```
 
-Like every tool, specificity is useless with a low sample size. In the case of specificity, this 'sample size' is the occupancy of a species, or how many samples that species was observed in. Here, we will create a new table containing only species that observed in at least 10 samples. NOTE: It's important we do this AFTER our proportional abundance calculation (above)! Otherwise the proportion of rare taxa in each sample would bias the proportional abundances.
+Like every statistical tool, specificity is useless with a low sample size. In the case of specificity, this 'sample size' is the occupancy of a species, or how many samples that species was observed in. Here, we will create a new table containing only species that observed in at least 10 samples. NOTE: It's important we do this AFTER our proportional abundance calculation (above)! Otherwise the proportion of rare taxa in each sample would bias the proportional abundances.
 ```{r echo = T}
 # apply occupancy threshold to remove low-occupancy species
 otutable_ovr10 <- occ_threshold(otutable, threshold=10)

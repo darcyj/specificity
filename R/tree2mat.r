@@ -18,9 +18,6 @@
 #' @param n_cores integer. Number of cores to use for parallel computation. No
 #'   parallelization will be done if n_cores = 1. Multithreading should only be used
 #'   for large trees where x has low redundancy (default: 1).
-#' @param delim string. Delimiter character or string for internal use. Must not be
-#'   present in tree$tip.label. This is checked by the function and will return an
-#'   error otherwise (default: ";").
 #' @return dist object, of vector length equal to (l^2-l)/2 where l is length(x); i.e. 
 #'   values are the lower triangle of a patristic distance matrix with rows=x and cols=x. 
 #'
@@ -33,38 +30,44 @@
 #' # ape::cophenetic.phylo(example_tree)
 #' # # dist object for example_x:
 #' # tree2mat(tree=example_tree, x=example_x)
-#' # 
-#' # # examples with other delimiters
-#' # tree2mat(tree=example_tree, x=example_x, delim="@")
-#' # tree2mat(tree=example_tree, x=example_x, delim="i love cats")
-#' # # should fail since "a" is in a tip name:
-#' # # tree2mat(tree=example_tree, x=example_x, delim="a")
 #' 
 #' @export
-tree2mat <- function(tree, x, n_cores=1, delim=";"){
+tree2mat <- function(tree, x, n_cores=1 ){
 	# check that each species in x is in tree exactly once
 	times_in_tree <- sapply(x, FUN=function(x){sum(tree$tip.label %in% x)})
 	if(0 %in% times_in_tree){ stop("ERROR: some species in x not in tree.") }
 	if(max(times_in_tree > 1)){ stop("ERROR: some species in x in tree multiple times.")}
 
-	# check that delim character isn't in tree tip names
-	if(any(grepl(delim, x=tree$tip.label))){
-		stop("ERROR: delim character is present in tip labels.")
-	}
+	# make vector of which comparison types we need for output
+	lt <- function(x){x[lower.tri(x)]}
 
 	# initialize output dist object
 	output <- as.dist(matrix(nrow=length(x), ncol=length(x), dimnames=list(x,x), data=0))
 
-	# make vector of which comparison types we need for output
-	lt <- function(x){x[lower.tri(x)]}
-	comp_pairs <- lt(outer(X=x, Y=x, FUN=function(x, y){paste(x, y, sep=delim)}))
-	# make order (a-b vs b-a) irrelevant
-	unorder <- function(x){
-		xv <- unlist(strsplit(x, delim))
-		xv <- xv[order(xv)]
-		return(paste(xv, collapse=delim))
-	}
-	comp_pairs <- sapply(X=comp_pairs, FUN=unorder)
+	# two columns of names: a and b
+	# same order as output lower-triangle dist output
+	comps2do <- data.frame(
+		a=lt(outer(X=x, Y=x, FUN=function(a, b){a})),
+		b=lt(outer(X=x, Y=x, FUN=function(a, b){b})),
+		stringsAsFactors=FALSE
+	)
+
+	# order so that names a and b are in alphabetical order, without messing up
+	# ordering per dist output
+	comps2do <- data.frame(
+		a=pmin(comps2do$a, comps2do$b), 
+		b=pmax(comps2do$a, comps2do$b),
+		stringsAsFactors=FALSE
+	)
+
+	# unique comparisons. same data structure as above but unique.
+	# as.matrix is required because of funkines with rows of data.frames being
+	# data.frames themselves. 
+	uniquecomps <- as.matrix(unique(comps2do))
+
+	# transform uniquecomps to list, to enable lapply functions without messy
+	# index-as-argument approach
+	uniquecomps <- lapply(X=1:nrow(uniquecomps), FUN=function(i){uniquecomps[i,]} )
 
 	# drop tips in tree not in x
 	tree <- ape::keep.tip(tree, x)
@@ -72,24 +75,25 @@ tree2mat <- function(tree, x, n_cores=1, delim=";"){
 	# make nested set object
 	ns <- make_nested_set(tree)
 
-	# wrapper function for bl_distance_ns that takes an item in comp_pairs as 1st arg
-	d_ab <- function(ab, treei=tree, nsi=ns, delimi=delim){
-		a <- unlist(strsplit(ab, delimi))[1]
-		b <- unlist(strsplit(ab, delimi))[2]
-		return(bl_distance_ns(tipa=a, tipb=b, treei, nsi))
+	# wrapper function for bl_distance_ns that takes an item in uniquecomps as 1st arg
+	d_ab <- function(ab, treei=tree, nsi=ns){
+		return(bl_distance_ns(tipa=ab[1], tipb=ab[2], treei, nsi))
 	}
 
-	# get branch-length distance for each unique pair
-	u_comp_pairs <- unique(comp_pairs)
+	# get branch-length distance for each unique comparison
 	if(n_cores <= 1){
-		u_dists <- as.vector(sapply(X=u_comp_pairs, FUN=d_ab))
+		uniquedists <- as.vector(sapply(X=uniquecomps, FUN=d_ab))
 	}else{
-		u_dists <- simplify2array(parallel::mclapply(X=u_comp_pairs, FUN=d_ab, mc.cores=n_cores))
+		uniquedists <- simplify2array(parallel::mclapply(X=uniquecomps, FUN=d_ab, mc.cores=n_cores))
 	}
 
-	# put u_dists into the right places in output
-	for(i in 1:length(u_comp_pairs)){
-		output[comp_pairs == u_comp_pairs[i]] <- u_dists[i]
+	# put values where they belong
+	for(i in 1:length(uniquecomps)){
+		ab <- uniquecomps[[i]]
+		d <- uniquedists[[i]]
+		if(ab[1] != ab[2]){
+			output[(comps2do$a == ab[1]) & (comps2do$b == ab[2])] <- d
+		}
 	}
 
 	# all done

@@ -4,7 +4,7 @@
 \alias{tree2mat}
 \title{tree2mat}
 \usage{
-tree2mat(tree, x, n_cores = 1, delim = ";")
+tree2mat(tree, x, n_cores = 1)
 }
 \arguments{
 \item{tree}{phylo object. Tree containing all unique species in x as tips. May
@@ -17,10 +17,6 @@ once.}
 \item{n_cores}{integer. Number of cores to use for parallel computation. No
 parallelization will be done if n_cores = 1. Multithreading should only be used
 for large trees where x has low redundancy (default: 1).}
-
-\item{delim}{string. Delimiter character or string for internal use. Must not be
-present in tree$tip.label. This is checked by the function and will return an
-error otherwise (default: ";").}
 }
 \value{
 dist object, of vector length equal to (l^2-l)/2 where l is length(x); i.e. 
@@ -43,12 +39,6 @@ within the phylogeny.
 # ape::cophenetic.phylo(example_tree)
 # # dist object for example_x:
 # tree2mat(tree=example_tree, x=example_x)
-# 
-# # examples with other delimiters
-# tree2mat(tree=example_tree, x=example_x, delim="@")
-# tree2mat(tree=example_tree, x=example_x, delim="i love cats")
-# # should fail since "a" is in a tip name:
-# # tree2mat(tree=example_tree, x=example_x, delim="a")
 
 }
 \author{

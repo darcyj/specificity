@@ -24,10 +24,9 @@ To install `specificity` from source, first we need the `remotes` package, which
 
 You'll also need `Rcpp`, which compiles C++ functions and makes specificity 10 to 20 times faster. It can be challenging to install on Mac OS, but it's easy to install on Linux systems. See the Rcpp install notes here: https://teuder.github.io/rcpp4everyone_en/020_install.html. 
 
-Now, activate `remotes`  and install `specificity`.
+Now that we have `remotes`, we can install `specificity`.
 ```{r echo = T, results = 'hide', eval = F}
-  library("remotes")
-  install_github("darcyj/specificity")
+  remotes::install_github("darcyj/specificity")
 ```
 
 ## Load 'endophyte' example data set
@@ -52,7 +51,18 @@ As you can see, there are 4 objects inside 'endophyte'.
 ## Pre-processing of 'endophyte' data
 The species 'abundance' values we feed to `specificity` are really just proxies for how confident we are that a species appeared in a given sample. Object `otutable` is a site-by-species matrix containing counts, but each site could have different total counts (in these example data, that isn't the case, but in your data it may be important). Here, we'll just transform the data to proportional abundance:
 ```{r echo = T}
-otutable <- prop_abund(otutable)
+  otutable <- prop_abund(otutable)
+```
+
+The HPC used to process these data originally had 24 threads and 128
+gigabytes of RAM. Your machine may not be so impressive. This is just
+a random downsampling of the data, done only for demonstration purposes.
+Real data in a real analysis should not be downsampled.
+```{r echo=T}
+  set.seed(12345)
+  keep <- sample(c(rep(TRUE, 300), rep(FALSE, nrow(otutable) - 300)))
+  otutable <- otutable[keep,]
+  metadata <- metadata[keep,]
 ```
 
 Like every tool, specificity is useless with a low sample size. In the case of specificity, this 'sample size' is the occupancy of a species, or how many samples that species was observed in. Here, we will create a new table containing only species that observed in at least 10 samples. NOTE: It's important we do this AFTER our proportional abundance calculation (above)! Otherwise the proportion of rare taxa in each sample would bias the proportional abundances.
@@ -88,21 +98,20 @@ specs_list <- list()
 
 # specificity for elevation:
 specs_list$"Elevation" <- phy_or_env_spec(otutable_ovr10, env=metadata$Elevation,
-  n_sim=100, n_cores=spec_ncores, p_method="gamma_fit")
+  n_sim=500, n_cores=spec_ncores)
 
 # specificity for rainfall
 specs_list$"Rainfall" <- phy_or_env_spec(otutable_ovr10, env=metadata$Rainfall, 
-  n_sim=100, n_cores=spec_ncores, p_method="gamma_fit")
+  n_sim=500, n_cores=spec_ncores)
 
 # specificity for evapotranspiration
 specs_list$"Evapotranspiration" <- phy_or_env_spec(otutable_ovr10,
-  env=metadata$Evapotranspiration, n_sim=100, n_cores=spec_ncores,
-  p_method="gamma_fit")
+  env=metadata$Evapotranspiration, n_sim=500, n_cores=spec_ncores )
 
 # specificity for host phylogeny - converting tree to dist will take a while!
 specs_list$"Host Phylogeny" <- phy_or_env_spec(otutable_ovr10,
-  hosts=metadata$PlantGenus, hosts_phylo=supertree, n_sim=100, n_cores=spec_ncores,
-  p_method="gamma_fit")
+  hosts=metadata$PlantGenus, hosts_phylo=supertree, n_sim=500, 
+  n_cores=spec_ncores)
 ```
 
 For geographic distance, we'll use specificity's `distcalc` function to calculate pairwise geographic distances between samples, using latitude and longitude data.  
@@ -111,31 +120,75 @@ For geographic distance, we'll use specificity's `distcalc` function to calculat
 geo_distmat <- distcalc(lat=metadata$Lat, lng=metadata$Lon, sampIDs=metadata$SampleID)
 # specificity for geographic distance
 specs_list$"Geographic Distance" <- phy_or_env_spec(otutable_ovr10, env=geo_distmat,
-  n_sim=100, 
-  n_cores=spec_ncores, p_method="gamma_fit")
+  n_sim=500, n_cores=spec_ncores)
 ```
 
 ## Visualization - Built-in
-Our built-in visualization function takes a list of results from `phy_or_env_spec()` as input, and produces a violin plot colored by statistical significance (dark = sig, light = nonsig). The names of items within `specs_list` will be the labels used in the plot. 
-```{r}
+Our built-in visualization function takes a list of results from `phy_or_env_spec()` as input, and produces a violin plot colored by statistical significance (dark = sig, light = nonsig). The names of items within `specs_list` will be the labels used in the plot (Figure 1). 
+```{r, echo=TRUE, fig.cap="Specificity violin plot", out.width="90%"}
 plot_specs_violin(specs_list, label_cex=0.6, cols=c("red", "blue", "gold", "green", "black"))
 ```
 
-We can also see how species specificity correlates between variables:
-```{r}
+We can also see how species specificity correlates between variables. From this, it looks like for most species, specificity to geographic distance strongly correlates with specificity to evapotranspiration (Figure 2)
+```{r, echo=TRUE, fig.cap="Pairwise specificity plot", out.width="90%"}
 plot_pairwise_spec(specs_list)
 ```
-From this, it looks like for most species, specificity to geographic distance strongly correlates with specificity to evapotranspiration. 
 
 ## Visualization - ggplot
-The popular `ggplot2` package can also be used to visualize data generated with `specificity`. To do this, first data must be transformed from our `specs_list` object to a long-format `data.frame`. Other species information (e.g. taxonomy) can be optionally combined into this object as well. In this example, we'll include (but not use) fungal taxonomic information. 
+The popular `ggplot2` package can also be used to visualize data generated with `specificity` (Figure 3). To do this, first data must be transformed from our `specs_list` object to a long-format `data.frame`. Other species information (e.g. taxonomy) can be optionally combined into this object as well. In this example, we'll include (but not use) fungal taxonomic information. 
 ```{r}
 specs_df <- aggregate_specs_list(specs_list, byFeature=FALSE, fd=taxonomy, fd_id=1)
 ```
 Now we'll load up ggplot and make a plot similar to the plot made above:
-```{r}
+```{r, echo=TRUE, fig.cap="Specificity violins using ggplot", out.width="90%"}
 library(ggplot2)
 ggplot(specs_df, aes(x=Variable, y=Spec, fill=Variable)) + 
   geom_violin() + 
   geom_jitter(width=0.2, size=0.2)
 ```
+
+## Interactive Visualization with specificity.shiny
+`specificity`'s companion package, `specificity.shiny`, creates interactive visualizations where individual species can be selected and compared between variables. The following requires `specificity.shiny`, which can be installed as follows:
+```{r echo = T, results = 'hide', eval = F}
+  remotes::install_github("darcyj/specificity.shiny")
+```
+Now we can use the functions from `shiny` and from `specificity.shiny` to run an interactive visualization. Feature data (`fd`) are supplied as a data.frame object that has some column of feature IDs. The default operation of this function is to assume that the first column contains those IDs, which must match with the IDs in your specs_list (`sl`) object. 
+```{r echo = T, results = 'hide', eval = F}
+  specificity.shiny::plot_specs_shiny(sl=specs_list, fd=endophyte$taxonomy)
+```
+That command creates and opens upp the visualization in your browser (Figure 4). In the visualization, points can be selected by dragging a rectangle around them. When you do so, those same features are hilighted across other variables. See the example screenshot below, where species with strong specificity to rainfall are selected. Feature data for those species, in this case including taxonomic information, are shown in the table at bottom. That table, or the raw data, can be downloaded using the "Download" button.
+
+```{r, echo=FALSE, fig.cap="Selecting points in specificity.shiny",  out.width = "80%"}
+  knitr::include_graphics("screenshots/screenshot_1.png")
+```
+
+The search feature can be used to only show features that match a certain string (Figure 5). By setting the search field to a column of the feature data supplied when making the visualization, plotted points can be subset to only show features that match your search string. Note that background violins will not be altered, only the points shown. This is especially useful when searching for species that match a certain taxonomic query, as in the example below where only fungi in the Basidiomycota are displayed. Those features can then be hilighted as above, to see their details.
+
+```{r, echo=FALSE, fig.cap="Searching by string match in specificity.shiny",  out.width = "80%"}
+  knitr::include_graphics("screenshots/screenshot_2.png")
+```
+
+## Hosting Your Interactive Visualization on shinyapps.io
+The visualization can also be made portable, so that it can be run on servers such as `shinyapps.io`, or simply run again locally without re-running anything else. Any visualization that is successful using the above approach can be made into a portable app. The only additional argument required is the name of the folder that should contain the app's data (we refer to this folder as the app). The output of the following command can be found with this vignette. 
+```{r echo = T, results = 'hide', eval = T}
+  specificity.shiny::make_specs_app(sl=specs_list, fd=endophyte$taxonomy, app_fp="endophytes_specs_app")
+```
+
+You can run the app locally using shiny:
+```{r echo = T, results = 'hide', eval = F}
+  shiny::runApp("endophytes_specs_app")
+```
+
+Or upload it to `shinyapps.io` so others can use your visualization online. See their guide on uploading [here](https://docs.rstudio.com/shinyapps.io/getting-started.html). Basically, set up your account on that website, install the `rsconnect` package, and then set your account info in R using:
+```{r echo = T, results = 'hide', eval = F}
+  rsconnect::setAccountInfo(
+    name="your account name here", 
+    token="your token here", 
+    secret="your secret here"
+  )
+```
+Then, simply uppload your app using `rsconnect::deployApp`. This will automatically open up your app in a web browser, so you can copy the URL and send it to collaborators. Note that unlike before, your app will be running on a remote server, not locally as before.
+```{r echo = T, results = 'hide', eval = F}
+  rsconnect::deployApp("endophytes_specs_app")
+```
+

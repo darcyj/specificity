@@ -211,7 +211,7 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 	# turn it all into a dist, no matter what.
 	if(data_type == "phy"){
 		msg("...Converting tree to dist...")
-		env <- tree2mat(tree=hosts_phylo, x=hosts, n_cores=n_cores, delim=";")
+		env <- tree2mat(tree=hosts_phylo, x=hosts, n_cores=n_cores)
 	}else if(data_type == "vec"){
 		msg("...Converting env vector to dist...")
 		env <- dist(env)

@@ -77,7 +77,7 @@
       }
       rowFromFeature <- function(f){
         specs <- sapply(X=variables, FUN=function(v){ output$Spec[output$FeatureID==f & output$Variable==v][1] })
-        pvals <- sapply(X=variables, FUN=function(v){ output$Spec[output$FeatureID==f & output$Variable==v][1] })
+        pvals <- sapply(X=variables, FUN=function(v){ output$Pval[output$FeatureID==f & output$Variable==v][1] })
         names(specs) <- spec_colnames
         names(pvals) <- pval_colnames
         cbind( data.frame(FeatureID=f, stringsAsFactors=FALSE), t(as.matrix( c(specs, pvals))) )

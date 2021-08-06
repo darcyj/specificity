@@ -6,4 +6,4 @@ testthat=3.0.2
 ape=5.5
 parallel=3.6.3
 fields=12.5
-specificity=0.1.9.9000
+specificity=0.1.10.9000

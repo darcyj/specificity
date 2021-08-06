@@ -1,7 +1,11 @@
 0.1.0.9000 // 2020 DEC 09
   * This changelog was created
   * all functions now refer to species weights as p (perviously w was used sometimes)
-  * new strategy for calculating sim specificities (as opposed to emp). uses MUCH less memory. however, this made use of custom null models more difficlt. So the function phy_or_env_spec() was changed such that the actual calculation of specificity is its own function called calculate_spec_and_pval(). in the distant future, a tutorial for "build your own specificity" may be written, maybe. 
+  * new strategy for calculating sim specificities (as opposed to emp). uses MUCH less
+    memory.however, this made use of custom null models more difficlt. So the function
+    phy_or_env_spec() was changed such that the actual calculation of specificity is its
+    own function called calculate_spec_and_pval(). in the distant future, a tutorial for
+    "build your own specificity" may be written, maybe. 
   * added function onto2nwk()
   * added function circularize2dist()
   * added cpp funs rao1sp() and raoperms() which replace spec_core()
@@ -51,3 +55,8 @@
     argument. This is a required argument and may break previous code using rao_genetic_max.
   * general improvements to documentation
   * updated vignette with a ggplot example
+0.1.10.9000 // 2021 JUL 23
+  * improved tree2mat function so it no longer needs delimiter and is faster
+  * set default prc value for GA to be realistically lower
+  * fixed bug in aggregation_specs_list where specs were substituted
+    for pvals if byFeature==TRUE

@@ -99,7 +99,7 @@
 #' # sim_raos <- mclapply(X=as.data.frame(otutable), FUN=function(p){
 #' #   replicate(200, rao1sp(p, D=env, perm=TRUE, seed=0))}, mc.cores=20)
 #' # calculate_spec_and_pval(emp_raos, sim_raos, otutable, env, 
-#' #   n_cores=20, denom_type="index_full")
+#' #   n_cores=20)
 #' 
 #' 
 #' @export
@@ -189,7 +189,7 @@ calculate_spec_and_pval <- function(emp_raos, sim_raos, abunds_mat, env,
 	}else if(denom_type == "raw"){
 		denom <- rep(1, length(sim_raos))
 	}else if(denom_type %in% c("index", "index_full")){
-		msg("...Approximating max RAO values (full)")
+		msg("...Approximating max RAO values")
 		# initialize denominator to sim_rao_centers, which is correct denominator for spec <= 0 otus
 		denom <- sim_rao_centers
 		# which species are overdispersed and need maxs calculated? This gives their indices

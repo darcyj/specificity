@@ -19,7 +19,7 @@ get_ga_defaults <- function(){
 		popsize_swap=150,
 		popsize_perm=150,
 		keep=5,
-		prc=0.01
+		prc=0.0001
 	)
 }
 

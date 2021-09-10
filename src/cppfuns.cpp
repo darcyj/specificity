@@ -178,7 +178,8 @@ inline IntegerVector permcolInt (const IntegerVector& x){
 
 
 // function to find which top n in a numeric vector (0-indexed)
-// returns indices of the top n items in x
+// returns indices of the top n items in x, in order from
+// greatest value to less greatest value
 inline IntegerVector which_top_n (const NumericVector x, const int n){
 	int xs = x.size();
 	LogicalVector used(xs);
@@ -347,7 +348,6 @@ List rao_genetic_max (const NumericVector& p, const NumericVector& D,
 	while(stopper == 0){
 		// calculate rao vals for each 
 		for(int j=0; j<popsize; j++){
-			// need function to calculate rao from ORDER
 			pop_raos[j] = rao1sp_order(pop(_,j), p, D);
 		}
 
@@ -410,6 +410,14 @@ List rao_genetic_max (const NumericVector& p, const NumericVector& D,
 		warning("Reached maxiters");
 	}
 
+	// translate p to best_p via best p order (order in pop(_,0))
+	NumericVector best_p(p.size());
+	int best_p_pos = 0;
+	for(int i=0; i<p.size(); i++){
+		best_p_pos = pop(i,0);
+		best_p[i] = p[best_p_pos];
+	}
+
 
 	// make output list object
 	IntegerVector iterations = seq(0, maxiters - 1);
@@ -418,9 +426,19 @@ List rao_genetic_max (const NumericVector& p, const NumericVector& D,
 	ret["best_rao"] = last_best_rao;
 	ret["iter_raos"] = iter_best_raos;
 	ret["iterations"] = iterations;
-	ret["best_p"] = pop(_,0);
+	ret["best_p"] = best_p;
 
 	return ret;
 
 }
 
+// # quick test to ensure that correct best_p is being returned
+// # in R:
+// library(Rcpp)
+// sourceCpp("cppfuns.cpp")
+// set.seed(12345)
+// p <- sample(1:30)
+// D <- dist(sample(p))
+// out <- rao_genetic_max(p,D,c(1,1,2,3))
+// out$best_rao
+// rao1sp(out$best_p, D)

@@ -60,3 +60,8 @@
   * set default prc value for GA to be realistically lower
   * fixed bug in aggregation_specs_list where specs were substituted
     for pvals if byFeature==TRUE
+0.1.11.9000 // 2021 SEPT 10
+  * rao_genetic_max rewritten to operate on order instead of actual input p. twice as fast now.
+  * PMX crossover algorithm added to rao_genetic_max, argument "cross". Default is zero because
+    it did not speed up computation on simulated data.
+  * default "keep" in rao_genetic_max and in get_ga_defaults changed from 5 to 25.

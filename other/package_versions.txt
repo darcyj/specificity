@@ -1,9 +1,9 @@
 Pagage versions used in this build and tests:
-devtools=2.3.0
+devtools=2.4.2
 roxygen2=7.1.1
 Rcpp=1.0.7
-testthat=3.0.2
+testthat=3.0.4
 ape=5.5
-parallel=3.6.3
+parallel=4.1.1
 fields=12.5
-specificity=0.1.10.9000
+specificity=0.1.11.9000

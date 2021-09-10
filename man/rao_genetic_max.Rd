@@ -11,7 +11,8 @@ rao_genetic_max(
   maxiters=400,
   popsize_perm=150,
   popsize_swap=150,
-  keep=5, 
+  keep=25, 
+  cross=0,
   prc=0.001,
   permute_pop=0)
 }
@@ -29,7 +30,9 @@ rao_genetic_max(
   all mutation post initialization is performed using swaps (default: 150).}
 \item{popsize_swap}{integer, population size for genetic algorithm that is initialized using
   random swaps of p. The numbers of swaps are drawn from swap_freq (default: 150).}
-\item{keep}{integer, number of individuals to keep during each iteration (default: 5).}
+\item{keep}{integer, number of individuals to keep during each iteration (default: 25).}
+\item{cross}{integer, number of items in pop mutated via PMX instead of by swap each 
+  generation (default: 0).}
 \item{prc}{double, precision for calculating termination with term_cycles (default: 0.001).}
 \item{permute_pop}{bool, whether to randomly permute p when initializing population (default: 0).}
 }

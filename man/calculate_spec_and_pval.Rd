@@ -131,7 +131,7 @@ Note that for this custom approach, the environmental variable must be a dist.
 # sim_raos <- mclapply(X=as.data.frame(otutable), FUN=function(p){
 #   replicate(200, rao1sp(p, D=env, perm=TRUE, seed=0))}, mc.cores=20)
 # calculate_spec_and_pval(emp_raos, sim_raos, otutable, env, 
-#   n_cores=20, denom_type="index_full")
+#   n_cores=20)
 
 
 }

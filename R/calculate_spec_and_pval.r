@@ -209,7 +209,8 @@ calculate_spec_and_pval <- function(emp_raos, sim_raos, abunds_mat, env,
 				term_cycles=ga_params$term_cycles, 
 				popsize_swap=ga_params$popsize_swap,
 				popsize_perm=ga_params$popsize_perm,
-				keep=ga_params$keep, 
+				keep=ga_params$keep,
+				cross=ga_params$cross,
 				prc=ga_params$prc, 
 				maxiters=ga_params$maxiters
 			)$best_rao
@@ -225,6 +226,7 @@ calculate_spec_and_pval <- function(emp_raos, sim_raos, abunds_mat, env,
 						popsize_swap=par$popsize_swap,
 						popsize_perm=par$popsize_perm,
 						keep=par$keep, 
+						cross=par$cross,
 						prc=par$prc, 
 						maxiters=par$maxiters
 					)$best_rao

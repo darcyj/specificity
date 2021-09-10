@@ -83,6 +83,30 @@ float rao1sp(const NumericVector& p, const NumericVector& D, bool perm=false, in
 }
 
 
+// same as above function, but it takes pidx=pindex=porder as first argument (still needs p)
+// so that p can remain static but rao calculated using an arbitrary ordering of p
+// p and pidx MUST be same length
+// note that this is an internal c++ function and pidx is 0-indexed!
+inline float rao1sp_order(const IntegerVector& pidx, const NumericVector& p, const NumericVector& D){
+	// integer for how big p is (or rather, what the final index of p is)
+	int npm1 = p.size() - 1;
+	// make rao output
+	float rao = 0;
+	// loop through p and D and create rao output
+	// i: row of D (as if it were a matrix)
+	// j: col of D (as if it were a matrix)
+	// k: index of vectorized D
+	int k = 0;
+	for(int j = 0; j < npm1; j++){
+		for(int i = j+1; i <= npm1; i++){
+			rao += p[pidx[i]] * p[pidx[j]] * D[k];
+			k++;
+		}
+	}
+	return(rao);
+}
+
+
 // raoperms
 //
 // Calculates many sim (i.e. null) rao for one species. 
@@ -130,23 +154,13 @@ inline IntegerVector twoDifferentRandomInts(int max){
 }
 
 
-// function that just swaps two items at random within a vector
-// there used to be another version but it wasn't used so bye-bye
+// function that just swaps two different ints at random within a vector
 // the reason this doesn't edit in place is because in the genetic algorithm,
-// unused columns in `pop` get overwritten. 
-inline NumericVector swapcol2 (const NumericVector& x){
-	NumericVector xout = clone(x);
-	IntegerVector xpos = twoDifferentRandomInts(xout.size());
-	std::swap(xout[xpos[0]], xout[xpos[1]]);
-	return xout;
-}
-
-// like above, but may do more than one swap
+// unused columns in `pop` get overwritten.
+// also, may do more than one swap
 // number of swaps is drawn at random from an vector of ints ns
-// the reason this doesn't edit in place is because in the genetic algorithm,
-// unused columns in `pop` get overwritten. 
-inline NumericVector swapcoln (const NumericVector& x, const IntegerVector ns){
-	NumericVector xout = clone(x);
+inline IntegerVector swapcolnInt (const IntegerVector& x, const IntegerVector& ns){
+	IntegerVector xout = clone(x);
 	int nspos = floor(R::runif(0,1) * ns.size());
 	for(int i=0; i<ns[nspos]; i++){
 		IntegerVector xpos = twoDifferentRandomInts(x.size());
@@ -155,19 +169,16 @@ inline NumericVector swapcoln (const NumericVector& x, const IntegerVector ns){
 	return(xout);
 }
 
-// function that randomly permutes a vector
-inline NumericVector permcol (const NumericVector& x){
-	int xsize = x.size();
-	NumericVector xout(xsize);
-	IntegerVector xpos = seq(0, xsize - 1);
-	shuffle_ints_so(xpos); // seed argument ommitted, default is just to not set a seed
-	for(int i=0; i<xsize; i++){
-		xout[i] = x[xpos[i]];
-	}
-	return xout;
+// function that randomly permutes a vector of ints
+inline IntegerVector permcolInt (const IntegerVector& x){
+	IntegerVector out = clone(x);
+	shuffle_ints_so(out);
+	return( out );
 }
 
-// function to find which top n
+
+// function to find which top n in a numeric vector (0-indexed)
+// returns indices of the top n items in x
 inline IntegerVector which_top_n (const NumericVector x, const int n){
 	int xs = x.size();
 	LogicalVector used(xs);
@@ -187,7 +198,6 @@ inline IntegerVector which_top_n (const NumericVector x, const int n){
 		used[out[i]] = 1;
 	}
 	return out;
-
 }
 
 // function that just repeats a sequence of ints from:to until it's length len
@@ -210,14 +220,74 @@ inline bool double_equals (const long double x1, const long double x2, const lon
 }
 
 
+// simple function to find what position of integervector v equals int x
+// returns -1 if x not in v
+inline int intWhich(int x, IntegerVector v){
+	for(int i=0; i<v.size(); i++){
+		if(x == v[i]){
+			return(i);
+		}
+	}
+	return(-1);
+}
+
+
+// PMX crossing function for GA. only returns ONE child! makes
+// the GA simpler to implement, no need to temporarily store both 
+// children then find homes for them.
+IntegerVector PMX(const IntegerVector& p1, const IntegerVector& p2){
+	IntegerVector mom = clone(p1);
+	IntegerVector dad = clone(p2);
+	NumericMatrix output = NumericMatrix(mom.size(), 2);
+	// make sure mom and dad are same size
+	// if(mom.size() != dad.size()){
+	// 	stop()
+	// }
+	// determine cut points. swap region is between them, inclusive.
+	IntegerVector cuts = twoDifferentRandomInts(mom.size());
+	if(cuts[0] > cuts[1]){ std::swap(cuts[1], cuts[0]);	}
+	// for each item within cut points, swap mom and dad.
+	for(int i=cuts[0]; i<=cuts[1]; i++){
+		std::swap(mom[i], dad[i]);
+	}
+
+	// for each item *not* within cut points, traverse map constructed by items within cut points
+	IntegerVector momMap = mom[Rcpp::Range(cuts[0], cuts[1])];
+	IntegerVector dadMap = dad[Rcpp::Range(cuts[0], cuts[1])];
+
+	// for each item NOT within cut points
+	for(int i=0; i<mom.size(); i++){ if((i < cuts[0]) | (i > cuts[1])){
+
+		// from mom perspective (note: -1 means not found)
+		int pos = intWhich(mom[i], momMap);
+		while(pos > -1){
+			//if(mom[i] == dadMap[pos]){break;}
+			mom[i] = dadMap[pos];
+			pos = intWhich(mom[i], momMap);
+		}
+
+	} }
+
+	return(mom);
+
+}
+
+
+// c++ version of R's order() function, starting at zero though.
+// returns indices of where to find the lowest (=0) to highest values.
+IntegerVector ordercpp(NumericVector x) {
+  NumericVector sorted = clone(x).sort();
+  return(match(sorted, x) - 1); // -1 needed because match returns 1-indexed 
+}
+
 
 // genetic optimization algorithm for finding order of p that maximizes Rao
 // [[Rcpp::export]]
 List rao_genetic_max (const NumericVector& p, const NumericVector& D, 
 	const IntegerVector swap_freq,
 	int term_cycles=10, int maxiters = 400, 
-	int popsize_perm=150, int popsize_swap=150, 
-	int keep=5, double prc = 0.001){
+	int popsize_perm=150, int popsize_swap=150,
+	int keep=25, int cross=0, double prc = 0.001){
 	// check to make sure p and D are correct lengths
 	int ps = p.size();
 	int p_expctd = (ps * (ps - 1)) / 2;
@@ -230,25 +300,34 @@ List rao_genetic_max (const NumericVector& p, const NumericVector& D,
 	if( (term_cycles < 1) | (maxiters < 1) | (popsize < 1) | (keep < 1) ){
 		throw std::invalid_argument("One or more integer arguments is too low.");
 	}
-	// check that keep < popsize
-	if(keep >= popsize){
-		throw std::invalid_argument("keep cannot be >= popsize.");
+	// check that keep > 2
+	if(keep < 2){
+		throw std::invalid_argument("keep must be at least 2.");
+	}
+	// check that cross + keep is less than popsize - 1
+	if(cross + keep >= popsize - 1){
+		throw std::invalid_argument("cross + keep cannot be >= popsize - 1.");
 	}
 
-	// propagate initial matrix; each col is a p vector (a population of p vecs)
-	NumericMatrix pop = NumericMatrix(ps, popsize);
+	// create initial order, which is relative to p
+	IntegerVector po = seq(0, ps - 1);
+
+	// propagate initial matrix, each col is an order of p derived from po
+	IntegerMatrix pop = IntegerMatrix(ps, popsize);
 	// do perm cols first
 	for(int j=0; j<popsize_perm; j++){
-		pop(_,j) = permcol(p); 
+		pop(_,j) = permcolInt(po); 
 	}
 	// now do swap cols
 	for(int j=popsize_perm; j<(popsize_perm+popsize_swap); j++){
-		pop(_,j) = swapcoln(p, swap_freq); 
+		pop(_,j) = swapcolnInt(po, swap_freq); 
 	}
-	// final column is initialized with p
-	// this is done so that if p is already the best state, it is kept
+	// final column is initialized with po
+	// this is done so that if po is already the best state, it is kept
 	// and we don't have to hope we find it later
-	pop(_,(popsize_perm+popsize_swap)) = p;
+	pop(_,(popsize_perm+popsize_swap)) = po;
+
+
 
 	// set up counters and outputs for generations
 	double last_best_rao = 0.0;
@@ -261,14 +340,15 @@ List rao_genetic_max (const NumericVector& p, const NumericVector& D,
 	// they never change size:
 	IntegerVector best_n_pos(keep);                   // stores which cols of pop are best
 	NumericVector pop_raos(popsize);                  // rao vals for each col of pop
-	NumericMatrix keepmat = NumericMatrix(ps, keep);  // stores best keep cols of pop while pop is overwritten
+	IntegerMatrix keepmat = IntegerMatrix(ps, keep);  // stores best keep cols of pop while pop is overwritten
+	IntegerVector parents(2);                         // indices of keepmat to be used as parents for crossing
 
 	// loop through iters
 	while(stopper == 0){
 		// calculate rao vals for each 
-		NumericVector pop_raos(popsize);
 		for(int j=0; j<popsize; j++){
-			pop_raos[j] = rao1sp(pop(_,j), D);
+			// need function to calculate rao from ORDER
+			pop_raos[j] = rao1sp_order(pop(_,j), p, D);
 		}
 
 		// find best n=keep 
@@ -289,10 +369,17 @@ List rao_genetic_max (const NumericVector& p, const NumericVector& D,
 		for(int j=0; j<keep; j++){
 			pop(_,j) = keepmat(_,j);
 		}
+
+		// do cross cols
+		for(int j=keep; j<keep+cross; j++){
+			parents = twoDifferentRandomInts(keep);
+			pop(_,j) = PMX(keepmat(_,parents[0]), keepmat(_,parents[1]));
+		}
+
 		// now do swap cols
 		IntegerVector col2do = seqrep(0, keep - 1, popsize); // vector of positions in keep range
-		for(int j=keep; j<popsize; j++){
-			pop(_,j) = swapcoln(keepmat(_,col2do[j]), swap_freq);
+		for(int j=keep+cross; j<popsize; j++){
+			pop(_,j) = swapcolnInt(keepmat(_,col2do[j]), swap_freq);
 		}
 
 		// check stop conditions and modify stopper
@@ -326,12 +413,12 @@ List rao_genetic_max (const NumericVector& p, const NumericVector& D,
 
 	// make output list object
 	IntegerVector iterations = seq(0, maxiters - 1);
-	NumericVector best_p = pop(_,0);
+	//NumericVector best_p = pop(_,0);
 	List ret;
 	ret["best_rao"] = last_best_rao;
 	ret["iter_raos"] = iter_best_raos;
 	ret["iterations"] = iterations;
-	ret["best_p"] = best_p;
+	ret["best_p"] = pop(_,0);
 
 	return ret;
 

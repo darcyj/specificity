@@ -50,8 +50,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // rao_genetic_max
-List rao_genetic_max(const NumericVector& p, const NumericVector& D, const IntegerVector swap_freq, int term_cycles, int maxiters, int popsize_perm, int popsize_swap, int keep, double prc);
-RcppExport SEXP _specificity_rao_genetic_max(SEXP pSEXP, SEXP DSEXP, SEXP swap_freqSEXP, SEXP term_cyclesSEXP, SEXP maxitersSEXP, SEXP popsize_permSEXP, SEXP popsize_swapSEXP, SEXP keepSEXP, SEXP prcSEXP) {
+List rao_genetic_max(const NumericVector& p, const NumericVector& D, const IntegerVector swap_freq, int term_cycles, int maxiters, int popsize_perm, int popsize_swap, int keep, int cross, double prc);
+RcppExport SEXP _specificity_rao_genetic_max(SEXP pSEXP, SEXP DSEXP, SEXP swap_freqSEXP, SEXP term_cyclesSEXP, SEXP maxitersSEXP, SEXP popsize_permSEXP, SEXP popsize_swapSEXP, SEXP keepSEXP, SEXP crossSEXP, SEXP prcSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -63,8 +63,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type popsize_perm(popsize_permSEXP);
     Rcpp::traits::input_parameter< int >::type popsize_swap(popsize_swapSEXP);
     Rcpp::traits::input_parameter< int >::type keep(keepSEXP);
+    Rcpp::traits::input_parameter< int >::type cross(crossSEXP);
     Rcpp::traits::input_parameter< double >::type prc(prcSEXP);
-    rcpp_result_gen = Rcpp::wrap(rao_genetic_max(p, D, swap_freq, term_cycles, maxiters, popsize_perm, popsize_swap, keep, prc));
+    rcpp_result_gen = Rcpp::wrap(rao_genetic_max(p, D, swap_freq, term_cycles, maxiters, popsize_perm, popsize_swap, keep, cross, prc));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -73,7 +74,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_specificity_pairwise_product", (DL_FUNC) &_specificity_pairwise_product, 1},
     {"_specificity_rao1sp", (DL_FUNC) &_specificity_rao1sp, 4},
     {"_specificity_raoperms", (DL_FUNC) &_specificity_raoperms, 4},
-    {"_specificity_rao_genetic_max", (DL_FUNC) &_specificity_rao_genetic_max, 9},
+    {"_specificity_rao_genetic_max", (DL_FUNC) &_specificity_rao_genetic_max, 10},
     {NULL, NULL, 0}
 };
 

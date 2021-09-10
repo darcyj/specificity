@@ -18,7 +18,8 @@ get_ga_defaults <- function(){
 		maxiters=400,
 		popsize_swap=150,
 		popsize_perm=150,
-		keep=5,
+		keep=25,
+		cross=0,
 		prc=0.0001
 	)
 }

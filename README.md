@@ -1,7 +1,7 @@
 # specificity
 R package for analyzing specificity in ecological data
 
-[![Build Status](https://travis-ci.com/darcyj/specificity.svg?branch=master)](https://travis-ci.com/darcyj/specificity)
+[![Build Status](https://app.travis-ci.com/darcyj/specificity.svg?branch=master)](https://app.travis-ci.com/darcyj/specificity)
 
 
 by John L. Darcy

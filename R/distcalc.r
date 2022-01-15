@@ -20,10 +20,14 @@
 #' 
 #' @export
 distcalc <- function(lat, lng, sampIDs=NULL){
-	longlats <- data.frame(lng, lat)
-	if(!is.null(sampIDs)){
-		rownames(longlats) <- sampIDs
+	if(requireNamespace("fields", quietly=TRUE)){
+		longlats <- data.frame(lng, lat)
+		if(!is.null(sampIDs)){
+			rownames(longlats) <- sampIDs
+		}
+		distmat=fields::rdist.earth(as.matrix(longlats), miles=FALSE, R=NULL) 
+		return((distmat))	
+	}else{
+		stop("Package 'fields' is required for distcalc. Please install it and try again.")
 	}
-	distmat=fields::rdist.earth(as.matrix(longlats), miles=F, R=NULL) 
-	return((distmat))
 }

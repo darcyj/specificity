@@ -233,7 +233,7 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 	abunds_mat_intcols <- sapply(X=1:ncol(abunds_mat), FUN=function(j){is.integer(abunds_mat[j])})
 	if(any(abunds_mat_intcols)){
 		msg("...Changing abunds_mat ints to doubles...")
-		abunds_mat <- apply(X=abunds_mat, MAR=2, FUN=as.double)
+		abunds_mat <- apply(X=abunds_mat, MARGIN=2, FUN=as.double)
 	}
 	# not necessary to do the same for env since double * int = double.
 	

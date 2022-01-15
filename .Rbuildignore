@@ -3,3 +3,4 @@
 ^vignette$
 ^\.travis.yml$
 ^other$
+^tests$

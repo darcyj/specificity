@@ -1,1 +1,1 @@
-[ [38;5;214mFAIL[39m 0 | [35mWARN[39m 0 | [34mSKIP[39m 0 | [32mPASS[39m 54 ]
+[ FAIL 0 | WARN 0 | SKIP 0 | PASS 54 ]

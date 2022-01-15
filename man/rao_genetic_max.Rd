@@ -13,8 +13,8 @@ rao_genetic_max(
   popsize_swap=150,
   keep=25, 
   cross=0,
-  prc=0.001,
-  permute_pop=0)
+  prc=0.001
+)
 }
 \arguments{
 \item{p}{numeric vector of length n - a species weights vector.}
@@ -34,7 +34,6 @@ rao_genetic_max(
 \item{cross}{integer, number of items in pop mutated via PMX instead of by swap each 
   generation (default: 0).}
 \item{prc}{double, precision for calculating termination with term_cycles (default: 0.001).}
-\item{permute_pop}{bool, whether to randomly permute p when initializing population (default: 0).}
 }
 \value{
 List object containing results of genetic algorithm:

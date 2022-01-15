@@ -76,7 +76,7 @@ writepkgvers("Rcpp")
 writepkgvers("testthat")
 writepkgvers("ape")
 writepkgvers("parallel")
-writepkgvers("fields")
+writepkgvers("fields")      # NOTE: only suggested now!
 writepkgvers("specificity")
 
 # make pdf manual

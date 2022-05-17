@@ -10,8 +10,8 @@ rao1sp(
 	seed=0)
 }
 \arguments{
-\item{p}{numeric vector of length n. a species weights vector.}
-\item{D}{numeric vector of length n(n-1)/2. i.e. a dist object whose full matrix is nxn.}
+\item{p}{numeric vector of length n. A species weights vector.}
+\item{D}{numeric vector of length n(n-1)/2. i.e. a dist object representing the lower triangle of an nxn matrix.}
 \item{perm}{bool. Whether or not the permute order of p before calculating Rao (default: FALSE).}
 \item{seed}{integer. a seed to be used if perm=TRUE. setting seed=0 will give nondeterministic random results, as if no seed were set (default: 0).}
 }

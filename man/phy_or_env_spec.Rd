@@ -31,7 +31,8 @@ returned. Negative values in abunds_mat are not allowed (REQUIRED).}
 
 \item{env}{numeric vector, dist, or square matrix. Environmental variable 
 corresponding to abunds. For example, temperature, or geographic distance.
-Not required for computing phylogenetic specificity (default: NULL).}
+Not required for computing phylogenetic specificity. If square matrix provided,
+note that only the lower triangle will be used (default: NULL).}
 
 \item{hosts}{character vector. Host identities corresponding to abunds. Only
 required if calculating phylogenetic specificity (default: NULL).}

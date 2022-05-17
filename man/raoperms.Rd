@@ -10,8 +10,8 @@ raoperms(
 	seed=12345)
 }
 \arguments{
-\item{p}{numeric vector of species weights.}
-\item{D}{numeric vector (dist) of distances corresponding to a lower triangle of a matrix whose rows and cols correspond to p; i.e. an lxl matrix where l is length(p). R's dist() function does this for you!}
+\item{p}{numeric vector of length n. A species weights vector.}
+\item{D}{numeric vector of length n(n-1)/2. i.e. a dist object representing the lower triangle of an nxn matrix.}
 \item{n_sim}{integer. number of sims to do (default: 1000).}
 \item{seed}{integer. a seed to be used for permutation. setting seed=0 will give nondeterministic random results, as if no seed were set (default: 0).}
 }

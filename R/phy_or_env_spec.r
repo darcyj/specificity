@@ -25,7 +25,8 @@
 #'   returned. Negative values in abunds_mat are not allowed (REQUIRED).
 #' @param env numeric vector, dist, or square matrix. Environmental variable 
 #'   corresponding to abunds. For example, temperature, or geographic distance.
-#'   Not required for computing phylogenetic specificity (default: NULL).
+#'   Not required for computing phylogenetic specificity. If square matrix provided,
+#'   note that only the lower triangle will be used (default: NULL). 
 #' @param hosts character vector. Host identities corresponding to abunds. Only
 #' required if calculating phylogenetic specificity (default: NULL).
 #' @param hosts_phylo phylo object. Tree containing all unique hosts as tips. Only

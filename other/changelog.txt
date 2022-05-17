@@ -66,4 +66,8 @@
     it did not speed up computation on simulated data.
   * default "keep" in rao_genetic_max and in get_ga_defaults changed from 5 to 25.
 0.1.12.9000 // 2022 JAN 15
-  * removed 'fields' as dependency, now it's just suggested. 
+  * removed 'fields' as dependency, now it's just suggested.
+0.1.13.9000 // 2022 MAY 16
+  * fixed rao statistic to be calculated as if a whole matrix were used, not just the lower
+    triangle; rao1sp now returns 2x what it did before. This will not affect any Spec
+    results (from phy_or_env_spec). Also simplified some C++ code to be more maintainable. 

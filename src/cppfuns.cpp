@@ -49,6 +49,35 @@ void shuffle_ints_so(IntegerVector &x, int seed=0){
 
 
 
+// same as above function, but it takes pidx=pindex=porder as first argument (still needs p)
+// so that p can remain static but rao calculated using an arbitrary ordering of p
+// p and pidx MUST be same length
+// note that this is an internal c++ function and pidx is 0-indexed!
+inline float rao1sp_order(const IntegerVector& pidx, const NumericVector& p, const NumericVector& D){
+	// integer for how big p is (or rather, what the final index of p is)
+	int npm1 = p.size() - 1;
+	// make rao output
+	float rao = 0;
+	// loop through p and D and create rao output
+	// i: row of D (as if it were a matrix)
+	// j: col of D (as if it were a matrix)
+	// k: index of vectorized D
+	int k = 0;
+	for(int j = 0; j < npm1; j++){
+		for(int i = j+1; i <= npm1; i++){
+			rao += p[pidx[i]] * p[pidx[j]] * D[k];
+			k++;
+		}
+	}
+	// multiply rao by 2, because we cheated and only used the lower triangle
+	// note that this assumes full matrix of D is symmetrical!
+	rao = rao * (float)2;
+	// return
+	return(rao);
+}
+
+
+
 // rao1sp
 //
 // Calculates empirical rao for one species. 
@@ -72,37 +101,7 @@ float rao1sp(const NumericVector& p, const NumericVector& D, bool perm=false, in
 	// i: row of D (as if it were a matrix)
 	// j: col of D (as if it were a matrix)
 	// k: index of vectorized D
-	int k = 0;
-	for(int j = 0; j < npm1; j++){
-		for(int i = j+1; i <= npm1; i++){
-			rao += p[pidx[i]] * p[pidx[j]] * D[k];
-			k++;
-		}
-	}
-	return(rao);
-}
-
-
-// same as above function, but it takes pidx=pindex=porder as first argument (still needs p)
-// so that p can remain static but rao calculated using an arbitrary ordering of p
-// p and pidx MUST be same length
-// note that this is an internal c++ function and pidx is 0-indexed!
-inline float rao1sp_order(const IntegerVector& pidx, const NumericVector& p, const NumericVector& D){
-	// integer for how big p is (or rather, what the final index of p is)
-	int npm1 = p.size() - 1;
-	// make rao output
-	float rao = 0;
-	// loop through p and D and create rao output
-	// i: row of D (as if it were a matrix)
-	// j: col of D (as if it were a matrix)
-	// k: index of vectorized D
-	int k = 0;
-	for(int j = 0; j < npm1; j++){
-		for(int i = j+1; i <= npm1; i++){
-			rao += p[pidx[i]] * p[pidx[j]] * D[k];
-			k++;
-		}
-	}
+	rao = rao1sp_order(pidx, p, D);
 	return(rao);
 }
 

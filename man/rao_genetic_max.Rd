@@ -17,8 +17,8 @@ rao_genetic_max(
 )
 }
 \arguments{
-\item{p}{numeric vector of length n - a species weights vector.}
-\item{D}{numeric vector of length n(n-1)/2 - i.e. a dist object whose full matrix is nxn.}
+\item{p}{numeric vector of length n. A species weights vector.}
+\item{D}{numeric vector of length n(n-1)/2. i.e. a dist object representing the lower triangle of an nxn matrix.}
 \item{swap_freq}{integer vector - distribution of swaps per generation. For a constant
   swap rate, set to a constant value (recommend 1). If set to c(1,1,2,3), for example, 
   one swap per generation will occur about half the time, and two swaps per generation will

@@ -88,7 +88,7 @@ wpd <- function(s, s_phylo, w=NULL, nested_set=NULL, metric="Hp"){
 	}
 
 	# remove NA data
-	keepers <- (!is.na(w)) && (!is.na(s))
+	keepers <- (!is.na(w)) & (!is.na(s))
 	w <- w[keepers]
 	s <- s[keepers]
 

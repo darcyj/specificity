@@ -71,3 +71,7 @@
   * fixed rao statistic to be calculated as if a whole matrix were used, not just the lower
     triangle; rao1sp now returns 2x what it did before. This will not affect any Spec
     results (from phy_or_env_spec). Also simplified some C++ code to be more maintainable. 
+0.1.14.9000 // 2022 JUN 21
+  * fixed minor bug in wpd that caused tests to flag warnings
+  * added Suggests: testthat (>= 3.0.0) to DESCRIPTION to prevent R CMD build warnings
+  * fixed removing 'fields' as dependency

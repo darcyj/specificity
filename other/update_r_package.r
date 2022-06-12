@@ -27,7 +27,6 @@ library(testthat)
 usethis::use_package("ape")
 usethis::use_package("parallel")
 usethis::use_package("Rcpp")
-usethis::use_package("fields")
 
 if(packageVersion("Rcpp") < "1.0.0"){
   stop("Rcpp needs to be updated to 1.0.0 or above.")

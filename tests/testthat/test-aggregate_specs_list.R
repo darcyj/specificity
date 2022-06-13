@@ -6,12 +6,15 @@ data(endophyte)
 otutable <- prop_abund(endophyte$otutable)
 otutable <- occ_threshold(otutable, 30)
 
+# define n cores parameter
+ncores <- 2 # for CRAN
+
 # make data - use index_rough to make it faster 
 specs_list <- list()
 specs_list$elevation <- phy_or_env_spec(otutable, endophyte$metadata$Elevation, 
-	n_sim=100, n_cores=20, denom_type="sim_center")
+	n_sim=100, n_cores=ncores, denom_type="sim_center")
 specs_list$rainfall <- phy_or_env_spec(otutable, endophyte$metadata$Rainfall,
-	n_sim=100, n_cores=20, denom_type="sim_center")
+	n_sim=100, n_cores=ncores, denom_type="sim_center")
 
 
 

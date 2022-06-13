@@ -5,6 +5,7 @@ library(parallel)
 set.seed(12345)
 perm <- rnorm(1000, mean=50, sd=20)
 emp <- 30
+ncores <- 2 # for CRAN check
 
 p_calc <- (sum(perm < emp) + 1) / length(perm)
 p_fun <- specificity:::p_from_perms_or_gfit(emp, perm, tails=1)
@@ -30,7 +31,7 @@ calculated_Ps <- simplify2array(mclapply(X=perms,
 		gf <- specificity:::fit_gamma_fwd_rev(x)
 		specificity:::p_from_perms_or_gfit(emp, gfit=gf, fallback=1)
 	},
-	mc.cores=10
+	mc.cores=ncores
 ))
 p_fun <- round(mean(calculated_Ps),2)
 p_calc <- round(parametric_P, 2)
@@ -47,7 +48,7 @@ perm_ps <- simplify2array(mcmapply(
 	FUN=specificity:::p_from_perms_or_gfit,
 	emp=emps,
 	perm=perms,
-	mc.cores=10
+	mc.cores=ncores
 ))
 
 gfs <- mclapply(X=perms, FUN=specificity:::fit_gamma_fwd_rev, mc.cores=10)
@@ -56,7 +57,7 @@ gamma_ps <- simplify2array(mcmapply(
 	emp=emps,
 	gfit=gfs,
 	fallback=perm_ps,
-	mc.cores=10
+	mc.cores=ncores
 ))
 
 test_that("perm pvals correlate to gamma pvals > 0.95 for p > 0.001", { expect_gt(cor(perm_ps, gamma_ps), 0.95) })

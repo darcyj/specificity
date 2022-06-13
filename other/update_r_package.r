@@ -17,6 +17,7 @@ write("^\\.Rproj\\.user$",         file=".Rbuildignore",append=TRUE)
 write("^vignette$",                file=".Rbuildignore",append=TRUE)
 write("^\\.travis.yml$",           file=".Rbuildignore",append=TRUE)
 write("^other$",                   file=".Rbuildignore",append=TRUE)
+write("specificity.pdf",           file=".Rbuildignore",append=TRUE)
 
 
 library(devtools)

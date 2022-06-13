@@ -4,6 +4,9 @@ library(testthat)
 data(endophyte)
 attach(endophyte)
 
+# ncores parameter 
+ncores <- 2 # for CRAN
+
 # make some OTUs to test.
 # flat = no pattern
 z_flat <- rep(1, length(metadata$Elevation))
@@ -39,7 +42,7 @@ spec_results <- phy_or_env_spec(
 	abunds_mat,
 	env = metadata$Elevation,
 	n_sim = 100,
-	n_cores = 10,
+	n_cores = ncores,
 	verbose=FALSE,
 	p_method="raw",
 	diagnostic = T
@@ -78,7 +81,7 @@ test_that("non-square env matrix gives error", {expect_error(
 			z_elev_lo_all, z_elev_med_all, z_elev_hi_all),
 		env = cbind(metadata$Elevation, metadata$Elevation), # nx2 matrix, not nxn.
 		n_sim = 1000,
-		n_cores = 10
+		n_cores = ncores
 	)
 )})
 
@@ -88,7 +91,7 @@ test_that("wrong length env vector gives error", {expect_error(
 			z_elev_lo_all, z_elev_med_all, z_elev_hi_all),
 		env = c(metadata$Elevation, 0),# length n+1 not n
 		n_sim = 1000,
-		n_cores = 10
+		n_cores = ncores
 	)
 )})
 
@@ -98,7 +101,7 @@ test_that("wrong length env dist gives error", {expect_error(
 			z_elev_lo_all, z_elev_med_all, z_elev_hi_all),
 		env = dist(c(metadata$Elevation, 0)),# length n+1 not n
 		n_sim = 1000,
-		n_cores = 10
+		n_cores = ncores
 	)
 )})
 
@@ -108,7 +111,7 @@ test_that("non-numeric env matrix gives error", {expect_error(
 			z_elev_lo_all, z_elev_med_all, z_elev_hi_all),
 		env = matrix("A", ncol=length(z_flat), nrow=length(z_flat)),
 		n_sim = 1000,
-		n_cores = 10
+		n_cores = ncores
 	)
 )})
 
@@ -118,7 +121,7 @@ test_that("non-numeric env vector gives error", {expect_error(
 				z_elev_lo_all, z_elev_med_all, z_elev_hi_all),
 			env = rep("A", length(z_flat)),
 			n_sim = 1000,
-			n_cores = 10
+			n_cores = ncores
 		)
 )})
 
@@ -129,7 +132,7 @@ test_that("hosts but no phylo gives error", {expect_error(
 		hosts=metadata$PlantGenus,
 		hosts_phylo = NULL,
 		n_sim = 1000,
-		n_cores = 10
+		n_cores = ncores
 	)
 )})
 
@@ -140,7 +143,7 @@ test_that("phylo but no hosts gives error", {expect_error(
 		hosts=NULL,
 		hosts_phylo = supertree,
 		n_sim = 1000,
-		n_cores = 10
+		n_cores = ncores
 	)
 )})
 
@@ -152,7 +155,7 @@ test_that("hosts+env+phylo gives error", {expect_error(
 		hosts_phylo = supertree,
 		env=metadata$Elevation,
 		n_sim = 1000,
-		n_cores = 10
+		n_cores = ncores
 	)
 )})
 
@@ -163,7 +166,7 @@ test_that("hosts+env gives error", {expect_error(
 		hosts=metadata$PlantGenus,
 		env=metadata$Elevation,
 		n_sim = 1000,
-		n_cores = 10
+		n_cores = ncores
 	)
 )})
 
@@ -174,7 +177,7 @@ test_that("env+phylo gives error", {expect_error(
 		hosts_phylo = supertree,
 		env=metadata$Elevation,
 		n_sim = 1000,
-		n_cores = 10
+		n_cores = ncores
 	)
 )})
 
@@ -185,7 +188,7 @@ test_that("incomplete phylo gives error", {expect_error(
 		hosts=metadata$PlantGenus,
 		hosts_phylo = ape::drop.tip(supertree, metadata$PlantGenus[1]),
 		n_sim = 1000,
-		n_cores = 10
+		n_cores = ncores
 	)
 )})
 
@@ -196,7 +199,7 @@ test_that("hosts wrong length gives error", {expect_error(
 		hosts=c(metadata$PlantGenus, metadata$PlantGenus[1]),
 		hosts_phylo = supertree,
 		n_sim = 1000,
-		n_cores = 10
+		n_cores = ncores
 	)
 )})
 
@@ -211,7 +214,7 @@ test_that("semicolons in hosts gives error", {expect_error(
 		hosts=badhosts,
 		hosts_phylo = badphylo,
 		n_sim = 1000,
-		n_cores = 10
+		n_cores = ncores
 	)
 )})
 
@@ -237,7 +240,7 @@ test_that("downsampled endophyte data and denom=index gives no errors", {expect_
 	    env=e,
 	    n_sim=100,
 	    denom_type="index",
-	    n_cores=4
+	    n_cores=ncores
 	)
 )})
 
@@ -248,7 +251,7 @@ test_that("downsampled endophyte data and denom=ses gives no errors", {expect_er
 	    env=e,
 	    n_sim=100,
 	    denom_type="ses",
-	    n_cores=4
+	    n_cores=ncores
 	)
 )})
 
@@ -259,7 +262,7 @@ test_that("downsampled endophyte data and denom=raw gives no errors", {expect_er
 	    env=e,
 	    n_sim=100,
 	    denom_type="raw",
-	    n_cores=4
+	    n_cores=ncores
 	)
 )})
 
@@ -270,6 +273,6 @@ test_that("downsampled endophyte data and denom=sim_center gives no errors", {ex
 	    env=e,
 	    n_sim=100,
 	    denom_type="sim_center",
-	    n_cores=4
+	    n_cores=ncores
 	)
 )})

@@ -26,7 +26,8 @@
 #' @param tails integer. 1 = 1-tailed, test for specificity only. 2 = 2-tailed.
 #'   3 = 1-tailed, test for cosmopolitanism only. 0 = no test, P=1.0 (default: 1).
 #' @param n_cores integer. Number of CPU cores to use for parallel operations. If
-#'   set to 1, lapply will be used instead of mclapply (default: 2).
+#'   set to 1, lapply will be used instead of mclapply. A warning will be shown if
+#'   n_cores > 1 on Windows, which does not support forked parallelism (default: 2).
 #' @param verbose logical. Should status messages be displayed? (default: TRUE).
 #' @param p_method string. "raw" for quantile method, or "gamma_fit" for calculating P
 #'   by fitting a gamma distribution (default: "raw").
@@ -107,8 +108,13 @@ calculate_spec_and_pval <- function(emp_raos, sim_raos, abunds_mat, env,
 	p_adj="fdr", tails=1, n_cores=2, verbose=TRUE, p_method="raw", center="mean", 
 	denom_type="index", diagnostic=FALSE, ga_params=get_ga_defaults()){
 
+	# warn if ncores > 1 and platform isn't  "unix" (windows can't do forked parallelism)
+	if(n_cores > 1 && .Platform$OS.type != "unix"){
+		warning("Windows is incompatible with n_cores > 1.")
+	}
+
 	# check if env is a dist
-	if(class(env) != "dist"){
+	if( ! inherits(env, "dist")){
 		stop("env must be of class dist")
 	}
 

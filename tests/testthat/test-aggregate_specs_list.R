@@ -7,7 +7,7 @@ otutable <- prop_abund(endophyte$otutable)
 otutable <- occ_threshold(otutable, 30)
 
 # define n cores parameter
-ncores <- 2 # for CRAN
+ncores <- ifelse(.Platform$OS.type == "unix", yes=2, no=1) # for CRAN check
 
 # make data - use index_rough to make it faster 
 specs_list <- list()

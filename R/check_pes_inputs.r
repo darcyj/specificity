@@ -37,7 +37,7 @@ check_pes_inputs <- function(abunds_mat, env, hosts, hosts_phylo, verbose=TRUE){
 	}else if(env_prsnt && (is.matrix(env) || is.data.frame(env))){
 		# env present and it's 2-dimensional
 		data_type <- "mat"
-	}else if(env_prsnt && class(env) == "dist"){
+	}else if(env_prsnt && inherits(env, "dist")){
 		# env present and it's a dist (LT from 2-dimensional)
 		data_type <- "dist"
 	}else if(env_prsnt && is.vector(env)){

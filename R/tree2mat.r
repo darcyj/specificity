@@ -15,9 +15,11 @@
 #' @param x character vector. Vector of species identities, each of which must
 #'   be in tree as a tip label. May contain any given species identity more than
 #'   once.
-#' @param n_cores integer. Number of cores to use for parallel computation. No
-#'   parallelization will be done if n_cores = 1. Multithreading should only be used
-#'   for large trees where x has low redundancy (default: 1).
+#' @param n_cores integer. Number of CPU cores to use for parallel operations.
+#'   Multithreading should only be used for large trees where x has low redundancy.
+#'   If set to 1, sapply will be used instead of mclapply. A warning will be shown if
+#'   n_cores > 1 on Windows, which does not support forked parallelism (default: 1).
+#'
 #' @return dist object, of vector length equal to (l^2-l)/2 where l is length(x); i.e. 
 #'   values are the lower triangle of a patristic distance matrix with rows=x and cols=x. 
 #'
@@ -33,6 +35,11 @@
 #' 
 #' @export
 tree2mat <- function(tree, x, n_cores=1 ){
+    # warn if ncores > 1 and platform isn't  "unix" (windows can't do forked parallelism)
+    if(n_cores > 1 && .Platform$OS.type != "unix"){
+        warning("Windows is incompatible with n_cores > 1.")
+    }
+    
 	# check that each species in x is in tree exactly once
 	times_in_tree <- sapply(x, FUN=function(x){sum(tree$tip.label %in% x)})
 	if(0 %in% times_in_tree){ stop("ERROR: some species in x not in tree.") }

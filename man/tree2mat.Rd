@@ -14,9 +14,10 @@ contain tips that are not in x.}
 be in tree as a tip label. May contain any given species identity more than
 once.}
 
-\item{n_cores}{integer. Number of cores to use for parallel computation. No
-parallelization will be done if n_cores = 1. Multithreading should only be used
-for large trees where x has low redundancy (default: 1).}
+\item{n_cores}{integer. Number of CPU cores to use for parallel operations.
+Multithreading should only be used for large trees where x has low redundancy.
+If set to 1, sapply will be used instead of mclapply. A warning will be shown if
+n_cores > 1 on Windows, which does not support forked parallelism (default: 1).}
 }
 \value{
 dist object, of vector length equal to (l^2-l)/2 where l is length(x); i.e. 

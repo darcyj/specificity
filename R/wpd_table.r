@@ -41,7 +41,10 @@
 #'       lengths in your tree (but only for taxa in s). Faith 1992.
 #'     }
 #'   }
-#' @param ncores integer. Number of CPU cores to use for parallel operations (default: 4).
+#' @param ncores integer. Number of CPU cores to use for parallel operations. If
+#'   set to 1, lapply will be used instead of mclapply. A warning will be shown if
+#'   n_cores > 1 on Windows, which does not support forked parallelism (default: 2).
+
 #' 
 #' @return multiple WPD or PD values, one for each column of m.
 #'
@@ -61,6 +64,10 @@
 #'
 #' @export
 wpd_table <- function(m, s_phylo, s_names=NULL, nested_set=NULL, metric="Hp", ncores=4){
+    # warn if ncores > 1 and platform isn't  "unix" (windows can't do forked parallelism)
+    if(ncores > 1 && .Platform$OS.type != "unix"){
+        warning("Windows is incompatible with ncores > 1.")
+    }
 	# handle s_names == NULL
 	if(is.null(s_names)){s_names <- colnames(m)}
 	# check all names occur in tree

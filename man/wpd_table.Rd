@@ -44,7 +44,9 @@ diversity metric. Available metrics are:
   }
 }}
 
-\item{ncores}{integer. Number of CPU cores to use for parallel operations (default: 4).}
+\item{ncores}{integer. Number of CPU cores to use for parallel operations. If
+set to 1, lapply will be used instead of mclapply. A warning will be shown if
+n_cores > 1 on Windows, which does not support forked parallelism (default: 2).}
 }
 \value{
 multiple WPD or PD values, one for each column of m.

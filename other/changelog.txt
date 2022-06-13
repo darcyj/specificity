@@ -77,3 +77,6 @@
   * fixed removing 'fields' as dependency
 0.1.15.9000 // 2022 JUN 21
   * lowered number of cores used in test code for CRAN
+0.1.16.9000 // 2022 JUN 22
+  * added checks for forked parallel use on Windows, as well as warning messages.
+  * changed tests to use just 1 core on windows machines.

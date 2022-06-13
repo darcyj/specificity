@@ -45,7 +45,8 @@
 #' @param tails integer. 1 = 1-tailed, test for specificity only. 2 = 2-tailed.
 #'   3 = 1-tailed, test for cosmopolitanism only. 0 = no test, P=1.0 (default: 1).
 #' @param n_cores integer. Number of CPU cores to use for parallel operations. If
-#'   set to 1, lapply will be used instead of mclapply (default: 2).
+#'   set to 1, lapply will be used instead of mclapply. A warning will be shown if
+#'   n_cores > 1 on Windows, which does not support forked parallelism (default: 2).
 #' @param verbose logical. Should status messages be displayed? (default: TRUE).
 #' @param p_method string. "raw" for quantile method, or "gamma_fit" for calculating P
 #'   by fitting a gamma distribution (default: "raw").
@@ -165,6 +166,11 @@ phy_or_env_spec <- function(abunds_mat, env=NULL, hosts=NULL,
 	# center <- "mean"
 	# chunksize <- 50
 
+    # warn if ncores > 1 and platform isn't  "unix" (windows can't do forked parallelism)
+    if(n_cores > 1 && .Platform$OS.type != "unix"){
+        warning("Windows is incompatible with n_cores > 1.")
+    }
+ 
 	# little message function, to clean up code a bit
 	msg <- function(x){if(verbose){message(x)}}
 

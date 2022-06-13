@@ -11,8 +11,9 @@ make_nested_set(phy, n_cores = 2)
 ordered. This is the default for rooted trees read in using ape's read.tree
 function.}
 
-\item{n_cores}{integer. Number of CPU cores to use (DEFAULT: 2). lapply will
-be used instead of mclapply if ncores is 1.}
+\item{n_cores}{integer. Number of CPU cores to use for parallel operations. If
+set to 1, lapply will be used instead of mclapply. A warning will be shown if
+n_cores > 1 on Windows, which does not support forked parallelism (default: 2).}
 }
 \value{
 Matrix object representing a nested set of nodes. Each row matches

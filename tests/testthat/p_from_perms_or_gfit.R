@@ -5,7 +5,8 @@ library(parallel)
 set.seed(12345)
 perm <- rnorm(1000, mean=50, sd=20)
 emp <- 30
-ncores <- 2 # for CRAN check
+
+ncores <- ifelse(.Platform$OS.type == "unix", yes=2, no=1) # for CRAN check
 
 p_calc <- (sum(perm < emp) + 1) / length(perm)
 p_fun <- specificity:::p_from_perms_or_gfit(emp, perm, tails=1)

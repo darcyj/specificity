@@ -20,8 +20,9 @@
 #' @param phy phylo object. Must be rooted, and sorted such that tip indices are
 #'   ordered. This is the default for rooted trees read in using ape's read.tree
 #'   function.
-#' @param n_cores integer. Number of CPU cores to use (DEFAULT: 2). lapply will
-#'   be used instead of mclapply if ncores is 1.
+#' @param n_cores integer. Number of CPU cores to use for parallel operations. If
+#'   set to 1, lapply will be used instead of mclapply. A warning will be shown if
+#'   n_cores > 1 on Windows, which does not support forked parallelism (default: 2).
 #'
 #' @return Matrix object representing a nested set of nodes. Each row matches
 #'   rows of the "edges" object within phy. Object has the following columns:
@@ -45,12 +46,17 @@
 #'
 #' @export
 make_nested_set <- function(phy, n_cores=2){
+	# check if tree is rooted
 	if( ! ape::is.rooted(phy)){
 		stop("ERROR: phylogeny is not rooted. Maybe try a midpoint root?")
 	}
+    # warn if ncores > 1 and platform isn't  "unix" (windows can't do forked parallelism)
+    if(n_cores > 1 && .Platform$OS.type != "unix"){
+        warning("Windows is incompatible with n_cores > 1.")
+    }
 	# this function is just a wrapper for tips_from_node, so that
 	# it returns only the node, min, max, and errors
-	get_node_tip_range <- function(node){
+	.get_node_tip_range <- function(node){
 		# find indices of descendent tips
 		descs <- tips_from_node(node, anc=phy$edge[,1], des=phy$edge[,2])
 		min <- min(descs)
@@ -66,9 +72,9 @@ make_nested_set <- function(phy, n_cores=2){
 	}
 	# parallelize get_node_tip_range across each node
 	if(n_cores <= 1){
-		dfs <- lapply(X=phy$edge[,2], FUN=get_node_tip_range)
+		dfs <- lapply(X=phy$edge[,2], FUN=.get_node_tip_range)
 	}else{
-		dfs <- parallel::mclapply(X=phy$edge[,2], FUN=get_node_tip_range, mc.cores=n_cores)
+		dfs <- parallel::mclapply(X=phy$edge[,2], FUN=.get_node_tip_range, mc.cores=n_cores)
 	}
 	# combine data frames.
 	dfs <- do.call("rbind", dfs)
@@ -79,4 +85,6 @@ make_nested_set <- function(phy, n_cores=2){
 
 	return(as.matrix(dfs))
 }
+
+
 

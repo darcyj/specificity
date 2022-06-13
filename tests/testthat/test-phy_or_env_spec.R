@@ -5,7 +5,7 @@ data(endophyte)
 attach(endophyte)
 
 # ncores parameter 
-ncores <- 2 # for CRAN
+ncores <- ifelse(.Platform$OS.type == "unix", yes=2, no=1) # for CRAN check
 
 # make some OTUs to test.
 # flat = no pattern

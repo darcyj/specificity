@@ -58,7 +58,8 @@ different permutations (default: 1234557).}
 3 = 1-tailed, test for cosmopolitanism only. 0 = no test, P=1.0 (default: 1).}
 
 \item{n_cores}{integer. Number of CPU cores to use for parallel operations. If
-set to 1, lapply will be used instead of mclapply (default: 2).}
+set to 1, lapply will be used instead of mclapply. A warning will be shown if
+n_cores > 1 on Windows, which does not support forked parallelism (default: 2).}
 
 \item{verbose}{logical. Should status messages be displayed? (default: TRUE).}
 

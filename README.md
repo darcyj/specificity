@@ -5,17 +5,20 @@ R package for analyzing specificity in ecological data
 
 
 by John L. Darcy
-Updated 23 JUL 2021
+Updated 27 JUL 2023
 
 ## What is "specificity"?
 The word "specificity" is often used in the context of host-parasite interactions. For example, a parasite may be "specific" to a narrow phylogenetic group of hosts. This is phylogenetic specificity. However, in this R package I define specificity more broadly: a species has specificity to a variable when that species occupies a limited range of that variable. A species may have specificity to elevation if it can only be found within a narrow elevational band. With this software, you can compute specificity for many species at once, to different types of variables including vectors (e.g. elevation), matrices (e.g. pairwise geographic distance), ontologies, and phylogenies. This R package can be used to analyze patterns of ecological specificity, particularly in microbiome data. Please check out the tutorial vignette in the `vignette` folder of this repository, which will walk you through the use of this software. 
 
 ## Installation
-There are two ways to install this package. The first is to compile it from source (this repository), and the second is to install a pre-compiled binary. Binaries are currently available for Mac OS (64 bit) and for Linux (64 bit).
 
-**Compiling:** To compile and install, make sure that R has packages `remotes` and `Rcpp` installed. `Remotes` is part of `devtools`, so if you have that, you should be good. You can install it by running `install.packages("remotes")`. For installing `Rcpp`, linux users should be fine with `install.packages("Rcpp")`, but apparently Mac OS users may experience difficulty and need to install with a pre-compiled binary instead. Otherwise, load `remotes` using `library("remotes")` and then install `specificity` using `install_github("darcyj/specificity")`. 
+```{r}
+install.packages("remotes")
+remotes::install_github("darcyj/specificity")
+```
+## Alternate Installation
 
-**Pre-compiled:** To install `specificity` using a pre-compiled binary, head over to https://github.com/darcyj/specificity_builds. Download the build that matches your OS, and install it from terminal using `R CMD INSTALL specificity_blahblahblah.tgz`.
+pre-compiled binaries are available at https://github.com/darcyj/specificity_builds. Download the build that matches your OS, and install it from terminal using `R CMD INSTALL specificity_blahblahblah.tgz`.
 
 ## Requirements
 `specificity` needs a few R packages to run. They should be installed automatically when you run the above. In case they aren't, you'll need:

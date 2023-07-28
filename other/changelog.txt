@@ -80,3 +80,5 @@
 0.1.16.9000 // 2022 JUN 22
   * added checks for forked parallel use on Windows, as well as warning messages.
   * changed tests to use just 1 core on windows machines.
+0.1.16.9000 // 2022 JUN 22
+  * bug fix in tree2mat() that affected using phylogenies in phy_or_env_spec() on windows

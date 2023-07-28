@@ -24,12 +24,12 @@ phy_or_env_spec(
 )
 }
 \arguments{
-\item{abunds_mat}{matrix or data frame of numeric values. Columns represent 
+\item{abunds_mat}{matrix or data frame of numeric values. Columns represent
 species, rows are samples. For columns where the value is nonzero for two or
-fewer data points, specificity cannot be calculated, and NAs will be 
+fewer data points, specificity cannot be calculated, and NAs will be
 returned. Negative values in abunds_mat are not allowed (REQUIRED).}
 
-\item{env}{numeric vector, dist, or square matrix. Environmental variable 
+\item{env}{numeric vector, dist, or square matrix. Environmental variable
 corresponding to abunds. For example, temperature, or geographic distance.
 Not required for computing phylogenetic specificity. If square matrix provided,
 note that only the lower triangle will be used (default: NULL).}
@@ -40,7 +40,7 @@ required if calculating phylogenetic specificity (default: NULL).}
 \item{hosts_phylo}{phylo object. Tree containing all unique hosts as tips. Only
 required if calculating phylogenetic specificity (default: NULL).}
 
-\item{n_sim}{integer. Number of simulations of abunds_mat to do under the null 
+\item{n_sim}{integer. Number of simulations of abunds_mat to do under the null
 hypothesis that host or environmental association is random. P-values will not
 be calculated if n_sim < 100 (default: 500).}
 
@@ -49,7 +49,7 @@ on P-values. Can take any valid method argument to p.adjust, including "none",
 "bonferroni", "holm", "fdr", and others (default: "fdr").}
 
 \item{seed}{integer. Seed to use so that this is repeatable. Same seed will be
-used for each species in abunds_mat, so all species will experience the same 
+used for each species in abunds_mat, so all species will experience the same
 permutations. This can be disabled by setting seed=0, which will make permutation
 is both non deterministic (not repeatable) AND each species will experience
 different permutations (default: 1234557).}
@@ -76,7 +76,7 @@ that denominator type does NOT affect P-values.
   \item{"ses":}{
     d for species s is calculated as the standard deviation of RQE values
     calculated from permuted species weights. This makes the output specificity
-    a standardized effect size (SES). Unfortunately, this makes SES 
+    a standardized effect size (SES). Unfortunately, this makes SES
     counterintuitively sensitive to occupancy, where species with high occupancy
     have more extreme SES than rare species, due to their more deterministic sim
     specificities. Included for comparative purposes, not suggested.
@@ -87,7 +87,7 @@ that denominator type does NOT affect P-values.
     from different variables are not comparable, since it is not scale-invariant to
     env or hosts_phylo. It not scale-invariant to the species weights in aunds_mat,
     either. Not sensitive to number of samples. Not suggested because units are
-    strange, and isn't comparable between variables. 
+    strange, and isn't comparable between variables.
   }
   \item{"index":}{
     d is the center of simulated (permuted) RQE values for species that have stronger
@@ -96,25 +96,25 @@ that denominator type does NOT affect P-values.
     specificity, where a species is associated with zero environmental variability.
     In the euclidean sense, this could be a species that is always found at the
     exact same elevation or the exact same pH. For species that have weaker specificity
-    than expected by chance, d is x minus the center (see above) of simulated RQE 
+    than expected by chance, d is x minus the center (see above) of simulated RQE
     values, where x is the maximum possible dissimilarity observable given species
     weights. x is estimated using a genetic algorithm. This d has
     other useful properties: scale invariance to env/hosts_phylo, insensitivity to
-    the number of samples, insensitivity to occupancy, and strong sensitivity to 
+    the number of samples, insensitivity to occupancy, and strong sensitivity to
     specificity (default).
   }
   \item{"sim_center":}{
     d is always the center of simulated (permuted) RQE values. For species that have
-    stronger specificity than expected by chance, this will return the same Spec 
+    stronger specificity than expected by chance, this will return the same Spec
     values as "index". For species with weaker specificity than expected by chance,
     instead of values that range between 0 and 1, they will range between 0 and Inf.
-    This is much faster than "index" because the genetic algorithm is not used. So 
+    This is much faster than "index" because the genetic algorithm is not used. So
     if species with weaker specificity than expected by chance are not interesting
     to you, this may be a good option.
   }
 }}
 
-\item{diagnostic}{logical. If true, changes output to include different parts of Spec. 
+\item{diagnostic}{logical. If true, changes output to include different parts of Spec.
 This includes Pval, Spec, raw, denom, emp, and all sim values with column labels as
 simN where N is the number of sims (default: FALSE)}
 
@@ -132,10 +132,10 @@ data.frame where each row is an input species. First column is P-value
   ($Pval), second column is specificity ($Spec).
 }
 \description{
-Calculates species' specificities to either a 1-dimensional variable (vector), 
+Calculates species' specificities to either a 1-dimensional variable (vector),
 2-dimensional variable (matrix), or to a phylogeny. Transforms all variable
 input types into a matrix D, and calculates specificity by comparing empirical
-Rao's Quadratic Entropy to simulated RQE (same but with permuted abundances). 
+Rao's Quadratic Entropy to simulated RQE (same but with permuted abundances).
 By default (denom_type = "index"), an index is calculated from emp and sim
 values such that Spec=0 indicates random assortment (null hypothesis), and more
 negative values indicate stronger specificity.
@@ -147,16 +147,16 @@ negative values indicate stronger specificity.
 # m <- occ_threshold(prop_abund(otutable), 20)
 # # create list to hold phy_or_env_spec outputs
 # specs_list <- list()
-# 
+#
 # # phylogenetic specificity using endophyte data set
 # specs_list$host <- phy_or_env_spec(
 #     abunds_mat=m,
-#     hosts=metadata$PlantGenus, 
+#     hosts=metadata$PlantGenus,
 #     hosts_phylo=supertree,
 #     n_sim=100, p_method="gamma_fit",
 #     n_cores=4
 # )
-# 
+#
 # # environmental specificity using elevation from endophyte data set:
 # specs_list$elev <- phy_or_env_spec(
 #     abunds_mat=m,
@@ -164,7 +164,7 @@ negative values indicate stronger specificity.
 #     n_sim=100, p_method="gamma_fit",
 #     n_cores=4
 # )
-# 
+#
 # # geographic specificity using spatial data from endophyte data set:
 # specs_list$geo <- phy_or_env_spec(
 #     abunds_mat=m,
@@ -172,7 +172,7 @@ negative values indicate stronger specificity.
 #     n_sim=100, p_method="gamma_fit",
 #     n_cores=4
 # )
-# 
+#
 # plot_specs_violin(specs_list, cols=c("forestgreen", "red", "black"))
 
 }
@@ -180,9 +180,9 @@ negative values indicate stronger specificity.
 \itemize{
   \item Poulin et al. (2011) Host specificity in phylogenetic and geographic
     space. Trends Parasitol 8:355-361. doi: 10.1016/j.pt.2011.05.003
-  \item Rao CR (2010) Quadratic entropy and analysis of diversity. Sankhya 
+  \item Rao CR (2010) Quadratic entropy and analysis of diversity. Sankhya
     72:70-80. doi: 10.1007/s13171-010-0016-3
-  \item Rao CR (1982) Diversity and dissimilarity measurements: A unified 
+  \item Rao CR (1982) Diversity and dissimilarity measurements: A unified
     approach. Theor Popul Biol 21:24-43.
 }
 }

@@ -1,1 +1,41 @@
-[ FAIL 0 | WARN 0 | SKIP 0 | PASS 54 ]
+[ FAIL 15 | WARN 34 | SKIP 0 | PASS 2 ]
+
+══ Failed tests ═══════════════════════════════════════════════════════════════════════════════════
+── Error ('test-aggregate_specs_list.R:6:1'): (code run outside of `test_that()`) ──
+Error in `eval(code, test_env)`: lazy-load database '/home/jack/R/x86_64-pc-linux-gnu-library/4.3/specificity/R/specificity.rdb' is corrupt
+── Error ('test-circularize2dist.R:7:1'): (code run outside of `test_that()`) ──
+Error in `as.matrix(circularize2dist(months, 12))`: lazy-load database '/home/jack/R/x86_64-pc-linux-gnu-library/4.3/specificity/R/specificity.rdb' is corrupt
+Backtrace:
+    ▆
+ 1. └─base::as.matrix(circularize2dist(months, 12)) at test-circularize2dist.R:7:0
+── Error ('test-make_nested_set.R:8:1'): (code run outside of `test_that()`) ───
+Error in `eval(code, test_env)`: lazy-load database '/home/jack/R/x86_64-pc-linux-gnu-library/4.3/specificity/R/specificity.rdb' is corrupt
+── Error ('test-onto2nwk.R:12:1'): (code run outside of `test_that()`) ─────────
+Error in `ape::read.tree(text = onto2nwk(onto))`: lazy-load database '/home/jack/R/x86_64-pc-linux-gnu-library/4.3/specificity/R/specificity.rdb' is corrupt
+Backtrace:
+    ▆
+ 1. └─ape::read.tree(text = onto2nwk(onto)) at test-onto2nwk.R:12:0
+── Error ('test-pairwise_product.R:6:1'): (code run outside of `test_that()`) ──
+Error in `eval(code, test_env)`: lazy-load database '/home/jack/R/x86_64-pc-linux-gnu-library/4.3/specificity/R/specificity.rdb' is corrupt
+── Error ('test-phy_or_env_spec.R:41:1'): (code run outside of `test_that()`) ──
+Error in `eval(code, test_env)`: lazy-load database '/home/jack/R/x86_64-pc-linux-gnu-library/4.3/specificity/R/specificity.rdb' is corrupt
+── Error ('test-test-wpd.R:10:3'): wpd's pd metric matches simple branch sum ───
+Error in `eval(code, test_env)`: lazy-load database '/home/jack/R/x86_64-pc-linux-gnu-library/4.3/specificity/R/specificity.rdb' is corrupt
+── Error ('test-test-wpd.R:18:3'): wpd Hp matches manual calculation ───────────
+Error in `eval(code, test_env)`: lazy-load database '/home/jack/R/x86_64-pc-linux-gnu-library/4.3/specificity/R/specificity.rdb' is corrupt
+── Error ('test-test-wpd.R:25:3'): wpd Hp matches manual calculation, using w for weights ──
+Error in `eval(code, test_env)`: lazy-load database '/home/jack/R/x86_64-pc-linux-gnu-library/4.3/specificity/R/specificity.rdb' is corrupt
+── Error ('test-test-wpd.R:34:3'): wpd_table matches manual calculation ────────
+Error in `eval(code, test_env)`: lazy-load database '/home/jack/R/x86_64-pc-linux-gnu-library/4.3/specificity/R/specificity.rdb' is corrupt
+── Error ('test-tree2mat.R:14:2'): tree2mat matches ape::cophenetic.phylo ──────
+Error in `eval(code, test_env)`: lazy-load database '/home/jack/R/x86_64-pc-linux-gnu-library/4.3/specificity/R/specificity.rdb' is corrupt
+── Error ('test-wpd.R:10:2'): wpd's pd metric matches simple branch sum ────────
+Error in `eval(code, test_env)`: lazy-load database '/home/jack/R/x86_64-pc-linux-gnu-library/4.3/specificity/R/specificity.rdb' is corrupt
+── Error ('test-wpd.R:18:2'): wpd Hp matches manual calculation ────────────────
+Error in `eval(code, test_env)`: lazy-load database '/home/jack/R/x86_64-pc-linux-gnu-library/4.3/specificity/R/specificity.rdb' is corrupt
+── Error ('test-wpd.R:25:2'): wpd Hp matches manual calculation, using w for weights ──
+Error in `eval(code, test_env)`: lazy-load database '/home/jack/R/x86_64-pc-linux-gnu-library/4.3/specificity/R/specificity.rdb' is corrupt
+── Error ('test-wpd.R:34:2'): wpd_table matches manual calculation ─────────────
+Error in `eval(code, test_env)`: lazy-load database '/home/jack/R/x86_64-pc-linux-gnu-library/4.3/specificity/R/specificity.rdb' is corrupt
+
+[ FAIL 15 | WARN 34 | SKIP 0 | PASS 2 ]

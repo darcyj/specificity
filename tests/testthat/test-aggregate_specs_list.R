@@ -9,10 +9,11 @@ otutable <- occ_threshold(otutable, 30)
 # define n cores parameter
 ncores <- ifelse(.Platform$OS.type == "unix", yes=2, no=1) # for CRAN check
 
-# make data - use index_rough to make it faster 
+# make data - use index_rough to make it faster
 specs_list <- list()
-specs_list$elevation <- phy_or_env_spec(otutable, endophyte$metadata$Elevation, 
+specs_list$elevation <- phy_or_env_spec(otutable, endophyte$metadata$Elevation,
 	n_sim=100, n_cores=ncores, denom_type="sim_center")
+
 specs_list$rainfall <- phy_or_env_spec(otutable, endophyte$metadata$Rainfall,
 	n_sim=100, n_cores=ncores, denom_type="sim_center")
 
@@ -78,3 +79,4 @@ specs_list$rainfall <- phy_or_env_spec(otutable, endophyte$metadata$Rainfall,
 
 		expect_true(all(ag_reg$tax == ag_perm$tax))
 	})
+

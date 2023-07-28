@@ -80,7 +80,7 @@ tree2mat <- function(tree, x, n_cores=1 ){
 	tree <- ape::keep.tip(tree, x)
 
 	# make nested set object
-	ns <- make_nested_set(tree)
+	ns <- make_nested_set(tree, n_cores)
 
 	# wrapper function for bl_distance_ns that takes an item in uniquecomps as 1st arg
 	d_ab <- function(ab, treei=tree, nsi=ns){
